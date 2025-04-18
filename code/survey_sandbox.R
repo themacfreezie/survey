@@ -52,7 +52,7 @@ stel_pop <- ggplot(nosa_stel, aes(x=calyear, y=lnnosa, group=popid)) +
 
 ORabundance <- chin_pop/coho_pop/stel_pop
 
-ggsave(here("output", "abundance.png"), plot=ORabundance, device="png", dpi=300,
+ggsave(here("output", "abundance.jpeg"), plot=ORabundance, device="jpeg",
        width = 15, height = 25)
 
 # two datasets to be set wide - counts (yt) and methods and pdo (dt)
