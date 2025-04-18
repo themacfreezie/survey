@@ -4,10 +4,16 @@ library(here)
 library(MARSS)
 library(marssTMB)
 library(panelr)
+library(patchwork)
 library(readxl)
+library(showtext)
+library(tidyverse)
 
 here::i_am("code/survey_sandbox.R")
 options(max.print=2000)
+
+showtext_auto()
+showtext_opts(dpi=300)
 
 # import data
 nosa <- read_excel(here("data", "bills_nosa_data.xlsx"))
@@ -20,6 +26,34 @@ methods <- read_excel(here("data", "METHODS_ODFW_Recompiled2_and_figs.xlsx"), sh
 nosa_chin <- nosa %>% filter(species=="chin")
 nosa_coho <- nosa %>% filter(species=="coho")
 nosa_stel <- nosa %>% filter(species=="steel")
+
+# some plots
+chin_pop <- ggplot(nosa_chin, aes(x=calyear, y=lnnosa, group=popid)) +
+  geom_line(color = nosa_chin$popid) +
+  labs(x = "",
+       y = "",
+       title = "Oregon salmonid populations",
+       subtitle = "Chinook") +
+  theme_classic()
+
+coho_pop <- ggplot(nosa_coho, aes(x=calyear, y=lnnosa, group=popid)) +
+  geom_line(color = nosa_coho$popid) +
+  labs(x = "",
+       y = "ln(Natural-origin Abundance)",
+       subtitle = "coho") +
+  theme_classic()
+
+stel_pop <- ggplot(nosa_stel, aes(x=calyear, y=lnnosa, group=popid)) +
+  geom_line(color = nosa_stel$popid) +
+  labs(x = "",
+       y = "",
+       subtitle = "steelhead") +
+  theme_classic()
+
+ORabundance <- chin_pop/coho_pop/stel_pop
+
+ggsave(here("output", "abundance.png"), plot=ORabundance, device="png", dpi=300,
+       width = 15, height = 25)
 
 # two datasets to be set wide - counts (yt) and methods and pdo (dt)
 nosa_chin_ct <- nosa_chin[-c(2, 4, 6:48)]
@@ -84,7 +118,7 @@ nosa_stel_mt <- panel_data(nosa_stel_mt, id = popid, wave = calyear)
 nosa_stel_mtW <- widen_panel(nosa_stel_mt, separator = "_")
 
 # build stacked matrix of binary indicators for survey methods
-species <- list(chin, coho, stel)
+species <- list("chin", "coho", "stel")
 
 for (j in species){
 popid_j <- as.data.frame(nosa_j_ctW$popid)
