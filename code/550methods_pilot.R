@@ -4,9 +4,8 @@ library(here)
 library(MARSS)
 library(marssTMB)
 library(panelr)
-library(patchwork)
 library(readxl)
-library(showtext)
+library(stringr)
 library(tidyverse)
 
 here::i_am("code/survey_sandbox.R")
@@ -17,7 +16,6 @@ showtext_opts(dpi=300)
 
 # import data
 nosa <- read_excel(here("data", "bills_nosa_data.xlsx"))
-methods <- read_excel(here("data", "METHODS_ODFW_Recompiled2_and_figs.xlsx"), sheet = "data-wide")
 
 # we'll look at coho
 nosa_chin <- nosa %>% filter(species=="chin")
@@ -46,7 +44,27 @@ data <- widen_panel(data, separator = "_")
 
 # some resorting and cleaning
 data <- data[,order(colnames(data))]
-data_rows <- data$popmethod
+data_rows <- as.data.frame(stringr::str_split_fixed(data$popmethod, "_", 2))
+colnames(data_rows) <- c("popid", "method")
 data <- data[-c(44)]
 colnames(data) <- substr(colnames(data), 8, 11)
 years <- colnames(data)
+data <- as.matrix(data)
+
+# constructing R and a and Z
+# R
+n <- nrow(data)
+R.model <- matrix(list(0), n, n)
+diag(R.model) <- paste0("r", data_rows$method)
+
+# a
+a.model <- matrix(paste0("a", data_rows$method))
+scale <- "a21"
+  # sets relative value against which other survey methods will be scaled
+a.model[a.model == scale] <- 0
+
+# Z
+pops <- c(unique(data_rows$popid))
+for(i in pops){
+  data_rows$assign(paste("pop_", i, sep=""), ifelse(data_rows$popid == i, 1, 0))
+}
