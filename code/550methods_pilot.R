@@ -11,9 +11,6 @@ library(tidyverse)
 here::i_am("code/survey_sandbox.R")
 options(max.print=2000)
 
-showtext_auto()
-showtext_opts(dpi=300)
-
 # import data
 nosa <- read_excel(here("data", "bills_nosa_data.xlsx"))
 
@@ -26,7 +23,8 @@ unique(nosa_chin$method)
 
 # selecting two populations with some overlapping methods
 table(nosa_chin$popid, nosa_chin$method)
-pilot <- nosa_chin %>% filter(popid==8|popid==11)
+# pilot <- nosa_chin %>% filter(popid==8|popid==11)
+pilot <- nosa_chin
 
 # throw away junk
 pilot <- pilot[-c(2, 4, 6:10, 12, 14:48)]
@@ -58,10 +56,14 @@ R.model <- matrix(list(0), n, n)
 diag(R.model) <- paste0("r", data_rows$method)
 
 # a
-a.model <- matrix(paste0("a", data_rows$method))
-scale <- "a21"
+a.model <- matrix(0, n, 1)
+scale <- "21"
   # sets relative value against which other survey methods will be scaled
-a.model[a.model == scale] <- 0
+for(i in 1:length(a.model)){
+  if(data_rows$method[i] != scale){
+    a.model[i] <- paste0("a", data_rows$method[i])
+  }
+}
 
 # Z
 pops <- c(unique(data_rows$popid))
@@ -83,4 +85,8 @@ mod.list <- list(
   tinitx = 0
 )
 
-ssm <- MARSS(data, model = mod.list, method = "kem" )
+# controls
+con.list <- list(maxit = 3000, allow.degen = TRUE)
+
+# run MARSS model
+ssm <- MARSS(data, model = mod.list, method = "kem", control = con.list)
