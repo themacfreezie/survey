@@ -65,6 +65,22 @@ a.model[a.model == scale] <- 0
 
 # Z
 pops <- c(unique(data_rows$popid))
-for(i in pops){
-  data_rows$assign(paste("pop_", i, sep=""), ifelse(data_rows$popid == i, 1, 0))
+Z.model <- matrix(0, nrow=nrow(data), ncol=length(unique(data_rows$popid)))
+for(i in seq(length(pops))){
+  Z.model[data_rows$popid == pops[i], i] <- 1
 }
+
+# model list
+mod.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "diagonal and unequal",
+  Z = Z.model,
+  A = a.model,
+  R = R.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
+ssm <- MARSS(data, model = mod.list, method = "kem" )
