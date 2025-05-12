@@ -79,7 +79,7 @@ diag(R.model) <- paste0("r", data_rows$method)
 # a
 scale <- "21"
   # sets relative value against which other survey methods will be scaled
-a.model <- matrix(0, n, 1)
+a.model <- matrix(list(0), n, 1)
 for(i in 1:length(a.model)){
   if(data_rows$method[i] != scale){
     a.model[i] <- paste0("a", data_rows$method[i])
