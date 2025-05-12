@@ -14,8 +14,29 @@ options(max.print=2000)
 # import data
 nosa <- read_excel(here("data", "bills_nosa_data.xlsx"))
 
-# we'll look at coho
+# some exploratory tables
+table(nosa$species, nosa$popid)
+table(nosa$species, nosa$method)
+methodsTable <- nosa %>% 
+  pivot_wider(names_from = "calyear", values_from = "method", id_cols = "popid")
+print(methodsTable)
+
+# different species
 nosa_chin <- nosa %>% filter(species=="chin")
+nosa_coho <- nosa %>% filter(species=="coho")
+nosa_stel <- nosa %>% filter(species=="steel")
+
+methodsTable_chin <- nosa_chin %>% 
+  pivot_wider(names_from = "calyear", values_from = "method", id_cols = "popid")
+print(methodsTable_chin)
+methodsTable_coho <- nosa_coho %>% 
+  pivot_wider(names_from = "calyear", values_from = "method", id_cols = "popid")
+print(methodsTable_coho)
+methodsTable_stel <- nosa_stel %>% 
+  pivot_wider(names_from = "calyear", values_from = "method", id_cols = "popid")
+print(methodsTable_stel)
+
+# we'll look at chinook
 unique(nosa_chin$popid)
   # 27 populations
 unique(nosa_chin$method)
@@ -23,18 +44,18 @@ unique(nosa_chin$method)
 
 # selecting two populations with some overlapping methods
 table(nosa_chin$popid, nosa_chin$method)
-# pilot <- nosa_chin %>% filter(popid==8|popid==11)
-pilot <- nosa_chin
+data <- nosa_chin %>% filter(popid==8|popid==11)
+# data <- nosa_chin
 
 # throw away junk
-pilot <- pilot[-c(2, 4, 6:10, 12, 14:48)]
+data <- data[-c(2, 4, 6:10, 12, 14:48)]
 
 # may need to clean to assure nosa = NA -> method = 0 and vice versa
 
 # new popid/method var
-pilot$popmethod <- paste0(as.character(pilot$popid),"_", as.character(pilot$method))
+data$popmethod <- paste0(as.character(data$popid),"_", as.character(data$method))
 # throw away junk
-data <- pilot[-c(1, 3, 5)]
+data <- data[-c(1, 3, 5)]
 
 # set data wide (rows = popid/method, columns = year)
 data <- panel_data(data, id = popmethod, wave = calyear)
@@ -56,9 +77,9 @@ R.model <- matrix(list(0), n, n)
 diag(R.model) <- paste0("r", data_rows$method)
 
 # a
-a.model <- matrix(0, n, 1)
 scale <- "21"
   # sets relative value against which other survey methods will be scaled
+a.model <- matrix(0, n, 1)
 for(i in 1:length(a.model)){
   if(data_rows$method[i] != scale){
     a.model[i] <- paste0("a", data_rows$method[i])
