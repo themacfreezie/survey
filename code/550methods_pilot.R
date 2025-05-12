@@ -111,3 +111,4 @@ con.list <- list(maxit = 3000, allow.degen = TRUE)
 
 # run MARSS model
 ssm <- MARSS(data, model = mod.list, method = "kem", control = con.list)
+ssm$AICc
