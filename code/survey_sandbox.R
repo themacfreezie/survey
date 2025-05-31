@@ -81,6 +81,31 @@ nosa_chin_ct <- nosa_chin_ct[-c(3)]
 nosa_coho_ct <- nosa_coho_ct[-c(3)]
 nosa_stel_ct <- nosa_stel_ct[-c(3)]
 
+# quick modeling to observe change over time
+models_chin <- nosa_chin_ct %>% 
+  group_by(popid) %>% 
+  do(model = lm(ct ~ calyear, data = .))
+models_chin$model
+for(i in 1:nrow(models_chin)){
+  print(summary(models_chin[[2]][[i]]))
+}
+
+models_coho <- nosa_coho_ct %>% 
+  group_by(popid) %>% 
+  do(model = lm(ct ~ calyear, data = .))
+models_coho$model
+for(i in 1:nrow(models_coho)){
+  print(summary(models_coho[[2]][[i]]))
+}
+
+models_stel <- nosa_stel_ct %>% 
+  group_by(popid) %>% 
+  do(model = lm(ct ~ calyear, data = .))
+models_stel$model
+for(i in 1:nrow(models_stel)){
+  print(summary(models_stel[[2]][[i]]))
+}
+
 # # standardize ln(ct) by population (state)
 # nosa_chin_ct <- nosa_chin_ct %>% 
 #   group_by(popid) %>% 
