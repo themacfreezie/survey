@@ -41,25 +41,48 @@ unique(nosa_coho$popid)
   # 27 populations
 unique(nosa_coho$method)
   # 15 methods including 0
+table(nosa_coho$method)
 
 # steelhead
 unique(nosa_stel$popid)
   # 23 populations
 unique(nosa_stel$method)
   # 18 methods including 0
+table(nosa_stel$method)
 
 # chinook
 unique(nosa_chin$popid)
   # 18 populations
 unique(nosa_chin$method)
   # 11 methods including 0
+table(nosa_chin$method)
 
 # throw away junk
 nosa_chin <- nosa_chin[-c(2, 4, 6:10, 12, 14:48)]
 nosa_coho <- nosa_coho[-c(2, 4, 6:10, 12, 14:48)]
 nosa_stel <- nosa_stel[-c(2, 4, 6:10, 12, 14:48)]
 
-# may need to clean to assure nosa = NA -> method = 0 and vice versa
+## gotta remove methods with very few observations (<10)
+# chinook
+nosa_chin <- nosa_chin[nosa_chin$method != 0, ]
+nosa_chin <- nosa_chin[nosa_chin$method != 30, ]
+
+# coho
+nosa_coho <- nosa_coho[nosa_coho$method != 0, ]
+nosa_coho <- nosa_coho[nosa_coho$method != 5, ]
+nosa_coho <- nosa_coho[nosa_coho$method != 6, ]
+nosa_coho <- nosa_coho[nosa_coho$method != 12, ]
+
+# steelhead
+nosa_stel <- nosa_stel[nosa_stel$method != 0, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 20, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 24, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 25, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 26, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 27, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 28, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 29, ]
+nosa_stel <- nosa_stel[nosa_stel$method != 31, ]
 
 # new popid/method var
 nosa_chin$popmethod <- paste0(as.character(nosa_chin$popid),"_", as.character(nosa_chin$method))
@@ -114,8 +137,9 @@ R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 
 # a
-scale <- "11"
+scale <- "15"
   # sets relative value against which other survey methods will be scaled
+  # 15 -> MArk-Recapture estimate at weird
 a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(a_chin.model)){
   if(nosa_chin_rows$method[i] != scale){
@@ -159,8 +183,9 @@ R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(R_coho.model) <- paste0("r", nosa_coho_rows$method)
 
 # a
-scale <- "11"
+scale <- "10"
   # sets relative value against which other survey methods will be scaled
+  # 10 -> Dam counts (Video)
 a_coho.model <- matrix(list(0), n_coho, 1)
 for(i in 1:length(a_coho.model)){
   if(nosa_coho_rows$method[i] != scale){
@@ -204,8 +229,9 @@ R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
 
 # a
-scale <- "11"
-# sets relative value against which other survey methods will be scaled
+scale <- "14"
+  # sets relative value against which other survey methods will be scaled
+  # 14 -> in-river weir count
 a_stel.model <- matrix(list(0), n_stel, 1)
 for(i in 1:length(a_stel.model)){
   if(nosa_stel_rows$method[i] != scale){
