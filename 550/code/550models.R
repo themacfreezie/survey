@@ -1,5 +1,4 @@
 ## SET WORKING DIR & PACKAGES
-
 library(here)
 library(MARSS)
 library(marssTMB)
@@ -8,11 +7,11 @@ library(readxl)
 library(stringr)
 library(tidyverse)
 
-here::i_am("code/550models.R")
+# here::i_am("code/550models.R")
 options(max.print=2000)
 
 # import data
-nosa <- read_excel(here("data", "bills_nosa_data.xlsx"))
+nosa <- read_excel(here("550", "data", "bills_nosa_data.xlsx"))
 
 # some exploratory tables
 table(nosa$species, nosa$popid)
@@ -145,12 +144,12 @@ mod_chin.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "ssm_chin.rds"))){
+if(!file.exists(here::here("550", "data", "ssm_chin.rds"))){
   ssm_chin <- MARSS(nosa_chin, model = mod_chin.list, method = "kem", control = con.list)
-  saveRDS(ssm_chin, file=here::here("data", "ssm_chin.rds"))
+  saveRDS(ssm_chin, file=here::here("550", "data", "ssm_chin.rds"))
 }
 # load in ssm_chin
-ssm_chin <- readRDS(file=here::here("data", "ssm_chin.rds"))
+ssm_chin <- readRDS(file=here::here("550", "data", "ssm_chin.rds"))
 
 ## model coho
 # constructing R and a and Z
@@ -190,12 +189,12 @@ mod_coho.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "ssm_coho.rds"))){
+if(!file.exists(here::here("550", "data", "ssm_coho.rds"))){
   ssm_coho <- MARSS(nosa_coho, model = mod_coho.list, method = "kem", control = con.list)
-  saveRDS(ssm_coho, file=here::here("data", "ssm_coho.rds"))
+  saveRDS(ssm_coho, file=here::here("550", "data", "ssm_coho.rds"))
 }
 # load in ssm_coho
-ssm_coho <- readRDS(file=here::here("data", "ssm_coho.rds"))
+ssm_coho <- readRDS(file=here::here("550", "data", "ssm_coho.rds"))
 
 ## model steelhead
 # constructing R and a and Z
@@ -235,12 +234,9 @@ mod_stel.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "ssm_stel.rds"))){
+if(!file.exists(here::here("550", "data", "ssm_stel.rds"))){
   ssm_stel <- MARSS(nosa_stel, model = mod_stel.list, method = "kem", control = con.list)
-  saveRDS(ssm_stel, file=here::here("data", "ssm_stel.rds"))
+  saveRDS(ssm_stel, file=here::here("550", "data", "ssm_stel.rds"))
 }
 # load in ssm_stel
-ssm_stel <- readRDS(file=here::here("data", "ssm_stel.rds"))
-
-# # AICc
-# ssm_chin$AICc
+ssm_stel <- readRDS(file=here::here("550", "data", "ssm_stel.rds"))
