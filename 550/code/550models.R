@@ -128,6 +128,7 @@ nosa_stel <- as.matrix(nosa_stel)
 
 # set controls
 con.list <- list(maxit = 5000, allow.degen = TRUE)
+scale <- "11"
 
 ## model chinook
 # constructing R and a and Z
@@ -137,7 +138,7 @@ R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 
 # a
-scale <- "15"
+# scale <- "15"
   # sets relative value against which other survey methods will be scaled
   # 15 -> MArk-Recapture estimate at weird
 a_chin.model <- matrix(list(0), n_chin, 1)
@@ -183,7 +184,7 @@ R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(R_coho.model) <- paste0("r", nosa_coho_rows$method)
 
 # a
-scale <- "10"
+# scale <- "10"
   # sets relative value against which other survey methods will be scaled
   # 10 -> Dam counts (Video)
 a_coho.model <- matrix(list(0), n_coho, 1)
@@ -229,7 +230,7 @@ R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
 
 # a
-scale <- "14"
+# scale <- "14"
   # sets relative value against which other survey methods will be scaled
   # 14 -> in-river weir count
 a_stel.model <- matrix(list(0), n_stel, 1)

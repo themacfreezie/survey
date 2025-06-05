@@ -46,6 +46,29 @@ methods_pct <- methods_ct %>%
   mutate(percentage = n / sum(n))
 
 # plot
+lines <- ggplot(data=methods_ct) + aes(x=year, y=Method, group=value, color=Group) + 
+  geom_line(size = 1) +
+  theme(axis.title.x =element_blank()) +
+  labs(x = "",
+       y='Survey Method',
+       title='Use of Salmonid Survey Methods in Oregon',
+       subtitle='1980-2022') +
+  scale_x_continuous(expand = c(0, 0), 
+                     breaks = c(1980, 1990, 2000, 2010, 2020)) +
+  scale_fill_discrete(name = "Method Group") +
+  scale_color_manual(values = c("#c1a13c",
+                               "#c772c5",
+                               "#5b3c90",
+                               "#b85c37",
+                               "#b94656",
+                               "#b0457b",
+                               "#729a43",
+                               "#6d85db",
+                               "#4dc48f")) +
+  theme_classic()
+lines <- lines + guides(color=guide_legend(title="Method Group"))
+lines
+
 survey <- ggplot(data=methods_ctGROUP) + aes(x=year, y=freq, fill=Group) + 
   geom_area(alpha=0.6 , size=.1, colour=NA) +
   theme(axis.title.x =element_blank()) +
@@ -56,7 +79,7 @@ survey <- ggplot(data=methods_ctGROUP) + aes(x=year, y=freq, fill=Group) +
   scale_x_continuous(expand = c(0, 0), 
                      breaks = c(1980, 1990, 2000, 2010, 2020)) + 
   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) + 
-  scale_fill_discrete(name = "Survey Method") +
+  scale_fill_discrete(name = "Method Group") +
   scale_fill_manual(values = c("#c1a13c",
                                "#c772c5",
                                "#5b3c90",
@@ -67,9 +90,10 @@ survey <- ggplot(data=methods_ctGROUP) + aes(x=year, y=freq, fill=Group) +
                                "#6d85db",
                                "#4dc48f")) +
   theme_classic()
-survey <- survey + guides(fill=guide_legend(title="Survey Method"))
+survey <- survey + guides(fill=guide_legend(title="Method Group"))
 survey
 
-ggsave(here("output", "survey.png"), plot=survey, device="png", dpi=300)
+ggsave(here("550", "output", "lines.png"), plot=lines, device="png", dpi=300)
+ggsave(here("550", "output", "survey.png"), plot=survey, device="png", dpi=300)
 
 # scale_color_manual(values = c("salmon", "orange3", "gold3", "darkolivegreen3", "green4","cyan4", "darkblue", "darkorchid", "darkslateblue")) +
