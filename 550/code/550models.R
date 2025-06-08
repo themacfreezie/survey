@@ -128,7 +128,8 @@ nosa_stel <- as.matrix(nosa_stel)
 
 # set controls
 con.list <- list(maxit = 5000, allow.degen = TRUE)
-scale <- "11"
+# scale <- "11"
+  # universal scale  
 
 ## model chinook
 # constructing R and a and Z
@@ -138,7 +139,7 @@ R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 
 # a
-# scale <- "15"
+scale <- "15"
   # sets relative value against which other survey methods will be scaled
   # 15 -> MArk-Recapture estimate at weird
 a_chin.model <- matrix(list(0), n_chin, 1)
@@ -169,12 +170,12 @@ mod_chin.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("550", "data", "ssm_chin.rds"))){
+if(!file.exists(here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))){
   ssm_chin <- MARSS(nosa_chin, model = mod_chin.list, method = "kem", control = con.list)
-  saveRDS(ssm_chin, file=here::here("550", "data", "ssm_chin.rds"))
+  saveRDS(ssm_chin, file=here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))
 }
 # load in ssm_chin
-ssm_chin <- readRDS(file=here::here("550", "data", "ssm_chin.rds"))
+ssm_chin <- readRDS(file=here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))
 
 ## model coho
 # constructing R and a and Z
@@ -184,7 +185,7 @@ R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(R_coho.model) <- paste0("r", nosa_coho_rows$method)
 
 # a
-# scale <- "10"
+scale <- "10"
   # sets relative value against which other survey methods will be scaled
   # 10 -> Dam counts (Video)
 a_coho.model <- matrix(list(0), n_coho, 1)
@@ -215,12 +216,12 @@ mod_coho.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("550", "data", "ssm_coho.rds"))){
+if(!file.exists(here::here("550", "data", paste("ssm_cohoM", scale, ".rds", sep="")))){
   ssm_coho <- MARSS(nosa_coho, model = mod_coho.list, method = "kem", control = con.list)
-  saveRDS(ssm_coho, file=here::here("550", "data", "ssm_coho.rds"))
+  saveRDS(ssm_coho, file=here::here("550", "data", paste("ssm_cohoM", scale, ".rds", sep="")))
 }
 # load in ssm_coho
-ssm_coho <- readRDS(file=here::here("550", "data", "ssm_coho.rds"))
+ssm_coho <- readRDS(file=here::here("550", "data", paste("ssm_cohoM", scale, ".rds", sep="")))
 
 ## model steelhead
 # constructing R and a and Z
@@ -230,7 +231,7 @@ R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
 
 # a
-# scale <- "14"
+scale <- "14"
   # sets relative value against which other survey methods will be scaled
   # 14 -> in-river weir count
 a_stel.model <- matrix(list(0), n_stel, 1)
@@ -261,9 +262,9 @@ mod_stel.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("550", "data", "ssm_stel.rds"))){
+if(!file.exists(here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))){
   ssm_stel <- MARSS(nosa_stel, model = mod_stel.list, method = "kem", control = con.list)
-  saveRDS(ssm_stel, file=here::here("550", "data", "ssm_stel.rds"))
+  saveRDS(ssm_stel, file=here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))
 }
 # load in ssm_stel
-ssm_stel <- readRDS(file=here::here("550", "data", "ssm_stel.rds"))
+ssm_stel <- readRDS(file=here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))
