@@ -1,4 +1,7 @@
 aerial_survey - Nic McPhee
+chinook _ Bureau of Land Management
+coho - Animalia
+grand coulee - Ken Lund
 net_survey - Bureau of Land Management
 razorback_PIT - US Fish and Wildlife Service
 snorkel_survey - National Parks Gallery
