@@ -2,7 +2,9 @@ aerial_survey - Nic McPhee
 chinook _ Bureau of Land Management
 coho - Animalia
 columbia - Ashish Jain
+evenmore_chinook - Pacific Northwest National Laboratory
 grand coulee - Ken Lund
+more_chinook - Pacific Northwest National Laboratory
 net_survey - Bureau of Land Management
 PIT_tag - Jake/Insidiator
 razorback_PIT - US Fish and Wildlife Service
