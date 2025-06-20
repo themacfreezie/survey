@@ -1,8 +1,10 @@
 aerial_survey - Nic McPhee
 chinook _ Bureau of Land Management
 coho - Animalia
+columbia - Ashish Jain
 grand coulee - Ken Lund
 net_survey - Bureau of Land Management
+PIT_tag - Jake/Insidiator
 razorback_PIT - US Fish and Wildlife Service
 snorkel_survey - National Parks Gallery
 sockeye_weir - Wikipedia Commons
