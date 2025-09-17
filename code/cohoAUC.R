@@ -6,7 +6,6 @@
 ## SET WORKING DIR & PACKAGES
 library(here)
 library(MARSS)
-library(marssTMB)
 library(panelr)
 library(readxl)
 library(stringr)
@@ -16,7 +15,7 @@ library(tidyverse)
 options(max.print=2000)
 
 # import data
-nosa <- read_excel(here("550", "data", "bills_nosa_data.xlsx"))
+nosa <- read_excel(here("data", "bills_nosa_data.xlsx"))
 
 # some exploratory tables
 table(nosa$species, nosa$popid)
@@ -57,24 +56,14 @@ nosa_coho <- nosa_coho[-c(2, 4, 6:10, 12, 14:48)]
 nosa_coho <- nosa_coho[nosa_coho$method != 7, ]
   # some obs with method 7 in pop 113 to be dropped
 
-# create data set for 2 method (combining 1&2)
-nosa_coho2 <- nosa_coho
-nosa_coho2$method[nosa_coho2$method == 2] <- 1
-
 # new popid/method var
 nosa_coho$popmethod <- paste0(as.character(nosa_coho$popid),"_", as.character(nosa_coho$method))
 # throw away more junk
 nosa_coho <- nosa_coho[-c(1, 3, 5)]
 
-nosa_coho2$popmethod <- paste0(as.character(nosa_coho2$popid),"_", as.character(nosa_coho2$method))
-nosa_coho2 <- nosa_coho2[-c(1, 3, 5)]
-
 # set data wide (rows = popid/method, columns = year)
 nosa_coho <- panel_data(nosa_coho, id = popmethod, wave = calyear)
 nosa_coho <- widen_panel(nosa_coho, separator = "_")
-
-nosa_coho2 <- panel_data(nosa_coho2, id = popmethod, wave = calyear)
-nosa_coho2 <- widen_panel(nosa_coho2, separator = "_")
 
 # resorting and cleaning
 nosa_coho <- nosa_coho[,order(colnames(nosa_coho))]
@@ -85,13 +74,6 @@ colnames(nosa_coho) <- substr(colnames(nosa_coho), 8, 11)
 years <- colnames(nosa_coho)
 nosa_coho <- as.matrix(nosa_coho)
 
-nosa_coho2 <- nosa_coho2[,order(colnames(nosa_coho2))]
-nosa_coho2_rows <- as.data.frame(stringr::str_split_fixed(nosa_coho2$popmethod, "_", 2))
-colnames(nosa_coho2_rows) <- c("popid", "method")
-nosa_coho2 <- nosa_coho2[-c(31)]
-colnames(nosa_coho2) <- substr(colnames(nosa_coho2), 8, 11)
-nosa_coho2 <- as.matrix(nosa_coho2)
-
 # set controls
 con.list <- list(maxit = 5000, allow.degen = TRUE)
 
@@ -101,10 +83,6 @@ con.list <- list(maxit = 5000, allow.degen = TRUE)
 n_coho <- nrow(nosa_coho)
 R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(R_coho.model) <- paste0("r", nosa_coho_rows$method)
-
-n_coho2 <- nrow(nosa_coho2)
-R_coho2.model <- matrix(list(0), n_coho2, n_coho2)
-diag(R_coho2.model) <- paste0("r", nosa_coho2_rows$method)
 
 # a
 scale <- "3"
@@ -117,12 +95,13 @@ for(i in 1:length(a_coho.model)){
   }
 }
 
-a_coho2.model <- matrix(list(0), n_coho2, 1)
-for(i in 1:length(a_coho2.model)){
-  if(nosa_coho2_rows$method[i] != scale){
-    a_coho2.model[i] <- paste0("a", nosa_coho2_rows$method[i])
-  }
-}
+## work on this
+# a_coho2.model <- matrix(list(0), n_coho2, 1)
+# for(i in 1:length(a_coho2.model)){
+#   if(nosa_coho2_rows$method[i] != scale){
+#     a_coho2.model[i] <- paste0("a", nosa_coho2_rows$method[i])
+#   }
+# }
 
 # Z
 pops_coho <- c(unique(nosa_coho_rows$popid))
@@ -131,11 +110,6 @@ for(i in seq(length(pops_coho))){
   Z_coho.model[nosa_coho_rows$popid == pops_coho[i], i] <- 1
 }
 
-pops_coho2 <- c(unique(nosa_coho2_rows$popid))
-Z_coho2.model <- matrix(0, nrow=nrow(nosa_coho2), ncol=length(unique(nosa_coho2_rows$popid)))
-for(i in seq(length(pops_coho2))){
-  Z_coho2.model[nosa_coho2_rows$popid == pops_coho2[i], i] <- 1
-}
 
 # model list
 mod_cohoAUC.list <- list(
@@ -150,36 +124,36 @@ mod_cohoAUC.list <- list(
   tinitx = 0
 )
 
-mod_coho2AUC.list <- list(
-  B = "identity",
-  U = "zero",
-  Q = "diagonal and unequal",
-  Z = Z_coho2.model,
-  A = a_coho2.model,
-  R = R_coho2.model,
-  x0 = "equal",
-  V0 = "zero",
-  tinitx = 0
-)
+# mod_coho2AUC.list <- list(
+#   B = "identity",
+#   U = "zero",
+#   Q = "diagonal and unequal",
+#   Z = Z_coho.model,
+#   A = a_coho2.model,
+#   R = R_coho.model,
+#   x0 = "equal",
+#   V0 = "zero",
+#   tinitx = 0
+# )
 
 # run MARSS model
-if(!file.exists(here::here("550", "data", paste("ssm_cohoAUC_M", scale, ".rds", sep="")))){
+if(!file.exists(here::here("data", paste("ssm_cohoAUC_M", scale, ".rds", sep="")))){
   ssm_cohoAUC <- MARSS(nosa_coho, model = mod_cohoAUC.list, method = "kem", control = con.list)
-  saveRDS(ssm_cohoAUC, file=here::here("550", "data", paste("ssm_cohoAUC_M", scale, ".rds", sep="")))
+  saveRDS(ssm_cohoAUC, file=here::here("data", paste("ssm_cohoAUC_M", scale, ".rds", sep="")))
 }
 # load in ssm_coho
-ssm_cohoAUC <- readRDS(file=here::here("550", "data", paste("ssm_cohoAUC_M", scale, ".rds", sep="")))
+ssm_cohoAUC <- readRDS(file=here::here("data", paste("ssm_cohoAUC_M", scale, ".rds", sep="")))
 
-# run MARSS model
-if(!file.exists(here::here("550", "data", paste("ssm_coho2AUC_M", scale, ".rds", sep="")))){
-  ssm_coho2AUC <- MARSS(nosa_coho2, model = mod_coho2AUC.list, method = "kem", control = con.list)
-  saveRDS(ssm_coho2AUC, file=here::here("550", "data", paste("ssm_coho2AUC_M", scale, ".rds", sep="")))
-}
-# load in ssm_coho
-ssm_coho2AUC <- readRDS(file=here::here("550", "data", paste("ssm_coho2AUC_M", scale, ".rds", sep="")))
+# # run MARSS model
+# if(!file.exists(here::here("data", paste("ssm_coho2AUC_M", scale, ".rds", sep="")))){
+#   ssm_coho2AUC <- MARSS(nosa_coho2, model = mod_coho2AUC.list, method = "kem", control = con.list)
+#   saveRDS(ssm_coho2AUC, file=here::here("data", paste("ssm_coho2AUC_M", scale, ".rds", sep="")))
+# }
+# # load in ssm_coho
+# ssm_coho2AUC <- readRDS(file=here::here("data", paste("ssm_coho2AUC_M", scale, ".rds", sep="")))
 
 # modular code
-mod <- ssm_coho2AUC
+mod <- ssm_cohoAUC
 
 # grab parameter estimates for a & r
 A.data <- as.data.frame(mod$par$A)
@@ -198,7 +172,7 @@ data[is.na(data)] <- 0
 plot(data$R, data$a)
 
 # pull in legend
-legend <- read_excel(here("550", "data", "method_key.xlsx"), col_names = TRUE)
+legend <- read_excel(here("data", "method_key.xlsx"), col_names = TRUE)
 legend$method <- legend$Method
 legend <- legend[-c(1,2)]
 
