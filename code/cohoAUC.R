@@ -179,7 +179,7 @@ if(!file.exists(here::here("550", "data", paste("ssm_coho2AUC_M", scale, ".rds",
 ssm_coho2AUC <- readRDS(file=here::here("550", "data", paste("ssm_coho2AUC_M", scale, ".rds", sep="")))
 
 # modular code
-mod <- ssm_coho2AUC
+mod <- ssm_cohoAUC
 
 # grab parameter estimates for a & r
 A.data <- as.data.frame(mod$par$A)
