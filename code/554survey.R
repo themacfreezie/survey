@@ -6,10 +6,10 @@ library(readxl) # read excel sheets
 library(tidyverse)
 
 # set loc
-here::i_am("code/survey.R")
+here::i_am("code/554survey.R")
 
 # grab data
-methods <- read_excel(here("data", "dat_survey", "METHODS_ODFW_Recompiled2_and_figs.xlsx"), sheet = "data-wide", col_names = TRUE)
+methods <- read_excel(here("data", "METHODS_ODFW_Recompiled2_and_figs.xlsx"), sheet = "data-wide", col_names = TRUE)
 methodsL <- melt(setDT(methods), id.vars=c("popid"), variable.name = "year")
   # set methods data long
 head(methodsL)
@@ -31,7 +31,7 @@ methods_ct$value <- as.factor(methods_ct$value)
   # set method as factor
 methods_ct <- na.omit(methods_ct)
   # drop NAs
-legend <- read_excel(here("data", "dat_survey", "method_key.xlsx"), col_names = TRUE)
+legend <- read_excel(here("data", "method_key.xlsx"), col_names = TRUE)
 legend$value <- legend$Method
   # pull in legend
 methods_ct <- merge(methods_ct, legend, by=c("value"))
