@@ -93,6 +93,7 @@ nosa_coho <- nosa_coho[-c(44)]
 colnames(nosa_coho) <- substr(colnames(nosa_coho), 8, 11)
 years <- colnames(nosa_coho)
 nosa_coho <- as.matrix(nosa_coho)
+save(nosa_coho, file=here("550", "data", "nosa_coho.rda"))
 
 nosa_stel <- nosa_stel[,order(colnames(nosa_stel))]
 nosa_stel_rows <- as.data.frame(stringr::str_split_fixed(nosa_stel$popmethod, "_", 2))
@@ -101,3 +102,4 @@ nosa_stel <- nosa_stel[-c(44)]
 colnames(nosa_stel) <- substr(colnames(nosa_stel), 8, 11)
 years <- colnames(nosa_stel)
 nosa_stel <- as.matrix(nosa_stel)
+save(nosa_stel, file=here("550", "data", "nosa_stel.rda"))
