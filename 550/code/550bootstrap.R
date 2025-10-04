@@ -182,6 +182,7 @@ ssm_chin <- readRDS(file=here::here("550", "data", paste("ssm_chinM", scale, ".r
 
 # bootstrap estimates
 boot_chin <- MARSSboot(ssm_chin, nboot=100, output="parameters", sim = "parametric")
+saveRDS(boot_chin, file=here::here("550", "data", paste("boot_chinM", scale, ".rds", sep="")))
 
 ## model steelhead
 # constructing R and a and Z
@@ -234,6 +235,7 @@ ssm_stel <- readRDS(file=here::here("550", "data", paste("ssm_stelM", scale, ".r
 
 # bootstrap estimates
 boot_stel <- MARSSboot(ssm_stel, nboot=100, output="parameters", sim = "parametric")
+saveRDS(boot_stel, file=here::here("550", "data", paste("boot_stelM", scale, ".rds", sep="")))
 
 ## model coho
 # constructing R and a and Z
@@ -286,3 +288,4 @@ ssm_coho <- readRDS(file=here::here("550", "data", paste("ssm_cohoM", scale, ".r
 
 # bootstrap estimates
 boot_coho <- MARSSboot(ssm_coho, nboot=100, output="parameters", sim = "parametric")
+saveRDS(boot_coho, file=here::here("550", "data", paste("boot_cohoM", scale, ".rds", sep="")))
