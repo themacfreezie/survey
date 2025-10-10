@@ -131,111 +131,111 @@ con.list <- list(maxit = 5000, allow.degen = TRUE)
 # scale <- "11"
 # universal scale  
 
-## model chinook
-# constructing R and a and Z
-# R
-n_chin <- nrow(nosa_chin)
-R_chin.model <- matrix(list(0), n_chin, n_chin)
-diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
-
-# a
-scale <- "15"
-# sets relative value against which other survey methods will be scaled
-# 15 -> MArk-Recapture estimate at weird
-a_chin.model <- matrix(list(0), n_chin, 1)
-for(i in 1:length(a_chin.model)){
-  if(nosa_chin_rows$method[i] != scale){
-    a_chin.model[i] <- paste0("a", nosa_chin_rows$method[i])
-  }
-}
-
-# Z
-pops_chin <- c(unique(nosa_chin_rows$popid))
-Z_chin.model <- matrix(0, nrow=nrow(nosa_chin), ncol=length(unique(nosa_chin_rows$popid)))
-for(i in seq(length(pops_chin))){
-  Z_chin.model[nosa_chin_rows$popid == pops_chin[i], i] <- 1
-}
-
-# model list
-mod_chin.list <- list(
-  B = "identity",
-  U = "zero",
-  Q = "diagonal and unequal",
-  Z = Z_chin.model,
-  A = a_chin.model,
-  R = R_chin.model,
-  x0 = "equal",
-  V0 = "zero",
-  tinitx = 0
-)
-
-# run MARSS model
-if(!file.exists(here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))){
-  ptm <- proc.time()
-  ssm_chin <- MARSS(nosa_chin, model = mod_chin.list, method = "kem", control = con.list)
-  saveRDS(ssm_chin, file=here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))
-  chin_time <- proc.time()[3] - ptm
-  chin_time
-}
-# load in ssm_chin
-ssm_chin <- readRDS(file=here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))
-
-# bootstrap estimates
-boot_chin <- MARSSboot(ssm_chin, nboot=100, output="parameters", sim = "parametric")
-saveRDS(boot_chin, file=here::here("550", "data", paste("boot_chinM", scale, ".rds", sep="")))
-
-## model steelhead
-# constructing R and a and Z
-# R
-n_stel <- nrow(nosa_stel)
-R_stel.model <- matrix(list(0), n_stel, n_stel)
-diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
-
-# a
-scale <- "14"
-# sets relative value against which other survey methods will be scaled
-# 14 -> in-river weir count
-a_stel.model <- matrix(list(0), n_stel, 1)
-for(i in 1:length(a_stel.model)){
-  if(nosa_stel_rows$method[i] != scale){
-    a_stel.model[i] <- paste0("a", nosa_stel_rows$method[i])
-  }
-}
-
-# Z
-pops_stel <- c(unique(nosa_stel_rows$popid))
-Z_stel.model <- matrix(0, nrow=nrow(nosa_stel), ncol=length(unique(nosa_stel_rows$popid)))
-for(i in seq(length(pops_stel))){
-  Z_stel.model[nosa_stel_rows$popid == pops_stel[i], i] <- 1
-}
-
-# model list
-mod_stel.list <- list(
-  B = "identity",
-  U = "zero",
-  Q = "diagonal and unequal",
-  Z = Z_stel.model,
-  A = a_stel.model,
-  R = R_stel.model,
-  x0 = "equal",
-  V0 = "zero",
-  tinitx = 0
-)
-
-# run MARSS model
-if(!file.exists(here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))){
-  ptm <- proc.time()
-  ssm_stel <- MARSS(nosa_stel, model = mod_stel.list, method = "kem", control = con.list)
-  saveRDS(ssm_stel, file=here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))
-  stel_time <- proc.time()[3] - ptm
-  stel_time
-}
-# load in ssm_stel
-ssm_stel <- readRDS(file=here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))
-
-# bootstrap estimates
-boot_stel <- MARSSboot(ssm_stel, nboot=100, output="parameters", sim = "parametric")
-saveRDS(boot_stel, file=here::here("550", "data", paste("boot_stelM", scale, ".rds", sep="")))
+# ## model chinook
+# # constructing R and a and Z
+# # R
+# n_chin <- nrow(nosa_chin)
+# R_chin.model <- matrix(list(0), n_chin, n_chin)
+# diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
+# 
+# # a
+# scale <- "15"
+# # sets relative value against which other survey methods will be scaled
+# # 15 -> MArk-Recapture estimate at weird
+# a_chin.model <- matrix(list(0), n_chin, 1)
+# for(i in 1:length(a_chin.model)){
+#   if(nosa_chin_rows$method[i] != scale){
+#     a_chin.model[i] <- paste0("a", nosa_chin_rows$method[i])
+#   }
+# }
+# 
+# # Z
+# pops_chin <- c(unique(nosa_chin_rows$popid))
+# Z_chin.model <- matrix(0, nrow=nrow(nosa_chin), ncol=length(unique(nosa_chin_rows$popid)))
+# for(i in seq(length(pops_chin))){
+#   Z_chin.model[nosa_chin_rows$popid == pops_chin[i], i] <- 1
+# }
+# 
+# # model list
+# mod_chin.list <- list(
+#   B = "identity",
+#   U = "zero",
+#   Q = "diagonal and unequal",
+#   Z = Z_chin.model,
+#   A = a_chin.model,
+#   R = R_chin.model,
+#   x0 = "equal",
+#   V0 = "zero",
+#   tinitx = 0
+# )
+# 
+# # run MARSS model
+# if(!file.exists(here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))){
+#   ptm <- proc.time()
+#   ssm_chin <- MARSS(nosa_chin, model = mod_chin.list, method = "kem", control = con.list)
+#   saveRDS(ssm_chin, file=here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))
+#   chin_time <- proc.time()[3] - ptm
+#   chin_time
+# }
+# # load in ssm_chin
+# ssm_chin <- readRDS(file=here::here("550", "data", paste("ssm_chinM", scale, ".rds", sep="")))
+# 
+# # bootstrap estimates
+# boot_chin <- MARSSboot(ssm_chin, nboot=100, output="parameters", sim = "parametric")
+# saveRDS(boot_chin, file=here::here("550", "data", paste("boot_chinM", scale, ".rds", sep="")))
+# 
+# ## model steelhead
+# # constructing R and a and Z
+# # R
+# n_stel <- nrow(nosa_stel)
+# R_stel.model <- matrix(list(0), n_stel, n_stel)
+# diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
+# 
+# # a
+# scale <- "14"
+# # sets relative value against which other survey methods will be scaled
+# # 14 -> in-river weir count
+# a_stel.model <- matrix(list(0), n_stel, 1)
+# for(i in 1:length(a_stel.model)){
+#   if(nosa_stel_rows$method[i] != scale){
+#     a_stel.model[i] <- paste0("a", nosa_stel_rows$method[i])
+#   }
+# }
+# 
+# # Z
+# pops_stel <- c(unique(nosa_stel_rows$popid))
+# Z_stel.model <- matrix(0, nrow=nrow(nosa_stel), ncol=length(unique(nosa_stel_rows$popid)))
+# for(i in seq(length(pops_stel))){
+#   Z_stel.model[nosa_stel_rows$popid == pops_stel[i], i] <- 1
+# }
+# 
+# # model list
+# mod_stel.list <- list(
+#   B = "identity",
+#   U = "zero",
+#   Q = "diagonal and unequal",
+#   Z = Z_stel.model,
+#   A = a_stel.model,
+#   R = R_stel.model,
+#   x0 = "equal",
+#   V0 = "zero",
+#   tinitx = 0
+# )
+# 
+# # run MARSS model
+# if(!file.exists(here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))){
+#   ptm <- proc.time()
+#   ssm_stel <- MARSS(nosa_stel, model = mod_stel.list, method = "kem", control = con.list)
+#   saveRDS(ssm_stel, file=here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))
+#   stel_time <- proc.time()[3] - ptm
+#   stel_time
+# }
+# # load in ssm_stel
+# ssm_stel <- readRDS(file=here::here("550", "data", paste("ssm_stelM", scale, ".rds", sep="")))
+# 
+# # bootstrap estimates
+# boot_stel <- MARSSboot(ssm_stel, nboot=100, output="parameters", sim = "parametric")
+# saveRDS(boot_stel, file=here::here("550", "data", paste("boot_stelM", scale, ".rds", sep="")))
 
 ## model coho
 # constructing R and a and Z
