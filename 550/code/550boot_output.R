@@ -1,4 +1,5 @@
 library(here)
+library(readxl)
 library(reshape2)
 library(tidyverse)
 
@@ -22,6 +23,19 @@ df <- df[, -c(18:36)]
 df_a <- df[, -c(9:17)]
 df_r <- df[, -c(1:8)]
 
+# grab mean and sd
+names_a <- colnames(df_a)
+names_r <- colnames(df_r)
+
+mean_a <- sapply(df_a, mean)
+mean_r <- sapply(df_r, mean)
+
+sd_a <- sapply(df_a, sd)
+sd_r <- sapply(df_r, sd)
+
+points_a <- data.frame(Method = names_a, mean_a = mean_a, sd_a = sd_a)
+points_r <- data.frame(Method = names_r, mean_r = mean_r, sd_r = sd_r)
+
 # adjust column names
 df_a <- melt(df_a)
 df_a$method <- as.character(df_a$variable)
@@ -30,6 +44,16 @@ df_a$method <- substr(df_a$method, 4, nchar(df_a$method))
 df_r <- melt(df_r)
 df_r$method <- as.character(df_r$variable)
 df_r$method <- substr(df_r$method, 4, nchar(df_r$method))
+
+points_a$method <- as.character(points_a$Method)
+points_a$method <- substr(points_a$method, 4, nchar(points_a$method))
+
+points_r$method <- as.character(points_r$Method)
+points_r$method <- substr(points_r$method, 4, nchar(points_r$method))
+
+points <- merge(points_a, points_r, by = "method", all.x = TRUE, all.y = TRUE)
+points <- points[-c(2,5)]
+points <- replace(points, is.na(points), 0)
 
 # # match colnames
 # matched_indices <- match(colnames(df_a), legend$method_a)
@@ -47,6 +71,9 @@ df_a <- df_a[-c(1,2)]
 df_r <- merge(df_r, legend, by = "method", all.x = TRUE, all.y = TRUE)
 df_r <- na.omit(df_r)
 df_r <- df_r[-c(1,2)]
+
+points <- merge(points, legend, by = "method", all.x = TRUE, all.y = TRUE)
+points <- na.omit(points)
 
 # box and whisker plots
 china_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) + 
@@ -89,15 +116,24 @@ chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 chinr_bplot
 
+chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
+  geom_point() +
+  geom_errorbarh(data=points, aes(xmin=(mean_r - 1.96*sd_r), xmax=(mean_r + 1.96*sd_r), y = mean_a)) +
+  geom_errorbar(data=points, aes(ymin=(mean_a - 1.96*sd_a), ymax=(mean_a + 1.96*sd_a), x = mean_r)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme_classic()
+chin_splot
+
 # modular code - coho
 mod <- boot_cohoM10
 
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(18:36)]
-df_a <- df[, -c(9:17)]
-df_r <- df[, -c(1:8)]
+df <- df[, -c(22:49)]
+df_a <- df[, -c(11:21)]
+df_r <- df[, -c(1:10)]
 
 # adjust column names
 df_a <- melt(df_a)
@@ -164,7 +200,7 @@ mod <- boot_stelM14
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(18:36)]
+df <- df[, -c(18:41)]
 df_a <- df[, -c(9:17)]
 df_r <- df[, -c(1:8)]
 
@@ -226,3 +262,4 @@ stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 stelr_bplot
+
