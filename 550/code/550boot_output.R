@@ -228,7 +228,7 @@ cohoa_bplot
 cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) + 
   geom_boxplot() +
   labs(x = NULL,
-       title='Coho Variance estimates',
+       title='Coho Variance Estimates',
        y=NULL) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c",
