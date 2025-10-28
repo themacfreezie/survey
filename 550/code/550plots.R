@@ -301,7 +301,7 @@ points <- ggplot(data=data, aes(x=R, y=a, color=Group, shape = species)) +
 points <- points + guides(color=guide_legend(title="Method Group"))
 points
 
-ggsave(here("550", "output", "chin_points.png"), plot=chin_points, device="png", dpi=300)
-ggsave(here("550", "output", "coho_points.png"), plot=coho_points, device="png", dpi=300)
-ggsave(here("550", "output", "stel_points.png"), plot=stel_points, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "chin_points.png"), plot=chin_points, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "coho_points.png"), plot=coho_points, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "stel_points.png"), plot=stel_points, device="png", dpi=300)
 

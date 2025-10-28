@@ -1,3 +1,4 @@
+library(gridExtra)
 library(here)
 library(readxl)
 library(reshape2)
@@ -401,3 +402,20 @@ stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   theme_classic()
 stel_splot
+
+ggsave(here("550", "output", "figures", "china_bplot.png"), plot=china_bplot, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "cohoa_bplot.png"), plot=cohoa_bplot, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "stela_bplot.png"), plot=stela_bplot, device="png", dpi=300)
+
+ggsave(here("550", "output", "figures", "chinr_bplot.png"), plot=chinr_bplot, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "cohor_bplot.png"), plot=cohor_bplot, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "stelr_bplot.png"), plot=stelr_bplot, device="png", dpi=300)
+
+ggsave(here("550", "output", "figures", "chin_error.png"), plot=chin_splot, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "coho_error.png"), plot=coho_splot, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "stel_error.png"), plot=stel_splot, device="png", dpi=300)
+
+# goalish
+p1 <- china_bplot
+p2 <- chinr_bplot
+grid.arrange(p1, p2, ncol = 1)
