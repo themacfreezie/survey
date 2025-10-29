@@ -136,6 +136,36 @@ chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   theme_classic()
 chin_splot
 
-points$cost <- sample(1:5, size = nrow(points), replace = TRUE)
+points$cost <- sample(1:100, size = nrow(points), replace = TRUE)
 
-cloud(cost~mean_r+mean_a, points, panel.3d.cloud = panel.3dbars, col.facet = points$Group)
+
+chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group, size = cost)) +
+  geom_point() +
+  labs(y = 'Relative Bias (mark-recapture estimate at weir)',
+       title='Chinook',
+       x = 'Variance') +
+  scale_color_manual(values = c("#c1a13c",
+                                # "#c772c5",
+                                "#5b3c90",
+                                # "#b85c37",
+                                "#b94656",
+                                # "#b0457b",
+                                "#729a43",
+                                "#6d85db",
+                                "#4dc48f"
+  )) +
+  geom_errorbarh(data=points, 
+                 aes(xmin=ifelse(mean_r - 1.96*sd_r < 0, 0, mean_r - 1.96*sd_r), 
+                     xmax=(mean_r + 1.96*sd_r), 
+                     y = mean_a), 
+                 linewidth = 1) +
+  geom_errorbar(data=points, 
+                aes(ymin=(mean_a - 1.96*sd_a), 
+                    ymax=(mean_a + 1.96*sd_a), 
+                    x = mean_r),
+                width = 0.01, 
+                linewidth = 1) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme_classic()
+chin_splot
