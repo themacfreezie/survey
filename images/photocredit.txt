@@ -12,3 +12,4 @@ snorkel_survey - National Parks Gallery
 sockeye_weir - Wikipedia Commons
 survey_sign - Bureau of Land Management
 wcr-recovery-map-2024 - NOAA Fisheries
+pacific-salmon-life-history-updated-2022 - NOAA Fisheries
