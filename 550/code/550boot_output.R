@@ -415,7 +415,262 @@ ggsave(here("550", "output", "figures", "chin_error.png"), plot=chin_splot, devi
 ggsave(here("550", "output", "figures", "coho_error.png"), plot=coho_splot, device="png", dpi=300)
 ggsave(here("550", "output", "figures", "stel_error.png"), plot=stel_splot, device="png", dpi=300)
 
-# goalish
+# combined box plots 
+
+# test
 p1 <- china_bplot
 p2 <- chinr_bplot
 grid.arrange(p1, p2, ncol = 1)
+
+# modular code - Chinook
+mod <- boot_chinM15
+
+# grab bootstrap parameter estimates for a & r
+df <- mod$boot.params
+df <- data.frame(t(df))
+df <- df[, -c(18:36)]
+df_a <- df[, -c(9:17)]
+df_r <- df[, -c(1:8)]
+
+# grab mean and sd
+names_a <- colnames(df_a)
+names_r <- colnames(df_r)
+
+# adjust column names
+df_a$A.a15 <- 0
+df_a <- melt(df_a)
+df_a$method <- as.character(df_a$variable)
+df_a$method <- substr(df_a$method, 4, nchar(df_a$method))
+  # add column of zeroes
+
+df_r <- melt(df_r)
+df_r$method <- as.character(df_r$variable)
+df_r$method <- substr(df_r$method, 4, nchar(df_r$method))
+
+# merge in legend
+df_a <- merge(df_a, legend, by = "method", all.x = TRUE, all.y = TRUE)
+df_a <- na.omit(df_a)
+df_a <- df_a[-c(1,2)]
+
+df_r <- merge(df_r, legend, by = "method", all.x = TRUE, all.y = TRUE)
+df_r <- na.omit(df_r)
+df_r <- df_r[-c(1,2)]
+
+# plots
+china_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) + 
+  geom_boxplot() +
+  labs(x = NULL,
+       title='Chinook',
+       subtitle='Bias (relative to Mark-Recapture Estimate at Weir)',
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c",
+                               # "#c772c5",
+                               "#5b3c90",
+                               # "#b85c37",
+                               "#b94656",
+                               # "#b0457b",
+                               "#729a43",
+                               "#6d85db",
+                               "#4dc48f"
+  )) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+china_bplot
+
+chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) + 
+  geom_boxplot() +
+  labs(x = NULL,
+       title=NULL,
+       subtitle="Variance",
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c",
+                               # "#c772c5",
+                               "#5b3c90",
+                               # "#b85c37",
+                               "#b94656",
+                               # "#b0457b",
+                               "#729a43",
+                               "#6d85db",
+                               "#4dc48f"
+  )) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
+chinr_bplot
+
+p1 <- china_bplot
+p2 <- chinr_bplot
+chin_boxes <- grid.arrange(p1, p2, ncol = 1)
+
+# modular code - coho
+mod <- boot_cohoM10
+
+# grab bootstrap parameter estimates for a & r
+df <- mod$boot.params
+df <- data.frame(t(df))
+df <- df[, -c(22:49)]
+df_a <- df[, -c(11:21)]
+df_r <- df[, -c(1:10)]
+
+# grab mean and sd
+names_a <- colnames(df_a)
+names_r <- colnames(df_r)
+
+# adjust column names
+df_a$A.a10 <- 0
+df_a <- melt(df_a)
+df_a$method <- as.character(df_a$variable)
+df_a$method <- substr(df_a$method, 4, nchar(df_a$method))
+# add column of zeroes
+
+df_r <- melt(df_r)
+df_r$method <- as.character(df_r$variable)
+df_r$method <- substr(df_r$method, 4, nchar(df_r$method))
+
+# merge in legend
+df_a <- merge(df_a, legend, by = "method", all.x = TRUE, all.y = TRUE)
+df_a <- na.omit(df_a)
+df_a <- df_a[-c(1,2)]
+
+df_r <- merge(df_r, legend, by = "method", all.x = TRUE, all.y = TRUE)
+df_r <- na.omit(df_r)
+df_r <- df_r[-c(1,2)]
+
+# plots
+cohoa_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) + 
+  geom_boxplot() +
+  labs(x = NULL,
+       title='Coho',
+       subtitle='Bias (relative to Dam Counts - Video)',
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c",
+                               "#c772c5",
+                               # "#5b3c90",
+                               "#b85c37",
+                               "#b94656",
+                               # "#b0457b",
+                               "#729a43"
+                               # "#6d85db",
+                               # "#4dc48f"
+  )) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+cohoa_bplot
+
+cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) + 
+  geom_boxplot() +
+  labs(x = NULL,
+       title=NULL,
+       subtitle="Variance",
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c",
+                               "#c772c5",
+                               # "#5b3c90",
+                               "#b85c37",
+                               "#b94656",
+                               # "#b0457b",
+                               "#729a43"
+                               # "#6d85db",
+                               # "#4dc48f"
+  )) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
+cohor_bplot
+
+p1 <- cohoa_bplot
+p2 <- cohor_bplot
+coho_boxes <- grid.arrange(p1, p2, ncol = 1)
+
+# modular code - steelhead
+mod <- boot_stelM14
+
+# grab bootstrap parameter estimates for a & r
+df <- mod$boot.params
+df <- data.frame(t(df))
+df <- df[, -c(18:41)]
+df_a <- df[, -c(9:17)]
+df_r <- df[, -c(1:8)]
+
+# grab mean and sd
+names_a <- colnames(df_a)
+names_r <- colnames(df_r)
+
+# adjust column names
+df_a$A.a14 <- 0
+df_a <- melt(df_a)
+df_a$method <- as.character(df_a$variable)
+df_a$method <- substr(df_a$method, 4, nchar(df_a$method))
+# add column of zeroes
+
+df_r <- melt(df_r)
+df_r$method <- as.character(df_r$variable)
+df_r$method <- substr(df_r$method, 4, nchar(df_r$method))
+
+# merge in legend
+df_a <- merge(df_a, legend, by = "method", all.x = TRUE, all.y = TRUE)
+df_a <- na.omit(df_a)
+df_a <- df_a[-c(1,2)]
+
+df_r <- merge(df_r, legend, by = "method", all.x = TRUE, all.y = TRUE)
+df_r <- na.omit(df_r)
+df_r <- df_r[-c(1,2)]
+
+# plots
+stela_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) + 
+  geom_boxplot() +
+  labs(x = NULL,
+       title='Steelhead',
+       subtitle='Bias (relative to In-River Weir Counts)',
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c",
+                               "#c772c5",
+                               # "#5b3c90",
+                               # "#b85c37",
+                               # "#b94656",
+                               # "#b0457b",
+                               # "#729a43",
+                               "#6d85db",
+                               "#4dc48f"
+  )) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+stela_bplot
+
+stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) + 
+  geom_boxplot() +
+  labs(x = NULL,
+       title=NULL,
+       subtitle="Variance",
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c",
+                               "#c772c5",
+                               # "#5b3c90",
+                               # "#b85c37",
+                               # "#b94656",
+                               # "#b0457b",
+                               # "#729a43",
+                               "#6d85db",
+                               "#4dc48f"
+  )) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
+stelr_bplot
+
+p1 <- stela_bplot
+p2 <- stelr_bplot
+stel_boxes <- grid.arrange(p1, p2, ncol = 1)
+
+ggsave(here("550", "output", "figures", "chin_boxes.png"), plot=chin_boxes, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "coho_boxes.png"), plot=coho_boxes, device="png", dpi=300)
+ggsave(here("550", "output", "figures", "stel_boxes.png"), plot=stel_boxes, device="png", dpi=300)
