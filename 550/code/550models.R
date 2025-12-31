@@ -141,7 +141,7 @@ diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 # a
 scale <- "15"
   # sets relative value against which other survey methods will be scaled
-  # 15 -> MArk-Recapture estimate at weird
+  # 15 -> MArk-Recapture estimate at weir
 a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(a_chin.model)){
   if(nosa_chin_rows$method[i] != scale){
