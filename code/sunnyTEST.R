@@ -1,4 +1,8 @@
+## SET WORKING DIR & PACKAGES
 library(dlm)
+here::i_am("code/sunnyTEST.R")
+options(max.print=2000)
+
 
 ## CREATING SYNTHETIC TIME SERIES
 ## Simple version -
@@ -34,7 +38,7 @@ U <- c(7, 4.5)
 # set params
 pops <- 2
 methods <- 4
-t <- 50 # must be even
+t <- 44 # must be even
 
 # work through it
 states_list <- vector("list", pops)
@@ -63,15 +67,74 @@ for(j in 1:pops) {
 obs_df <- data.frame(matrix(unlist(obs_list), nrow = length(obs_list), byrow=TRUE))
   # this is very "neat" - could it be more randomized?
 
+# assign methods and population names
 df <- data.frame(t(obs_df))
-colnames(df) <- c("P1", "P2")
-df <- stack(df, select = c("P1", "P2"))
-df$method <- c(rep("M1", 25), 
-               rep("M3", 15), 
-               rep("M4", 10), 
-               rep("M2", 25), 
-               rep("M4", 15), 
-               rep("M3", 10))
+colnames(df) <- c("Plarge", "Psmall")
+df <- stack(df, select = c("Plarge", "Psmall"))
+df$method <- c(rep("Ma", (t/2)), 
+               rep("Mc", (t/2) - 10), 
+               rep("Md", 10), 
+               rep("Mb", (t/2)), 
+               rep("Mc", (t/2)-10), 
+               rep("Md", 10))
+df$year <- c(rep((1+1975):(t+1975), pops))
 
+## getting the data in shape for MARSS
+# construct popmethod
+df$popmethod <- paste0(as.character(df$ind),"_", as.character(df$method))
+df <- df[-c(2, 3)]
 
-            
+# set data wide (rows = popid/method, columns = year)
+df <- panel_data(df, id = popmethod, wave = year)
+df <- widen_panel(df, separator = "_")
+
+# some resorting and cleaning
+df <- df[,order(colnames(df))]
+df_rows <- as.data.frame(stringr::str_split_fixed(df$popmethod, "_", 2))
+colnames(df_rows) <- c("popid", "method")
+df <- df[-c(1)]
+colnames(df) <- substr(colnames(df), 8, 11)
+years <- colnames(df)
+df <- as.matrix(df)
+
+## setting up MARSS stuff
+# set controls
+con.list <- list(maxit = 5000, allow.degen = TRUE)
+
+## model chinook
+# constructing R and a and Z
+# R
+n <- nrow(df)
+R.model <- matrix(list(0), n, n)
+diag(R.model) <- paste0("r", df_rows$method)
+
+# Z
+pops_df <- c(unique(df_rows$popid))
+Z.model <- matrix(0, nrow=nrow(df), ncol=length(unique(df_rows$popid)))
+for(i in seq(length(pops_df))){
+  Z.model[df_rows$popid == pops_df[i], i] <- 1
+}
+
+# model list
+mod.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "diagonal and equal",
+  Z = Z.model,
+  A = "zero",
+  R = R.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
+# run MARSS model
+if(!file.exists(here::here("data", "clean", "ssm_dfTEST.rds"))){
+  ptm <- proc.time()
+  ssm <- MARSS(df, model = mod.list, method = "kem", control = con.list)
+  saveRDS(ssm, file=here::here("data", "clean", "ssm_dfTEST.rds"))
+  time <- proc.time()[3] - ptm
+  time
+}
+# load in ssm_chin
+ssm <- readRDS(file=here::here("data", "clean", "ssm_dfTEST.rds"))
