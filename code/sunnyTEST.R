@@ -1,8 +1,11 @@
 ## SET WORKING DIR & PACKAGES
 library(dlm)
+library(here)
+library(MARSS)
+library(panelr)
+
 here::i_am("code/sunnyTEST.R")
 options(max.print=2000)
-
 
 ## CREATING SYNTHETIC TIME SERIES
 ## Simple version -
@@ -13,7 +16,12 @@ options(max.print=2000)
   # starting w/ n = 1000, evenly distributed p1 & p2 = 500 each, all methods = 250
 
 ## set seed for reproducibility
-set.seed(69420)
+# set.seed(694201)
+
+# set params
+pops <- 4
+methods <- 4 # I don't think I use this...
+t <- 50 # must be even
 
 ## generate process error terms
 # same process variance
@@ -28,17 +36,13 @@ R_a <- runif(1, 0, 1)
 R_b <- runif(1, 0, 1) 
 R_c <- runif(1, 0, 1)
 R_d <- runif(1, 0, 1)
-R <- c(R_a, R_b, R_c, R_d)
+R <- c(R_a, R_a, R_b, R_b, R_c, R_d, R_c, R_d)
 
 ## generate run size scalers
-U <- c(7, 4.5)
+U <- c(7, 7, 4.5, 4.5)
 
 ## GENERATE TIME SERIES
 ## generate process time series - 50 time steps
-# set params
-pops <- 2
-methods <- 4
-t <- 44 # must be even
 
 # work through it
 states_list <- vector("list", pops)
@@ -53,30 +57,43 @@ states_df <- data.frame(matrix(unlist(states_list), nrow = length(states_list), 
 
 ## generate observed time series - 50 time steps
 obs_list <- states_list
+spot_list <- vector("list", 2*pops)
 for(j in 1:pops) {
-  for(i in 1:(t/2)) {
-    obs_list[[j]][i] <- obs_list[[j]][i] + rnorm(1, 0, R[j])  
+  spot_list[[j]][1] <- sample(6:(t/2),1)
+  spot_list[[j+pops]][1] <- sample(((t/2)+1):(t-sample(5:9,1)),1)
+  # spot_list[[(j+4)]][1] <- sample((spot_list[[(j+2)]][1]+1):t,1)
+  for(i in 1:spot_list[[j]][1]) {
+    obs_list[[j]][i] <- obs_list[[j]][i] + rnorm(1, 0, sqrt(R[j]))  
   }
-  for(i in ((t/2)+1):(t-10)) {
-    obs_list[[j]][i] <- obs_list[[j]][i] + rnorm(1, 0, R[(j+2)])  
+  for(i in (spot_list[[j]][1]+1):spot_list[[(j+pops)]][1]) {
+    obs_list[[j]][i] <- obs_list[[j]][i] + rnorm(1, 0, sqrt(R[(j+pops)]))  
   }
-  for(i in (t-9):t) {
-    obs_list[[j]][i] <- obs_list[[j]][i] + rnorm(1, 0, R[abs(j-5)])  
+  for(i in (spot_list[[(j+pops)]][1]+1):t) {
+    obs_list[[j]][i] <- obs_list[[j]][i] + rnorm(1, 0, sqrt(R[abs(j-((2*pops)+1))]))  
   }
 }
 obs_df <- data.frame(matrix(unlist(obs_list), nrow = length(obs_list), byrow=TRUE))
-  # this is very "neat" - could it be more randomized?
 
 # assign methods and population names
 df <- data.frame(t(obs_df))
-colnames(df) <- c("Plarge", "Psmall")
-df <- stack(df, select = c("Plarge", "Psmall"))
-df$method <- c(rep("Ma", (t/2)), 
-               rep("Mc", (t/2) - 10), 
-               rep("Md", 10), 
-               rep("Mb", (t/2)), 
-               rep("Mc", (t/2)-10), 
-               rep("Md", 10))
+colnames(df) <- c("Plarge1", "Plarge2", "Psmall1", "Psmall2")
+df <- stack(df, select = c("Plarge1", "Plarge2", "Psmall1", "Psmall2"))
+df$method <- c(rep("Ma", spot_list[[1]][1]), 
+               rep("Mc", length((spot_list[[1]][1]+1):spot_list[[pops+1]][1])), 
+               rep("Md", length((spot_list[[pops+1]][1]+1):t)), 
+               
+               rep("Ma", spot_list[[2]][1]), 
+               rep("Md", length((spot_list[[2]][1]+1):spot_list[[pops+2]][1])), 
+               rep("Mc", length((spot_list[[pops+2]][1]+1):t)), 
+               
+               rep("Mb", spot_list[[3]][1]), 
+               rep("Mc", length((spot_list[[3]][1]+1):spot_list[[pops+3]][1])), 
+               rep("Md", length((spot_list[[pops+3]][1]+1):t)), 
+               
+               rep("Mb", spot_list[[4]][1]), 
+               rep("Md", length((spot_list[[4]][1]+1):spot_list[[pops+4]][1])), 
+               rep("Mc", length((spot_list[[pops+4]][1]+1):t)) 
+               ) 
 df$year <- c(rep((1+1975):(t+1975), pops))
 
 ## getting the data in shape for MARSS
@@ -129,12 +146,12 @@ mod.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", "ssm_dfTEST.rds"))){
+# if(!file.exists(here::here("data", "clean", "ssm_dfTEST.rds"))){
   ptm <- proc.time()
   ssm <- MARSS(df, model = mod.list, method = "kem", control = con.list)
   saveRDS(ssm, file=here::here("data", "clean", "ssm_dfTEST.rds"))
   time <- proc.time()[3] - ptm
   time
-}
-# load in ssm_chin
-ssm <- readRDS(file=here::here("data", "clean", "ssm_dfTEST.rds"))
+# }
+# # load in ssm_chin
+# ssm <- readRDS(file=here::here("data", "clean", "ssm_dfTEST.rds"))
