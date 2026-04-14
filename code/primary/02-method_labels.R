@@ -18,6 +18,7 @@ mtds <- mtds %>%
   # keep only one row per ID
   distinct(MethodNameID, .keep_all = TRUE)
 
+# combine methods with #.# structure (i.e. 21.0, 21.1, and 21.2)
 mtds <- mtds %>%
   mutate(
     # if the ID starts with 21 (e.g., 21.1, 21.2), make it exactly 21
@@ -28,3 +29,55 @@ mtds <- mtds %>%
                         MethodName)
   ) %>% 
   distinct(MethodNameID, .keep_all = TRUE)
+
+mtds <- mtds %>%
+  mutate(
+    # if the ID starts with 21 (e.g., 21.1, 21.2), make it exactly 21
+    MethodNameID = ifelse(floor(MethodNameID) == 17, 17, MethodNameID),
+    # update the name for all ID 21 rows
+    MethodName = ifelse(MethodNameID == 17, 
+                        "Peak redd counts * Fish per redd estimate", 
+                        MethodName)
+  ) %>% 
+  distinct(MethodNameID, .keep_all = TRUE)
+
+## pure ai here - trying to lock down unique elements
+# 1. Get all unique individual elements from the MethodName column
+all_elements <- mtds %>%
+  separate_rows(MethodName, sep = "\\s*\\+\\s*") %>% # Split by '+' and trim whitespace
+  pull(MethodName) %>%
+  unique() %>%
+  sort()
+
+# 2. Create a lookup table: each unique string gets a unique alphabetical code
+# letters[1:26] provides a-z. If you have >26, you can use combinations.
+codes <- setNames(paste0('"', letters[seq_along(all_elements)], '"'), all_elements)
+
+# 3. Define a function to translate names to codes
+translate_to_code <- function(name) {
+  parts <- str_split(name, "\\s*\\+\\s*")[[1]] # Split the string
+  mapped_parts <- codes[parts]                  # Map to alphabetical letters
+  paste(mapped_parts, collapse = " + ")         # Recombine with +
+}
+
+# 4. Apply to your dataframe
+mtds <- mtds %>%
+  rowwise() %>%
+  mutate(MethodCode = translate_to_code(MethodName)) %>%
+  ungroup()
+
+## seems to work great!
+
+# look at method names for nosa
+nosa_methods <- nosa %>%
+  distinct(MethodNameID)
+  # need to truncate methods
+
+nosa <- nosa %>%
+  mutate(MethodNameID = floor(MethodNameID))
+nosa <- nosa[-c(7)]
+
+merge <- nosa %>%
+  left_join(mtds, by = "MethodNameID")
+
+save(merge, file=here("data", "clean", "nosa_codes.Rda"))
