@@ -30,6 +30,13 @@ mtds <- mtds %>%
   ) %>% 
   distinct(MethodNameID, .keep_all = TRUE)
 
+# same catch for method 26
+mtds <- mtds %>%
+  # fix capitalization for ID 20
+  mutate(MethodName = ifelse(MethodNameID == 26, "In-river weir counts + Index redd count expansion * Fish per redd estimate", MethodName)) %>%
+  # keep only one row per ID
+  distinct(MethodNameID, .keep_all = TRUE)
+
 mtds <- mtds %>%
   mutate(
     # if the ID starts with 21 (e.g., 21.1, 21.2), make it exactly 21
@@ -51,7 +58,7 @@ all_elements <- mtds %>%
 
 # 2. Create a lookup table: each unique string gets a unique alphabetical code
 # letters[1:26] provides a-z. If you have >26, you can use combinations.
-codes <- setNames(paste0('"', letters[seq_along(all_elements)], '"'), all_elements)
+codes <- setNames(paste0(letters[seq_along(all_elements)]), all_elements)
 
 # 3. Define a function to translate names to codes
 translate_to_code <- function(name) {
