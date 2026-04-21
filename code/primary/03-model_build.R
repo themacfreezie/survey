@@ -1,5 +1,8 @@
 ## SET WORKING DIR & PACKAGES
 library(here)
+library(MARSS)
+library(marssTMB)
+library(panelr)
 library(tidyverse)
 
 here::i_am("code/primary/03-model_build.R")
@@ -21,7 +24,7 @@ method_map <- nosa %>%
 
 # will drop those methods for which fewer than 30 coded (letter) observations exist
 nosa <- nosa %>%
-  filter(!MethodNameID %in% c(15, 25, 28, 30, 31))
+  filter(!MethodNameID %in% c(15, 20, 25, 28, 30, 31))
 
 # trying to build an all-species model..
   # must include species as a factor covariate in process equation?
@@ -31,7 +34,7 @@ nosa <- nosa %>%
 nosa$popmethod <- paste0(as.character(nosa$PopID),"_", as.character(nosa$MethodNameID))
 
 # natural log of counts
-nosa$lnnosa <- log(nosa$NOSA)
+nosa$lnnosa <- log(nosa$NOSA + 1)
 
 # dismiss extra stuff
 nosa_trim <- nosa[-c(1, 3, 4, 6:8)]
@@ -59,17 +62,24 @@ R.model <- matrix(list(0), n, n)
 diag(R.model) <- paste0("r", nosa_dat_rows$method)
 
 # a
-scale <- "15"
-# sets relative value against which other survey methods will be scaled
-  # 15 -> MArk-Recapture estimate at weir
-a.model <- matrix(list(0), n, 1)
-for(i in 1:length(a.model)){
-  if(nosa_dat_rows$method[i] != scale){
-    a.model[i] <- nosa_dat_rows$method[i]
+# define your scale method
+scale <- "j"
+
+# generate the list elements
+res_list <- lapply(nosa_dat_rows$code, function(x) {
+  parts <- trimws(unlist(strsplit(as.character(x), "\\+")))
+  remaining <- parts[parts != scale]
+  if (length(remaining) == 0) {
+    return("0")
+  } else if (length(remaining) == 1) {
+    return(remaining)
+  } else {
+    return(paste0("1*", remaining, collapse = "+"))
   }
-}
-a.model <- method_map$MethodCode[match(a.model, method_map$MethodNameID)]
-a.model <- gsub("([a-z])", "1*\\1", a.model)
+})
+
+# convert to an n x 1 list matrix
+a.model <- matrix(res_list, nrow = length(res_list), ncol = 1)
 
 
 # Z
@@ -79,14 +89,14 @@ for(i in seq(length(pops))){
   Z.model[nosa_dat_rows$popid == pops[i], i] <- 1
 }
 
-
 # model list
 mod.list <- list(
   B = "identity",
   U = "zero",
   Q = "diagonal and unequal",
   Z = Z.model,
-  A = a.model,
+  # A = a.model,
+  A = "unequal",
   R = R.model,
   x0 = "equal",
   V0 = "zero",
@@ -94,16 +104,26 @@ mod.list <- list(
 )
 
 # set controls
-con.list <- list(maxit = 5000, allow.degen = TRUE)
+con.list <- list(maxit = 5000, allow.degen = TRUE, safe = TRUE, trace = 1)
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", paste("ssm_nosa", scale, ".rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_nosa_", scale, ".rds", sep="")))){
   ptm <- proc.time()
   ssm <- MARSS(nosa_dat, model = mod.list, method = "kem", control = con.list)
-  saveRDS(ssm, file=here::here("data", "clean", paste("ssm_nosa", scale, ".rds", sep="")))
+  # saveRDS(ssm, file=here::here("data", "clean", paste("ssm_nosa_", scale, ".rds", sep="")))
   time <- proc.time()[3] - ptm
   time
 }
-# load in ssm_chin
-ssm_nosa <- readRDS(file=here::here("data", "clean", paste("ssm_nosa", scale, ".rds", sep="")))
+  # issues with data density
+
+# check data in each row - some are very sparse
+  # recall each row applies to a population and the method in use
+records <- rowSums(!is.na(nosa_dat))
+records
+  # lots of rows with fewer than 10 observations, a good handful with only one each...
+nosa_dat_rows$records <- records
+  # r only appears 3 times..
+
+# # load in ssm_chin
+# ssm_nosa <- readRDS(file=here::here("data", "clean", paste("ssm_nosa", scale, ".rds", sep="")))
 
