@@ -287,5 +287,5 @@ if(!file.exists(here::here("550", "data", paste("ssm_cohoM", scale, ".rds", sep=
 ssm_coho <- readRDS(file=here::here("550", "data", paste("ssm_cohoM", scale, ".rds", sep="")))
 
 # bootstrap estimates
-boot_coho <- MARSSboot(ssm_coho, nboot=100, output="parameters", sim = "parametric")
+boot_coho <- MARSSboot(ssm_coho, nboot=100, output="parameters", sim = "parametric", param.gen = "hessian")
 saveRDS(boot_coho, file=here::here("550", "data", paste("boot_cohoM", scale, ".rds", sep="")))

@@ -1,7 +1,6 @@
 ## SET WORKING DIR & PACKAGES
 library(here)
 library(MARSS)
-library(marssTMB)
 library(panelr)
 library(tidyverse)
 
