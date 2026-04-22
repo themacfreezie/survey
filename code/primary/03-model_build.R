@@ -54,7 +54,9 @@ unique(nosa_coho$MethodNameID)
   # 8 methods
 table(nosa_coho$MethodNameID)
   # method 9 only appears 26 times
+  # method 11 only appears 22 times
 nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 9, ]
+nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 11, ]
 
 # steelhead
 length(unique(nosa_stel$PopID))
@@ -99,7 +101,7 @@ nosa_chin <- as.matrix(nosa_chin)
 nosa_coho <- nosa_coho[,order(colnames(nosa_coho))]
 nosa_coho_rows <- as.data.frame(stringr::str_split_fixed(nosa_coho$popmethod, "_", 2))
 colnames(nosa_coho_rows) <- c("popid", "method")
-nosa_coho <- nosa_coho[-c(46)]
+nosa_coho <- nosa_coho[-c(36)]
 colnames(nosa_coho) <- substr(colnames(nosa_coho), 8, 11)
 years <- colnames(nosa_coho)
 nosa_coho <- as.matrix(nosa_coho)
@@ -123,9 +125,9 @@ R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 
 # a
-scale <- "21"
+scale <- "16"
   # sets relative value against which other survey methods will be scaled
-  # 21 -> Index redd count expansion * fish per redd estimate, most common method
+  # 16 -> Peak redd count expansion * Fish per redd estimate, least common method
 a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(a_chin.model)){
   if(nosa_chin_rows$method[i] != scale){
@@ -172,9 +174,9 @@ R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(R_coho.model) <- paste0("r", nosa_coho_rows$method)
 
 # a
-scale <- "3"
-  # 3 -> Area Under the Curve: Population (live spawners), most common method
-    # worried it might be too common - it's like half the obs - could cause issues
+scale <- "10"
+  # 10 -> Dam counts (Video), least common method
+    # kind of an odd choice as a scale though...
 a_coho.model <- matrix(list(0), n_coho, 1)
 for(i in 1:length(a_coho.model)){
   if(nosa_coho_rows$method[i] != scale){
@@ -221,9 +223,8 @@ R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
 
 # a
-scale <- "21"
-  # 21 -> Index redd count expansion * fish per redd estimate, most common method
-  # again, may be too common - contains lots of obs
+scale <- "22"
+  # 22 -> Total redd counts * Fish per redd estimate, least common method
 a_stel.model <- matrix(list(0), n_stel, 1)
 for(i in 1:length(a_stel.model)){
   if(nosa_stel_rows$method[i] != scale){
