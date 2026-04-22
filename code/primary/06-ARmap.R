@@ -99,3 +99,12 @@ ggplot(data = sf_coho_nad83col) +
   labs(title = "Map of population size in coho populations",
        fill = "Average pop size (1980-2024)") +
   theme_minimal()
+
+ggplot(data = sf_coho_nad83col) +
+  annotation_map_tile(type = "osm", zoom = 10) + 
+  geom_sf(aes(fill = log(mean_R)), alpha = 0.7) + 
+  coord_sf(crs = 4269) + 
+  scale_fill_viridis_c(option = "plasma") + # Provides a high-contrast, accessible gradient
+  labs(title = "Map of precision in coho populations",
+       fill = "Mean variance") +
+  theme_minimal()
