@@ -4,7 +4,7 @@ library(MARSS)
 library(panelr)
 library(tidyverse)
 
-here::i_am("code/primary/03-LINEARmodel_build.R")
+here::i_am("code/primary/03-model_build.R")
 options(max.print=2000)
 
 # pull in data
