@@ -81,7 +81,6 @@ res_list <- lapply(nosa_dat_rows$code, function(x) {
 # convert to an n x 1 list matrix
 a.model <- matrix(res_list, nrow = length(res_list), ncol = 1)
 
-
 # Z
 pops <- c(unique(nosa_dat_rows$popid))
 Z.model <- matrix(0, nrow=nrow(nosa_dat), ncol=length(unique(nosa_dat_rows$popid)))
@@ -95,8 +94,8 @@ mod.list <- list(
   U = "zero",
   Q = "diagonal and unequal",
   Z = Z.model,
-  # A = a.model,
-  A = "unequal",
+  A = a.model,
+  # A = "unequal",
   R = R.model,
   x0 = "equal",
   V0 = "zero",
