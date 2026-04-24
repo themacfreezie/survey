@@ -1,9 +1,13 @@
 ## SET WORKING DIR & PACKAGES
+library(biscale)
+library(cowplot)
 library(ggspatial)
 library(here)
+library(patchwork)
 library(prettymapr)
 library(sf)
 library(tidyverse)
+library(tigris)
 
 here::i_am("code/primary/06-ARmap.R")
 options(max.print=2000)
@@ -72,8 +76,34 @@ sf_coho_nad83col <- sf_coho_nad83 %>%
     .groups = "drop"
   )
 
-# replotting
-ggplot(data = sf_coho_nad83col) +
+# preplots
+bbox <- st_bbox(sf_coho_nad83col)
+region_states <- states(cb = TRUE, resolution = "20m") %>%
+  filter(STUSPS %in% c("OR", "WA")) %>%
+  st_transform(4269) # match main map's CRS (NAD83)
+# these bounds roughly cover the columbia basin
+basin_xlim <- c(-125.0, -116.0)
+basin_ylim <- c(41.5, 49.5)
+
+# create the basin-centered inset
+inset_context <- ggplot() +
+  geom_sf(data = region_states, fill = "gray95", color = "gray60", linewidth = 0.3) +
+  # red box representing your specific study area
+  annotate("rect", 
+           xmin = bbox["xmin"], xmax = bbox["xmax"], 
+           ymin = bbox["ymin"], ymax = bbox["ymax"], 
+           color = "red", fill = NA, linewidth = 0.8) +
+  # Crop the map to the Columbia River Basin extent
+  coord_sf(xlim = basin_xlim, ylim = basin_ylim, expand = FALSE) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "white", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+    plot.margin = margin(1, 1, 1, 1)
+  )
+
+# plotting
+main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
@@ -81,8 +111,12 @@ ggplot(data = sf_coho_nad83col) +
   labs(title = "Map of relative bias in coho populations",
        fill = "Mean relative bias") +
   theme_minimal()
+coho_a <- main_map + inset_element(inset_context, 
+                                   left = 0.85, bottom = 0.05, 
+                                   right = 1.1, top = 0.3)
+coho_a
 
-ggplot(data = sf_coho_nad83col) +
+main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
@@ -90,8 +124,12 @@ ggplot(data = sf_coho_nad83col) +
   labs(title = "Map of precision in coho populations",
        fill = "Mean variance") +
   theme_minimal()
+coho_r <- main_map + inset_element(inset_context, 
+                                   left = 0.85, bottom = 0.05, 
+                                   right = 1.1, top = 0.3)
+coho_r
 
-ggplot(data = sf_coho_nad83col) +
+main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
@@ -99,6 +137,35 @@ ggplot(data = sf_coho_nad83col) +
   labs(title = "Map of population size in coho populations",
        fill = "Average pop size (1980-2024)") +
   theme_minimal()
+coho_pop <- main_map + inset_element(inset_context, 
+                                     left = 0.85, bottom = 0.05, 
+                                     right = 1.1, top = 0.3)
+coho_pop
+
+# choropleth
+data <- bi_class(sf_coho_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
+# bi_class creates a new 'bi_class' column based on quantiles of two variables
+map <- ggplot() +
+  annotation_map_tile(
+    type = "hotstyle",
+    zoom = 10
+  ) + 
+  geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
+  bi_theme()
+legend <- bi_legend(pal = "GrPink2",
+                    dim = 4,
+                    xlab = "Bias",
+                    ylab = "Variance",
+                    size = 8) +
+  theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 1))
+final_plot <- ggdraw() +
+  draw_plot(map, 0, 0, 1, 1) +
+  draw_plot(legend, 0.7, 0.35, 0.2, 0.2) # Adjust coordinates and size as needed
+coho_ARchoro <- final_plot + inset_element(inset_context, 
+                                           left = 0.7, bottom = 0.05, 
+                                           right = 0.98, top = 0.3)
+coho_ARchoro
 
 
 ###### chinook
@@ -139,8 +206,34 @@ sf_chin_nad83col <- sf_chin_nad83 %>%
     .groups = "drop"
   )
 
-# replotting
-ggplot(data = sf_chin_nad83col) +
+# preplots
+bbox <- st_bbox(sf_chin_nad83col)
+region_states <- states(cb = TRUE, resolution = "20m") %>%
+  filter(STUSPS %in% c("OR", "WA", "ID")) %>%
+  st_transform(4269) # match main map's CRS (NAD83)
+# these bounds roughly cover the columbia basin
+basin_xlim <- c(-125, -110)
+basin_ylim <- c(41.5, 49.5)
+
+# create the basin-centered inset
+inset_context <- ggplot() +
+  geom_sf(data = region_states, fill = "gray95", color = "gray60", linewidth = 0.3) +
+  # red box representing your specific study area
+  annotate("rect", 
+           xmin = bbox["xmin"], xmax = bbox["xmax"], 
+           ymin = bbox["ymin"], ymax = bbox["ymax"], 
+           color = "red", fill = NA, linewidth = 0.8) +
+  # Crop the map to the Columbia River Basin extent
+  coord_sf(xlim = basin_xlim, ylim = basin_ylim, expand = FALSE) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "white", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+    plot.margin = margin(1, 1, 1, 1)
+  )
+
+# plotting
+main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
@@ -148,8 +241,12 @@ ggplot(data = sf_chin_nad83col) +
   labs(title = "Map of relative bias in chin populations",
        fill = "Mean relative bias") +
   theme_minimal()
+chin_a <- main_map + inset_element(inset_context, 
+                                   left = 0.7, bottom = 0.05, 
+                                   right = 0.98, top = 0.3)
+chin_a
 
-ggplot(data = sf_chin_nad83col) +
+main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
@@ -157,8 +254,12 @@ ggplot(data = sf_chin_nad83col) +
   labs(title = "Map of precision in chinook populations",
        fill = "Mean variance") +
   theme_minimal()
+chin_r <- main_map + inset_element(inset_context, 
+                                   left = 0.7, bottom = 0.05, 
+                                   right = 0.98, top = 0.3)
+chin_r
 
-ggplot(data = sf_chin_nad83col) +
+main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
@@ -166,7 +267,35 @@ ggplot(data = sf_chin_nad83col) +
   labs(title = "Map of population size in chinook populations",
        fill = "Average pop size (1980-2024)") +
   theme_minimal()
+chin_pop <- main_map + inset_element(inset_context, 
+                                   left = 0.7, bottom = 0.05, 
+                                   right = 0.98, top = 0.3)
+chin_pop
 
+# choropleth
+data <- bi_class(sf_chin_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
+# bi_class creates a new 'bi_class' column based on quantiles of two variables
+map <- ggplot() +
+  annotation_map_tile(
+    type = "hotstyle",
+    zoom = 10
+  ) + 
+  geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
+  bi_theme()
+legend <- bi_legend(pal = "GrPink2",
+                    dim = 4,
+                    xlab = "Bias",
+                    ylab = "Variance",
+                    size = 8) +
+  theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 1))
+final_plot <- ggdraw() +
+  draw_plot(map, 0, 0, 1, 1) +
+  draw_plot(legend, 0.5, 0.05, 0.2, 0.2) # Adjust coordinates and size as needed
+chin_ARchoro <- final_plot + inset_element(inset_context, 
+                                           left = 0.7, bottom = 0.05, 
+                                           right = 0.98, top = 0.3)
+chin_ARchoro
 
 ###### steelhead
 ARstel <- ARstel %>%
@@ -206,30 +335,95 @@ sf_stel_nad83col <- sf_stel_nad83 %>%
     .groups = "drop"
   )
 
-# replotting
-ggplot(data = sf_stel_nad83col) +
+# plotting
+bbox <- st_bbox(sf_stel_nad83col)
+region_states <- states(cb = TRUE, resolution = "20m") %>%
+  filter(STUSPS %in% c("OR", "WA", "ID")) %>%
+  st_transform(4269) # match main map's CRS (NAD83)
+# these bounds roughly cover the columbia basin
+basin_xlim <- c(-125, -110)
+basin_ylim <- c(41.5, 49.5)
+
+# create the basin-centered inset
+inset_context <- ggplot() +
+  geom_sf(data = region_states, fill = "gray95", color = "gray60", linewidth = 0.3) +
+  # red box representing your specific study area
+  annotate("rect", 
+           xmin = bbox["xmin"], xmax = bbox["xmax"], 
+           ymin = bbox["ymin"], ymax = bbox["ymax"], 
+           color = "red", fill = NA, linewidth = 0.8) +
+  # Crop the map to the Columbia River Basin extent
+  coord_sf(xlim = basin_xlim, ylim = basin_ylim, expand = FALSE) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "white", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+    plot.margin = margin(1, 1, 1, 1)
+  )
+
+main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of relative bias in steelhead populations",
-       fill = "Mean relative bias") +
+  labs(title = "Map of average relative bias in steelhead surveys (1980-2024)",
+       fill = "Bias") +
   theme_minimal()
+stel_a <- main_map + inset_element(inset_context, 
+                                     left = 0.7, bottom = 0.05, 
+                                     right = 0.98, top = 0.3)
+stel_a
 
-ggplot(data = sf_stel_nad83col) +
+main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of precision in steelhead populations",
-       fill = "Mean variance") +
+  labs(title = "Map of average precision in steelhead surveys (1980-2024)",
+       fill = "Variance") +
   theme_minimal()
+stel_r <- main_map + inset_element(inset_context, 
+                                     left = 0.7, bottom = 0.05, 
+                                     right = 0.98, top = 0.3)
+stel_r
 
-ggplot(data = sf_stel_nad83col) +
-  annotation_map_tile(type = "osm", zoom = 10) + 
+main_map <- ggplot(data = sf_stel_nad83col) +
+  annotation_map_tile(
+    type = "cartolight",
+    zoom = 10
+  ) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of population size in steelhead populations",
-       fill = "Average pop size (1980-2024)") +
+  labs(title = "Map of average population size in steelhead populations (1980-2024)",
+       fill = "Pop. size") +
   theme_minimal()
+stel_pop <- main_map + inset_element(inset_context, 
+                         left = 0.7, bottom = 0.05, 
+                         right = 0.98, top = 0.3)
+stel_pop
+
+# choropleth
+data <- bi_class(sf_stel_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
+  # bi_class creates a new 'bi_class' column based on quantiles of two variables
+map <- ggplot() +
+  annotation_map_tile(
+    type = "hotstyle",
+    zoom = 10
+  ) + 
+  geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
+  bi_theme()
+legend <- bi_legend(pal = "GrPink2",
+                    dim = 4,
+                    xlab = "Bias",
+                    ylab = "Variance",
+                    size = 8) +
+  theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 1))
+final_plot <- ggdraw() +
+  draw_plot(map, 0, 0, 1, 1) +
+  draw_plot(legend, 0.05, 0.7, 0.2, 0.2) # Adjust coordinates and size as needed
+stel_ARchoro <- final_plot + inset_element(inset_context, 
+                                           left = 0.7, bottom = 0.05, 
+                                           right = 0.98, top = 0.3)
+stel_ARchoro
