@@ -3,9 +3,11 @@ library(biscale)
 library(cowplot)
 library(ggspatial)
 library(here)
+library(pals)
 library(patchwork)
 library(prettymapr)
 library(sf)
+library(stringr)
 library(tidyverse)
 library(tigris)
 
@@ -22,6 +24,9 @@ gdb_path <- here("data", "raw", "WCR_Salmon_Steelhead_gdb_2015", "WCR_Salmon_Ste
 st_layers(gdb_path)
   # I want 'fish' datalayer
 sf_fish <- read_sf(dsn = gdb_path, layer = "fish")
+sf_fish$DPS_IDtrunc <- substr(sf_fish$DPS_ID, 1, 5)
+  # grab DPS_ID
+sf_fish$DPStrunc <- str_remove(sf_fish$DPS, " - Outside legal area$")
 
 # coho test case - as no NWFSC ids are missing
 sf_fish_combined <- sf_fish %>%
@@ -68,7 +73,7 @@ sf_coho_nad83 <- st_transform(sf_coho, crs = 4269)
 
 # can this be collapsed?
 sf_coho_nad83col <- sf_coho_nad83 %>%
-  group_by(NWFSC_POP_ID) %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc) %>%
   summarize(
     mean_lnnosa = mean(mean_lnnosa, na.rm = TRUE),
     mean_a      = mean(mean_a, na.rm = TRUE),
@@ -102,10 +107,16 @@ inset_context <- ggplot() +
     plot.margin = margin(1, 1, 1, 1)
   )
 
+# create ESU outlines
+sf_outlines <- sf_coho_nad83col %>%
+  group_by(DPS_IDtrunc, DPStrunc) %>%
+  summarize(SHAPE = st_union(SHAPE))
+
 # plotting
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of relative bias in coho populations",
@@ -119,6 +130,7 @@ coho_a
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of precision in coho populations",
@@ -132,6 +144,7 @@ coho_r
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of population size in coho populations",
@@ -143,7 +156,7 @@ coho_pop <- main_map + inset_element(inset_context,
 coho_pop
 
 # choropleth
-data <- bi_class(sf_coho_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
+data <- bi_class(sf_coho_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
 # bi_class creates a new 'bi_class' column based on quantiles of two variables
 map <- ggplot() +
   annotation_map_tile(
@@ -151,11 +164,12 @@ map <- ggplot() +
     zoom = 10
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
   bi_theme()
 legend <- bi_legend(pal = "GrPink2",
                     dim = 4,
-                    xlab = "Bias",
+                    xlab = "Population",
                     ylab = "Variance",
                     size = 8) +
   theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 1))
@@ -198,13 +212,18 @@ sf_chin_nad83 <- st_transform(sf_chin, crs = 4269)
 
 # can this be collapsed?
 sf_chin_nad83col <- sf_chin_nad83 %>%
-  group_by(NWFSC_POP_ID) %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc) %>%
   summarize(
     mean_lnnosa = mean(mean_lnnosa, na.rm = TRUE),
     mean_a      = mean(mean_a, na.rm = TRUE),
     mean_R      = mean(mean_R, na.rm = TRUE),
     .groups = "drop"
   )
+
+# create ESU outlines
+sf_outlines <- sf_chin_nad83col %>%
+  group_by(DPS_IDtrunc, DPStrunc) %>%
+  summarize(SHAPE = st_union(SHAPE))
 
 # preplots
 bbox <- st_bbox(sf_chin_nad83col)
@@ -236,6 +255,7 @@ inset_context <- ggplot() +
 main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of relative bias in chin populations",
@@ -249,6 +269,7 @@ chin_a
 main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of precision in chinook populations",
@@ -262,6 +283,7 @@ chin_r
 main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of population size in chinook populations",
@@ -273,7 +295,7 @@ chin_pop <- main_map + inset_element(inset_context,
 chin_pop
 
 # choropleth
-data <- bi_class(sf_chin_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
+data <- bi_class(sf_chin_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
 # bi_class creates a new 'bi_class' column based on quantiles of two variables
 map <- ggplot() +
   annotation_map_tile(
@@ -281,11 +303,12 @@ map <- ggplot() +
     zoom = 10
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
   bi_theme()
 legend <- bi_legend(pal = "GrPink2",
                     dim = 4,
-                    xlab = "Bias",
+                    xlab = "Population",
                     ylab = "Variance",
                     size = 8) +
   theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 1))
@@ -327,13 +350,18 @@ sf_stel_nad83 <- st_transform(sf_stel, crs = 4269)
 
 # can this be collapsed?
 sf_stel_nad83col <- sf_stel_nad83 %>%
-  group_by(NWFSC_POP_ID) %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
   summarize(
     mean_lnnosa = mean(mean_lnnosa, na.rm = TRUE),
     mean_a      = mean(mean_a, na.rm = TRUE),
     mean_R      = mean(mean_R, na.rm = TRUE),
     .groups = "drop"
   )
+
+# create ESU outlines
+sf_outlines <- sf_stel_nad83col %>%
+  group_by(DPS_IDtrunc, DPStrunc) %>%
+  summarize(SHAPE = st_union(SHAPE))
 
 # plotting
 bbox <- st_bbox(sf_stel_nad83col)
@@ -364,6 +392,7 @@ inset_context <- ggplot() +
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of average relative bias in steelhead surveys (1980-2024)",
@@ -377,6 +406,7 @@ stel_a
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of average precision in steelhead surveys (1980-2024)",
@@ -393,6 +423,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
     zoom = 10
   ) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of average population size in steelhead populations (1980-2024)",
@@ -404,7 +435,7 @@ stel_pop <- main_map + inset_element(inset_context,
 stel_pop
 
 # choropleth
-data <- bi_class(sf_stel_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
+data <- bi_class(sf_stel_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
   # bi_class creates a new 'bi_class' column based on quantiles of two variables
 map <- ggplot() +
   annotation_map_tile(
@@ -412,11 +443,12 @@ map <- ggplot() +
     zoom = 10
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
-  bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
+  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
   bi_theme()
-legend <- bi_legend(pal = "GrPink2",
+legend <- bi_legend(pal = "Brown2",
                     dim = 4,
-                    xlab = "Bias",
+                    xlab = "Population",
                     ylab = "Variance",
                     size = 8) +
   theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 1))
@@ -427,3 +459,46 @@ stel_ARchoro <- final_plot + inset_element(inset_context,
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
 stel_ARchoro
+
+# getting weird... iterated choropleths by esu
+outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+plot_list <- lapply(1:nrow(sf_outlines), function(i) {
+  
+  # select the single focus polygon
+  focus_polygon <- sf_outlines[i, ]
+  
+  # extract the title for this specific iteration
+  current_title <- focus_polygon$DPStrunc
+  
+  # "cookie cut" the data to the focus polygon boundary
+  # this removes all data outside the outline and clips bordering polygons
+  focus_data_clipped <- st_intersection(data, focus_polygon)
+  
+  # build the map
+  p <- ggplot() +
+    annotation_map_tile(type = "hotstyle", zoom = 10) +
+    # Background: Full muted choropleth
+    geom_sf(data = data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+    # Shroud: Semi-opaque white layer
+    geom_sf(data = st_union(data), fill = "white", alpha = 0.7, color = NA) +
+    # Highlight: Clipped data only
+    geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+    # Outline: Crisp black border
+    geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
+    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_theme() +
+    labs(title = current_title) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
+  
+  
+  # combine with legend
+  ggdraw() + 
+    draw_plot(p, 0, 0, 1, 1) + 
+    draw_plot(legend, 0.005, 0.65, 0.25, 0.25)
+})
+
+doink <- wrap_plots(plot_list, ncol = 2)
+stel_ARchoro_panel <- doink + inset_element(inset_context, 
+                                           left = 0.7, bottom = 0.05, 
+                                           right = 0.98, top = 0.3)
+stel_ARchoro_panel
