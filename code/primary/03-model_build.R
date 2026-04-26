@@ -16,7 +16,7 @@ counts <- table(nosa$MethodNameID)
 counts
 
 # will drop those methods for which fewer than 30 observations exist
-low_count_ids <- names(counts[counts < 30])
+low_count_ids <- names(counts[counts < 10])
 low_counts <- as.numeric(low_count_ids)
 
 nosa <- nosa %>%
@@ -54,8 +54,8 @@ unique(nosa_coho$MethodNameID)
 table(nosa_coho$MethodNameID)
   # method 9 only appears 26 times
   # method 11 only appears 22 times
-nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 9, ]
-nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 11, ]
+# nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 9, ]
+# nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 11, ]
 
 # steelhead
 length(unique(nosa_stel$PopID))
@@ -100,7 +100,7 @@ nosa_chin <- as.matrix(nosa_chin)
 nosa_coho <- nosa_coho[,order(colnames(nosa_coho))]
 nosa_coho_rows <- as.data.frame(stringr::str_split_fixed(nosa_coho$popmethod, "_", 2))
 colnames(nosa_coho_rows) <- c("popid", "method")
-nosa_coho <- nosa_coho[-c(36)]
+nosa_coho <- nosa_coho[-c(46)]
 colnames(nosa_coho) <- substr(colnames(nosa_coho), 8, 11)
 years <- colnames(nosa_coho)
 nosa_coho <- as.matrix(nosa_coho)

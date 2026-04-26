@@ -73,7 +73,7 @@ sf_coho_nad83 <- st_transform(sf_coho, crs = 4269)
 
 # can this be collapsed?
 sf_coho_nad83col <- sf_coho_nad83 %>%
-  group_by(NWFSC_POP_ID, DPS_IDtrunc) %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
   summarize(
     mean_lnnosa = mean(mean_lnnosa, na.rm = TRUE),
     mean_a      = mean(mean_a, na.rm = TRUE),
@@ -112,12 +112,15 @@ sf_outlines <- sf_coho_nad83col %>%
   group_by(DPS_IDtrunc, DPStrunc) %>%
   summarize(SHAPE = st_union(SHAPE))
 
+# check for empty geometries
+# sf_coho_nad83col <- sf_coho_nad83col[!st_is_empty(sf_coho_nad83col), ]
+
 # plotting
 main_map <- ggplot(data = sf_coho_nad83col) +
-  annotation_map_tile(type = "osm", zoom = 10) + 
+  # annotation_map_tile(type = "osm", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) + 
+  coord_sf(crs = 4269) +
   scale_fill_viridis_c(option = "plasma") + 
   labs(title = "Map of relative bias in coho populations",
        fill = "Mean relative bias") +
@@ -181,6 +184,49 @@ coho_ARchoro <- final_plot + inset_element(inset_context,
                                            right = 0.98, top = 0.3)
 coho_ARchoro
 
+# getting weird... iterated choropleths by esu
+outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+plot_list <- lapply(1:nrow(sf_outlines), function(i) {
+  
+  # select the single focus polygon
+  focus_polygon <- sf_outlines[i, ]
+  
+  # extract the title for this specific iteration
+  current_title <- focus_polygon$DPStrunc
+  
+  # "cookie cut" the data to the focus polygon boundary
+  # this removes all data outside the outline and clips bordering polygons
+  focus_data_clipped <- st_intersection(data, focus_polygon)
+  
+  # build the map
+  p <- ggplot() +
+    annotation_map_tile(type = "hotstyle", zoom = 10) +
+    # Background: Full muted choropleth
+    geom_sf(data = data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+    # Shroud: Semi-opaque white layer
+    geom_sf(data = st_union(data), fill = "white", alpha = 0.7, color = NA) +
+    # Highlight: Clipped data only
+    geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+    # Outline: Crisp black border
+    geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
+    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_theme() +
+    labs(title = current_title) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
+  
+  
+  # combine with legend
+  ggdraw() + 
+    draw_plot(p, 0, 0, 1, 1) + 
+    draw_plot(legend, 0.005, 0.65, 0.25, 0.25)
+})
+
+doink <- wrap_plots(plot_list, ncol = 2)
+coho_ARchoro_panel <- doink + inset_element(inset_context, 
+                                            left = 0.7, bottom = 0.05, 
+                                            right = 0.98, top = 0.3)
+coho_ARchoro_panel
+
 
 ###### chinook
 ARchin <- ARchin %>%
@@ -212,7 +258,7 @@ sf_chin_nad83 <- st_transform(sf_chin, crs = 4269)
 
 # can this be collapsed?
 sf_chin_nad83col <- sf_chin_nad83 %>%
-  group_by(NWFSC_POP_ID, DPS_IDtrunc) %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
   summarize(
     mean_lnnosa = mean(mean_lnnosa, na.rm = TRUE),
     mean_a      = mean(mean_a, na.rm = TRUE),
@@ -319,6 +365,51 @@ chin_ARchoro <- final_plot + inset_element(inset_context,
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
 chin_ARchoro
+
+# getting weird... iterated choropleths by esu
+outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+plot_list <- lapply(1:nrow(sf_outlines), function(i) {
+  
+  # select the single focus polygon
+  focus_polygon <- sf_outlines[i, ]
+  
+  # extract the title for this specific iteration
+  current_title <- focus_polygon$DPStrunc
+  
+  # "cookie cut" the data to the focus polygon boundary
+  # this removes all data outside the outline and clips bordering polygons
+  focus_data_clipped <- st_intersection(data, focus_polygon)
+  
+  # build the map
+  p <- ggplot() +
+    annotation_map_tile(type = "hotstyle", zoom = 10) +
+    # Background: Full muted choropleth
+    geom_sf(data = data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+    # Shroud: Semi-opaque white layer
+    geom_sf(data = st_union(data), fill = "white", alpha = 0.7, color = NA) +
+    # Highlight: Clipped data only
+    geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
+    # Outline: Crisp black border
+    geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
+    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_theme() +
+    labs(title = current_title) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
+  
+  
+  # combine with legend
+  ggdraw() + 
+    draw_plot(p, 0, 0, 1, 1) + 
+    draw_plot(legend, 0.005, 0.65, 0.25, 0.25)
+})
+
+doink <- wrap_plots(plot_list, ncol = 2)
+chin_ARchoro_panel <- doink + inset_element(inset_context, 
+                                            left = 0.7, bottom = 0.05, 
+                                            right = 0.98, top = 0.3)
+chin_ARchoro_panel
+
+
 
 ###### steelhead
 ARstel <- ARstel %>%
