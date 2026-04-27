@@ -44,12 +44,12 @@ saveRDS(boot_stel, file=here::here("data", "clean", "ssmBOOT_stelM22.rds"))
 # stopCluster(cl)
 
 # bootstrap estimates - the long way
-boot_chin <- MARSSboot(ssm_chin, nboot=10000, output="parameters", sim = "parametric", param.gen = "itself")
+boot_chin <- MARSSboot(ssm_chin, nboot=200, output="parameters", sim = "parametric", param.gen = "itself")
 saveRDS(boot_chin, file=here::here("data", "clean", "ssmBOOT_chinM16_ITSELF.rds"))
 
-boot_coho <- MARSSboot(ssm_coho, nboot=10000, output="parameters", sim = "parametric", param.gen = "itself")
+boot_coho <- MARSSboot(ssm_coho, nboot=200, output="parameters", sim = "parametric", param.gen = "itself")
 saveRDS(boot_coho, file=here::here("data", "clean", "ssmBOOT_cohoM10_ITSELF.rds"))
 
-boot_stel <- MARSSboot(ssm_stel, nboot=10000, output="parameters", sim = "parametric", param.gen = "itself")
+boot_stel <- MARSSboot(ssm_stel, nboot=200, output="parameters", sim = "parametric", param.gen = "itself")
 saveRDS(boot_stel, file=here::here("data", "clean", "ssmBOOT_stelM22_ITSELF.rds"))
   
