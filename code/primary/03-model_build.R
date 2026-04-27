@@ -124,9 +124,9 @@ R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 
 # a
-scale <- "16"
+scale <- "9"
   # sets relative value against which other survey methods will be scaled
-  # 16 -> Peak redd count expansion * Fish per redd estimate, least common method
+  # 9 -> dam counts - accurate (according to parsons and Skalski)
 a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(a_chin.model)){
   if(nosa_chin_rows$method[i] != scale){
@@ -173,9 +173,8 @@ R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(R_coho.model) <- paste0("r", nosa_coho_rows$method)
 
 # a
-scale <- "10"
-  # 10 -> Dam counts (Video), least common method
-    # kind of an odd choice as a scale though...
+scale <- "9"
+  # 9 -> dam counts - accurate (according to parsons and Skalski)
 a_coho.model <- matrix(list(0), n_coho, 1)
 for(i in 1:length(a_coho.model)){
   if(nosa_coho_rows$method[i] != scale){
@@ -222,8 +221,8 @@ R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
 
 # a
-scale <- "22"
-  # 22 -> Total redd counts * Fish per redd estimate, least common method
+scale <- "9"
+  # 9 -> dam counts - accurate (according to parsons and Skalski)
 a_stel.model <- matrix(list(0), n_stel, 1)
 for(i in 1:length(a_stel.model)){
   if(nosa_stel_rows$method[i] != scale){
