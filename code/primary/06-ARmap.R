@@ -117,7 +117,7 @@ sf_outlines <- sf_coho_nad83col %>%
 
 # plotting
 main_map <- ggplot(data = sf_coho_nad83col) +
-  # annotation_map_tile(type = "osm", zoom = 10) + 
+  annotation_map_tile(type = "osm", zoom = 10) +
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
@@ -129,6 +129,7 @@ coho_a <- main_map + inset_element(inset_context,
                                    left = 0.85, bottom = 0.05, 
                                    right = 1.1, top = 0.3)
 coho_a
+ggsave(here("output", "figures", "coho_a.png"), plot=coho_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
@@ -143,6 +144,7 @@ coho_r <- main_map + inset_element(inset_context,
                                    left = 0.85, bottom = 0.05, 
                                    right = 1.1, top = 0.3)
 coho_r
+ggsave(here("output", "figures", "coho_r.png"), plot=coho_r, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
@@ -157,6 +159,7 @@ coho_pop <- main_map + inset_element(inset_context,
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
 coho_pop
+ggsave(here("output", "figures", "coho_pop.png"), plot=coho_pop, device="png", dpi=300)
 
 # choropleth
 data <- bi_class(sf_coho_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
@@ -168,9 +171,9 @@ map <- ggplot() +
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
+  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
   bi_theme()
-legend <- bi_legend(pal = "GrPink2",
+legend <- bi_legend(pal = "Brown2",
                     dim = 4,
                     xlab = "Population",
                     ylab = "Variance",
@@ -183,6 +186,7 @@ coho_ARchoro <- final_plot + inset_element(inset_context,
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
 coho_ARchoro
+ggsave(here("output", "figures", "coho_ARchoro.png"), plot=coho_ARchoro, device="png", dpi=300)
 
 # getting weird... iterated choropleths by esu
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
@@ -226,6 +230,7 @@ coho_ARchoro_panel <- doink + inset_element(inset_context,
                                             left = 0.7, bottom = 0.05, 
                                             right = 0.98, top = 0.3)
 coho_ARchoro_panel
+ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
 
 
 ###### chinook
@@ -311,6 +316,7 @@ chin_a <- main_map + inset_element(inset_context,
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
 chin_a
+ggsave(here("output", "figures", "chin_a.png"), plot=chin_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
@@ -325,6 +331,7 @@ chin_r <- main_map + inset_element(inset_context,
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
 chin_r
+ggsave(here("output", "figures", "chin_r.png"), plot=chin_r, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_chin_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
@@ -339,6 +346,7 @@ chin_pop <- main_map + inset_element(inset_context,
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
 chin_pop
+ggsave(here("output", "figures", "chin_pop.png"), plot=chin_pop, device="png", dpi=300)
 
 # choropleth
 data <- bi_class(sf_chin_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
@@ -350,9 +358,9 @@ map <- ggplot() +
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  bi_scale_fill(pal = "GrPink2", dim = 4) + # Choose a built-in bivariate palette
+  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
   bi_theme()
-legend <- bi_legend(pal = "GrPink2",
+legend <- bi_legend(pal = "Brown2",
                     dim = 4,
                     xlab = "Population",
                     ylab = "Variance",
@@ -365,6 +373,7 @@ chin_ARchoro <- final_plot + inset_element(inset_context,
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
 chin_ARchoro
+ggsave(here("output", "figures", "chin_ARchoro.png"), plot=chin_ARchoro, device="png", dpi=300)
 
 # getting weird... iterated choropleths by esu
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
@@ -408,6 +417,7 @@ chin_ARchoro_panel <- doink + inset_element(inset_context,
                                             left = 0.7, bottom = 0.05, 
                                             right = 0.98, top = 0.3)
 chin_ARchoro_panel
+ggsave(here("output", "figures", "chin_ARchoro_panel.png"), plot=chin_ARchoro_panel, device="png", dpi=300)
 
 
 
@@ -493,6 +503,7 @@ stel_a <- main_map + inset_element(inset_context,
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
 stel_a
+ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "osm", zoom = 10) + 
@@ -507,6 +518,7 @@ stel_r <- main_map + inset_element(inset_context,
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
 stel_r
+ggsave(here("output", "figures", "stel_r.png"), plot=stel_r, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(
@@ -524,6 +536,7 @@ stel_pop <- main_map + inset_element(inset_context,
                          left = 0.7, bottom = 0.05, 
                          right = 0.98, top = 0.3)
 stel_pop
+ggsave(here("output", "figures", "stel_pop.png"), plot=stel_pop, device="png", dpi=300)
 
 # choropleth
 data <- bi_class(sf_stel_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
@@ -550,6 +563,7 @@ stel_ARchoro <- final_plot + inset_element(inset_context,
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
 stel_ARchoro
+ggsave(here("output", "figures", "stel_ARchoro.png"), plot=stel_ARchoro, device="png", dpi=300)
 
 # getting weird... iterated choropleths by esu
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
@@ -593,3 +607,4 @@ stel_ARchoro_panel <- doink + inset_element(inset_context,
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
 stel_ARchoro_panel
+ggsave(here("output", "figures", "stel_ARchoro_panel.png"), plot=stel_ARchoro_panel, device="png", dpi=300)
