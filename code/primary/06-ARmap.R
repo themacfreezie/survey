@@ -40,19 +40,19 @@ sf_coho <- sf_fish_combined %>%
 sf_coho_nad83 <- st_transform(sf_coho, crs = 4269)
 
 # ggplot(data = sf_coho_nad83) +
-#   annotation_map_tile(type = "osm", zoom = 10) + 
+#   annotation_map_tile(type = "hotstyle", zoom = 10) + 
 #   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
 #   coord_sf(crs = 4269) + 
-#   scale_fill_viridis_c(option = "plasma") + # Provides a high-contrast, accessible gradient
+#   scale_fill_viridis_c(option = "inferno") + # Provides a high-contrast, accessible gradient
 #   labs(title = "Map of bias in coho populations",
 #        fill = "Mean bias") +
 #   theme_minimal()
 # 
 # ggplot(data = sf_coho_nad83) +
-#   annotation_map_tile(type = "osm", zoom = 10) + 
+#   annotation_map_tile(type = "hotstyle", zoom = 10) + 
 #   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
 #   coord_sf(crs = 4269) + 
-#   scale_fill_viridis_c(option = "plasma") + # Provides a high-contrast, accessible gradient
+#   scale_fill_viridis_c(option = "inferno") + # Provides a high-contrast, accessible gradient
 #   labs(title = "Map of precision in coho populations",
 #        fill = "Mean variance") +
 #   theme_minimal()
@@ -118,13 +118,14 @@ sf_outlines <- sf_coho_nad83col %>%
 
 # plotting
 main_map <- ggplot(data = sf_coho_nad83col) +
-  annotation_map_tile(type = "osm", zoom = 10) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of relative bias in coho populations",
-       fill = "Mean relative bias") +
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Average bias - coho surveys (1980-2024)",
+       caption = "Bias measured relative to 'Dam Counts' method",
+       fill = "Bias") +
   theme_minimal()
 coho_a <- main_map + inset_element(inset_context, 
                                    left = 0.85, bottom = 0.05, 
@@ -133,13 +134,13 @@ coho_a
 ggsave(here("output", "figures", "coho_a.png"), plot=coho_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_coho_nad83col) +
-  annotation_map_tile(type = "osm", zoom = 10) + 
+  annotation_map_tile(type = "hotstyle", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of precision in coho populations",
-       fill = "Mean variance") +
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Average precision - coho surveys (1980-2024)",
+       fill = "Variance") +
   theme_minimal()
 coho_r <- main_map + inset_element(inset_context, 
                                    left = 0.85, bottom = 0.05, 
@@ -148,13 +149,13 @@ coho_r
 ggsave(here("output", "figures", "coho_r.png"), plot=coho_r, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_coho_nad83col) +
-  annotation_map_tile(type = "osm", zoom = 10) + 
+  annotation_map_tile(type = "hotstyle", zoom = 10) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of population size in coho populations",
-       fill = "Average pop size (1980-2024)") +
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Average population size - coho (1980-2024)",
+       fill = "pop. size") +
   theme_minimal()
 coho_pop <- main_map + inset_element(inset_context, 
                                      left = 0.85, bottom = 0.05, 
@@ -284,7 +285,7 @@ outline_panels_clipped <- lapply(1:nrow(sf_outlines), function(i) {
   ggplot() +
     geom_sf(data = esu_data_clipped, aes(fill = mean_a), alpha = 0.7, color = "white", size = 0.1) +
     geom_sf(data = focus_outline, fill = NA, color = "black", linewidth = 1.2) +
-    scale_fill_viridis_c(option = "plasma") +
+    scale_fill_viridis_c(option = "inferno") +
     labs(title = focus_outline$DPStrunc) +
     theme_minimal() +
     theme(
@@ -332,11 +333,11 @@ shared_borders <- st_intersection(sf_outlines) %>%
 
 # plotting
 # main_map <- ggplot(data = sf_chin_nad83col) +
-#   annotation_map_tile(type = "osm", zoom = 10) + 
+#   annotation_map_tile(type = "hotstyle", zoom = 10) + 
 #   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
 #   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
 #   coord_sf(crs = 4269) + 
-#   scale_fill_viridis_c(option = "plasma") + 
+#   scale_fill_viridis_c(option = "inferno") + 
 #   labs(title = "Map of relative bias in chin populations",
 #        fill = "Mean relative bias") +
 #   theme_minimal()
@@ -361,13 +362,13 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "plasma", 
+    option = "inferno", 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
-    name = "Mean relative bias"
+    name = "Bias"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Map of relative bias in chin populations",
-       caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
+  labs(title = "Average bias - Chinook surveys (1980-2024)",
+       caption = "Bias measured relative to 'Dam Counts' method, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal()
 chin_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
@@ -392,12 +393,12 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "plasma", 
+    option = "inferno", 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
-    name = "Mean relative bias"
+    name = "Variance"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Map of relative bias in chin populations",
+  labs(title = "Average precision - Chinook surveys (1980-2024)",
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal()
 chin_r <- main_map + inset_element(inset_context, 
@@ -423,12 +424,12 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "plasma", 
+    option = "inferno", 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
-    name = "Mean relative bias"
+    name = "Pop. size"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Map of relative bias in chin populations",
+  labs(title = "Average population size - Chinook (1980-2024)",
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal()
 chin_pop <- main_map + inset_element(inset_context, 
@@ -505,7 +506,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   current_title <- focus_polygon$DPStrunc
   focus_data_clipped <- st_intersection(data, focus_polygon)
   p <- ggplot() +
-    annotation_map_tile(type = "hotstyle", zoom = 10) +
+    # annotation_map_tile(type = "hotstyle", zoom = 10) +
     geom_sf(data = data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
     geom_sf(data = st_union(data), fill = "white", alpha = 0.7, color = NA) +
     geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
@@ -516,7 +517,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
   ggdraw() + 
     draw_plot(p, 0, 0, 1, 1) + 
-    draw_plot(legend, 0.005, 0.65, 0.25, 0.25)
+    draw_plot(legend, 0.55, 0.05, 0.25, 0.25)
 })
 doink <- wrap_plots(plot_list, ncol = 2)
 chin_ARchoro_panel <- doink + inset_element(inset_context, 
@@ -597,12 +598,13 @@ inset_context <- ggplot() +
   )
 
 main_map <- ggplot(data = sf_stel_nad83col) +
-  annotation_map_tile(type = "osm", zoom = 10) + 
+  annotation_map_tile(type = "hotstyle", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of average relative bias in steelhead surveys (1980-2024)",
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Average bias - steelhead surveys (1980-2024)",
+       caption = "Bias measured relative to 'Dam Counts' method",
        fill = "Bias") +
   theme_minimal()
 stel_a <- main_map + inset_element(inset_context, 
@@ -612,12 +614,12 @@ stel_a
 ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
-  annotation_map_tile(type = "osm", zoom = 10) + 
+  annotation_map_tile(type = "hotstyle", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of average precision in steelhead surveys (1980-2024)",
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Average precision - steelhead surveys (1980-2024)",
        fill = "Variance") +
   theme_minimal()
 stel_r <- main_map + inset_element(inset_context, 
@@ -634,8 +636,8 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "plasma") + 
-  labs(title = "Map of average population size in steelhead populations (1980-2024)",
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Average population size - steelhead (1980-2024)",
        fill = "Pop. size") +
   theme_minimal()
 stel_pop <- main_map + inset_element(inset_context, 
@@ -655,6 +657,7 @@ map <- ggplot() +
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
+  labs(title = "Average survey variance and average population size (1980-2024)")
   bi_theme()
 legend <- bi_legend(pal = "Brown2",
                     dim = 4,
@@ -664,7 +667,7 @@ legend <- bi_legend(pal = "Brown2",
   theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 1))
 final_plot <- ggdraw() +
   draw_plot(map, 0, 0, 1, 1) +
-  draw_plot(legend, 0.05, 0.7, 0.2, 0.2) # Adjust coordinates and size as needed
+  draw_plot(legend, 0.05, 0.75, 0.2, 0.2) # Adjust coordinates and size as needed
 stel_ARchoro <- final_plot + inset_element(inset_context, 
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)

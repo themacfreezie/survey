@@ -9,12 +9,16 @@ boot_chinM16 <- readRDS(here("data", "clean", "ssmBOOT_chinM16.rds"))
 boot_cohoM10 <- readRDS(here("data", "clean", "ssmBOOT_cohoM10.rds"))
 boot_stelM22 <- readRDS(here("data", "clean", "ssmBOOT_stelM22.rds"))
 
+boot_chinM9 <- readRDS(here("data", "clean", "ssmBOOT_chinM9.rds"))
+boot_cohoM9 <- readRDS(here("data", "clean", "ssmBOOT_cohoM9.rds"))
+boot_stelM9 <- readRDS(here("data", "clean", "ssmBOOT_stelM9.rds"))
+
 legend <- read_excel(here("data", "clean", "method_key.xlsx"), col_names = TRUE)
 legend$method <- legend$Method
 legend <- legend[-c(1)]
 
 # modular code - Chinook
-mod <- boot_chinM16
+mod <- boot_chinM9
 
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
@@ -82,7 +86,7 @@ china_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Chinook Bias Estimates',
-       subtitle='Bias relative to mark-recapture estimate at weir',
+       subtitle='Bias relative to damn counts',
        y=NULL) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
@@ -121,7 +125,7 @@ chinr_bplot
 
 chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
-  labs(y = 'Relative Bias (mark-recapture estimate at weir)',
+  labs(y = 'Relative Bias (dam counts)',
        title='Chinook',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
@@ -151,7 +155,7 @@ chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
 chin_splot
 
 # modular code - Coho
-mod <- boot_cohoM10
+mod <- boot_cohoM9
 
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
@@ -219,7 +223,7 @@ cohoa_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Coho Bias Estimates',
-       subtitle='Bias relative to mark-recapture estimate at weir',
+       subtitle='Bias relative to dam counts',
        y=NULL) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
@@ -258,7 +262,7 @@ cohor_bplot
 
 coho_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
-  labs(y = 'Relative Bias (mark-recapture estimate at weir)',
+  labs(y = 'Relative Bias (dam counts)',
        title='Coho',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
@@ -288,7 +292,7 @@ coho_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
 coho_splot
 
 # modular code - steelhead
-mod <- boot_stelM22
+mod <- boot_stelM9
 
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
@@ -356,7 +360,7 @@ stela_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Steelhead Bias Estimates',
-       subtitle='Bias relative to mark-recapture estimate at weir',
+       subtitle='Bias relative to dam counts',
        y=NULL) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
@@ -395,7 +399,7 @@ stelr_bplot
 
 stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
-  labs(y = 'Relative Bias (mark-recapture estimate at weir)',
+  labs(y = 'Relative Bias (dam counts)',
        title='Steelhead',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
