@@ -100,6 +100,15 @@ china_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
                                "#4dc48f" # Weir counts
   )) +
   theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 24),
+    legend.title = element_text(size = 18),
+    legend.text = element_text(size = 14),
+    axis.text.x = element_text(size = 14, color = "black"),
+    axis.text.y= element_text(size = 14, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
   theme(axis.text.x = element_text(angle = 350, hjust = 0, vjust = 0.9))
 china_bplot
 
@@ -120,13 +129,22 @@ chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
                                "#4dc48f" # Weir counts
   )) +
   theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 24),
+    legend.title = element_text(size = 18),
+    legend.text = element_text(size = 14),
+    axis.text.x = element_text(size = 14, color = "black"),
+    axis.text.y= element_text(size = 14, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 chinr_bplot
 
 chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
   labs(y = 'Relative Bias (dam counts)',
-       title='Chinook',
+       title='Chinook Bias and Variance',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 # "#c772c5",
@@ -151,7 +169,18 @@ chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
                 linewidth = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  theme_classic()
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 24),
+    legend.title = element_text(size = 18),
+    legend.text = element_text(size = 14),
+    axis.title.x = element_text(size = 18),
+    axis.title.y= element_text(size = 18),
+    axis.text.x = element_text(size = 14, color = "black"),
+    axis.text.y= element_text(size = 14, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  )
 chin_splot
 
 # modular code - Coho
