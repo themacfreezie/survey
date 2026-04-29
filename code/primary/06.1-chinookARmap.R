@@ -151,12 +151,12 @@ main_map <- ggplot() +
        caption = "Bias measured relative to 'Dam Counts' method, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
   theme(
-    plot.title = element_text(face = "bold", size = 24),
-    legend.title = element_text(size = 18),
-    legend.text = element_text(size = 14),
-    axis.text.x = element_text(size = 14, color = "black"),
-    axis.text.y= element_text(size = 14, color = "black"),
-  )
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+  ) 
 chin_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
@@ -189,12 +189,12 @@ main_map <- ggplot() +
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
   theme(
-    plot.title = element_text(face = "bold", size = 24),
-    legend.title = element_text(size = 18),
-    legend.text = element_text(size = 14),
-    axis.text.x = element_text(size = 14, color = "black"),
-    axis.text.y= element_text(size = 14, color = "black"),
-  )
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+  ) 
 chin_r <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
@@ -227,12 +227,12 @@ main_map <- ggplot() +
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
   theme(
-    plot.title = element_text(face = "bold", size = 24),
-    legend.title = element_text(size = 18),
-    legend.text = element_text(size = 14),
-    axis.text.x = element_text(size = 14, color = "black"),
-    axis.text.y= element_text(size = 14, color = "black"),
-  )
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+  ) 
 chin_pop <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
@@ -380,11 +380,11 @@ create_single_dps_plot <- function(current_dps_name, data, fill_var, title_prefi
     ) +
     theme_minimal() +
     theme(
-      plot.title = element_text(face = "bold", size = 24),
-      legend.title = element_text(size = 18),
-      legend.text = element_text(size = 14),
-      axis.text.x = element_text(size = 14, color = "black"),
-      axis.text.y= element_text(size = 14, color = "black"),
+      plot.title = element_text(face = "bold", size = 28),
+      legend.title = element_text(size = 20),
+      legend.text = element_text(size = 18),
+      axis.text.x = element_text(size = 18, color = "black"),
+      axis.text.y= element_text(size = 18, color = "black"),
       panel.grid = element_blank(),
       legend.position = "right"
     ) +
@@ -426,8 +426,8 @@ bi_legend_shared <- bi_legend(
 ) +
   theme(
     plot.background = element_rect(color = "black", fill = "white", linewidth = 1),
-    axis.title.x = element_text(size = 18, face = "bold"),
-    axis.title.y = element_text(size = 18, face = "bold")
+    axis.title.x = element_text(size = 20, face = "bold"),
+    axis.title.y = element_text(size = 20, face = "bold")
   )
 
 create_bivariate_dps_plot <- function(current_dps_name, data, legend) {
@@ -469,14 +469,15 @@ create_bivariate_dps_plot <- function(current_dps_name, data, legend) {
     
     theme_minimal() +
     theme(
-      plot.title = element_text(face = "bold", size = 24),
+      plot.title = element_text(face = "bold", size = 28),
       legend.title = element_text(size = 24),
       legend.text = element_text(size = 18),
-      axis.text.x = element_text(size = 14, color = "black"),
-      axis.text.y= element_text(size = 14, color = "black"),
+      axis.text.x = element_text(size = 18, color = "black"),
+      axis.text.y= element_text(size = 18, color = "black"),
       panel.grid = element_blank(),
       legend.position = "none"  # we add legend manually
     )
+
   
   # Combine main plot + legend
   combined <- ggdraw() +
