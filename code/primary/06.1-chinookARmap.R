@@ -510,3 +510,70 @@ precision_plots_list[[3]]
 bivar_dps_plots[[1]]
 bivar_dps_plots[[2]]
 bivar_dps_plots[[3]]
+
+
+
+# 1. Prepare Bivariate Data
+# We classify the full dataset first so colors are consistent across both layers
+sf_bivariate <- bi_class(sf_chin_nad83col, 
+                         x = mean_lnnosa, 
+                         y = mean_R, 
+                         style = "equal", 
+                         dim = 4)
+
+# 2. Separate into Base and Stripe (matching your previous logic)
+# Solid color = Lower Columbia (assuming non-104), Striped = Upper Willamette (104)
+sf_base_bi   <- sf_bivariate %>% filter(NWFSC_POP_ID != 104)
+sf_stripe_bi <- sf_bivariate %>% filter(NWFSC_POP_ID == 104)
+
+# 3. Create the Bivariate Legend
+# We'll use this as an inset later
+legend_bi <- bi_legend(pal = "Brown2",
+                       dim = 4,
+                       xlab = "Population",
+                       ylab = "Variance",
+                       size = 16) +
+  theme(plot.background = element_rect(color = "black", fill = "white", linewidth = 0.5),
+        axis.title = element_text(size = 16))
+
+# 4. The Unified Bivariate Map
+main_choro_map <- ggplot() +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  # Layer 1: Solid Base (Lower Columbia)
+  geom_sf(data = sf_base_bi, 
+          aes(fill = bi_class), 
+          alpha = 0.8, color = "white", size = 0.1, show.legend = FALSE) +
+  # Layer 2: Striped Overlay (Upper Willamette / Pop 104)
+  geom_sf_pattern(
+    data = sf_stripe_bi,
+    aes(pattern_fill = bi_class), 
+    pattern = 'stripe',
+    pattern_color = NA,
+    pattern_density = 0.2,
+    pattern_spacing = 0.015,
+    fill = NA,                # Transparent fill lets underlying area show
+    alpha = 1,
+    show.legend = FALSE
+  ) +
+  # Layer 3: Borders & Outlines
+  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) +
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +
+  # Use the bivariate scale for BOTH fill and pattern_fill
+  bi_scale_fill(pal = "Brown2", dim = 4, aesthetics = c("fill", "pattern_fill")) +
+  coord_sf(crs = 4269) +
+  labs(caption = "Solid = Lower Columbia ESU | Striped = Upper Willamette ESU") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 22),
+    axis.text = element_text(size = 12)
+  )
+
+# 5. Combine with Insets
+# We add both the study-area context map AND the bivariate legend
+final_bivariate_plot <- ggdraw(main_choro_map) +
+  # Place the spatial context map
+  draw_plot(inset_context, x = 0.75, y = 0.05, width = 0.2, height = 0.25) +
+  # Place the bivariate legend
+  draw_plot(legend_bi, x = 0.5, y = 0.05, width = 0.25, height = 0.25)
+
+final_bivariate_plot
