@@ -266,7 +266,16 @@ cohoa_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
                                # "#4dc48f" # Weir counts
   )) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 350, hjust = 0, vjust = 0.9))
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 cohoa_bplot
 
 cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
@@ -286,13 +295,22 @@ cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
                                # "#4dc48f" # Weir counts
   )) +
   theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 cohor_bplot
 
 coho_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
   labs(y = 'Relative Bias (dam counts)',
-       title='Coho',
+       title='Coho Bias and Variance',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 "#c772c5", # AUC monitoring
@@ -317,7 +335,18 @@ coho_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
                 linewidth = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  theme_classic()
+  theme_classic() +
+theme(
+  plot.title = element_text(face = "bold", size = 28),
+  legend.title = element_text(size = 20),
+  legend.text = element_text(size = 18),
+  axis.title.x = element_text(size = 20),
+  axis.title.y= element_text(size = 20),
+  axis.text.x = element_text(size = 18, color = "black"),
+  axis.text.y= element_text(size = 18, color = "black"),
+  panel.grid = element_blank(),
+  legend.position = "right"
+)
 coho_splot
 
 # modular code - steelhead
@@ -403,7 +432,16 @@ stela_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
                                "#4dc48f" # Weir counts
   )) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 350, hjust = 0, vjust = 0.9))
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 stela_bplot
 
 stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
@@ -423,13 +461,22 @@ stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
                                "#4dc48f" # Weir counts
   )) +
   theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 stelr_bplot
 
 stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
   labs(y = 'Relative Bias (dam counts)',
-       title='Steelhead',
+       title='Steelhead Bias and Variance',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 # "#c772c5", # AUC monitoring
@@ -454,5 +501,16 @@ stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
                 linewidth = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  theme_classic()
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.title.x = element_text(size = 20),
+    axis.title.y= element_text(size = 20),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  )
 stel_splot
