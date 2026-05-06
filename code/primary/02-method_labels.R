@@ -88,3 +88,10 @@ merge <- nosa %>%
   left_join(mtds, by = "MethodNameID")
 
 save(merge, file=here("data", "clean", "nosa_codes.Rda"))
+
+# make look up table for annual methods
+load(here("data", "clean", "populations_list.Rda"))
+lookit <- merge(nosa, pop_list, by = "PopID")
+lookit <- merge(lookit, method_list, by = "MethodNameID")
+annual_popMethod <- lookit[-c(6,7,8,9,12:16)]
+save(annual_popMethod, file=here("data", "clean", "annual_popMethod.Rda"))
