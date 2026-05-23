@@ -100,6 +100,34 @@ collapsed_ARdata <- merged_ARdata %>%
             mean_a = mean(a, na.rm = TRUE), 
             mean_R = mean(R, na.rm = TRUE))
 
+# pulling averages for first and last decade of observations by population
+ordered_ARdata <- merged_ARdata %>%
+  group_by(PopID, CommonName) %>%
+  arrange(Year, .by_group = TRUE) %>% # Sort chronologically within each group
+  ungroup()
+
+first_10_means <- ordered_ARdata %>%
+  group_by(PopID, CommonName) %>%
+  slice_head(n = 10) %>% # Grabs the earliest 10 available records per group
+  summarize(
+    first10_mean_lnnosa = mean(lnnosa, na.rm = TRUE),
+    first10_mean_a      = mean(a, na.rm = TRUE),
+    first10_mean_R      = mean(R, na.rm = TRUE),
+    .groups             = "drop"
+  )
+
+last_10_means <- ordered_ARdata %>%
+  group_by(PopID, CommonName) %>%
+  slice_tail(n = 10) %>% # Grabs the most recent 10 available records per group
+  summarize(
+    last10_mean_lnnosa = mean(lnnosa, na.rm = TRUE),
+    last10_mean_a      = mean(a, na.rm = TRUE),
+    last10_mean_R      = mean(R, na.rm = TRUE),
+    .groups            = "drop"
+  )
+
+firstlast_ARdata <- full_join(first_10_means, last_10_means, by = c("PopID", "CommonName"))
+
 # merge in population data
 popavgAR <- merge(collapsed_ARdata, pop_list, by = c("PopID"))
   # why are there more lines than in collapsed_ARdata
@@ -114,6 +142,7 @@ table(pop_list$PopID)
 # try this again
 pop_list <- pop_list[-c(52, 68, 69), ]
 popavgAR <- merge(collapsed_ARdata, pop_list, by = c("PopID", "CommonName"))
+FLavgAR <- merge(firstlast_ARdata, pop_list, by = c("PopID", "CommonName"))
   # matched up
 
 # bring in nmfs popid
@@ -136,13 +165,22 @@ lookup_nmfs <- lookup_nmfs %>%
 
 # merge in NWFSC pop IDs (to match with gis)
 popavgAR <- left_join(popavgAR, lookup_nmfs, by = "PopID")
+FLavgAR <- left_join(FLavgAR, lookup_nmfs, by = "PopID")
 
 # different species
 popavgAR_chin <- popavgAR %>% filter(CommonName=="Chinook Salmon")
 popavgAR_coho <- popavgAR %>% filter(CommonName=="Coho Salmon")
 popavgAR_stel <- popavgAR %>% filter(CommonName=="Steelhead")
 
+FLavgAR_chin <- FLavgAR %>% filter(CommonName=="Chinook Salmon")
+FLavgAR_coho <- FLavgAR %>% filter(CommonName=="Coho Salmon")
+FLavgAR_stel <- FLavgAR %>% filter(CommonName=="Steelhead")
+
 # save it up
 saveRDS(popavgAR_chin, file=here::here("data", "clean", "popavgAR_chin.rds"))
 saveRDS(popavgAR_coho, file=here::here("data", "clean", "popavgAR_coho.rds"))
 saveRDS(popavgAR_stel, file=here::here("data", "clean", "popavgAR_stel.rds"))
+
+saveRDS(FLavgAR_chin, file=here::here("data", "clean", "FLavgAR_chin.rds"))
+saveRDS(FLavgAR_coho, file=here::here("data", "clean", "FLavgAR_coho.rds"))
+saveRDS(FLavgAR_stel, file=here::here("data", "clean", "FLavgAR_stel.rds"))
