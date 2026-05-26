@@ -17,6 +17,7 @@ options(max.print=2000)
 
 # pull in AR data
 ARchin <- readRDS(here("data", "clean", "popavgAR_chin.rds"))
+# ARchinFL <- readRDS(here("data", "clean", "FLavgAR_chin.rds"))
 
 # pull in spatial layers
 gdb_path <- here("data", "raw", "WCR_Salmon_Steelhead_gdb_2015", "WCR_Salmon_Steelhead_gdb_2015.gdb")
