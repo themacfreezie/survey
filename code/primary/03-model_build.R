@@ -46,11 +46,22 @@ methodsTable_stel <- nosa_stel %>%
 print(methodsTable_stel)
 
 ## per species
+# chinook
+length(unique(nosa_chin$PopID))
+  # 21 populations
+unique(nosa_chin$MethodNameID)
+length(unique(nosa_chin$MethodNameID))
+  # 10 methods
+table(nosa_chin$MethodNameID)
+  # method 14 only appears 8 times
+# nosa_chin <- nosa_chin[nosa_chin$MethodNameID != 14, ]
+
 # coho
 length(unique(nosa_coho$PopID))
   # 29 populations
 unique(nosa_coho$MethodNameID)
-  # 8 methods
+length(unique(nosa_coho$MethodNameID))
+  # 10 methods
 table(nosa_coho$MethodNameID)
   # method 9 only appears 26 times
   # method 11 only appears 22 times
@@ -61,24 +72,41 @@ table(nosa_coho$MethodNameID)
 length(unique(nosa_stel$PopID))
   # 23 populations
 unique(nosa_stel$MethodNameID)
-  # 5 methods
+length(unique(nosa_stel$MethodNameID))
+  # 8 methods
 table(nosa_stel$MethodNameID)
-
-# chinook
-length(unique(nosa_chin$PopID))
-  # 21 populations
-unique(nosa_chin$MethodNameID)
-  # 9 methods including 0
-table(nosa_chin$MethodNameID)
 
 # throw away junk
 nosa_chinFULL <- nosa_chin
 nosa_cohoFULL <- nosa_coho
 nosa_stelFULL <- nosa_stel
 
-nosa_chin <- nosa_chin[-c(1, 3, 4:9)]
-nosa_coho <- nosa_coho[-c(1, 3, 4:9)]
-nosa_stel <- nosa_stel[-c(1, 3, 4:9)]
+# preserve time series @ level of populations
+nosa_chinPOP <- nosa_chinFULL
+nosa_cohoPOP <- nosa_cohoFULL
+nosa_stelPOP <- nosa_stelFULL
+
+nosa_chinPOP <- nosa_chinPOP[-c(3:10)]
+nosa_cohoPOP <- nosa_cohoPOP[-c(3:10)]
+nosa_stelPOP <- nosa_stelPOP[-c(3:10)]
+
+# set data wide (rows = popid/method, columns = year)
+nosa_chinPOP <- panel_data(nosa_chinPOP, id = PopID, wave = Year)
+nosa_chinPOP <- widen_panel(nosa_chinPOP, separator = "_")
+nosa_cohoPOP <- panel_data(nosa_cohoPOP, id = PopID, wave = Year)
+nosa_cohoPOP <- widen_panel(nosa_cohoPOP, separator = "_")
+nosa_stelPOP <- panel_data(nosa_stelPOP, id = PopID, wave = Year)
+nosa_stelPOP <- widen_panel(nosa_stelPOP, separator = "_")
+
+# save these for later
+saveRDS(nosa_chinPOP, file=here::here("data", "clean", "nosa_chinPOP.rds"))
+saveRDS(nosa_cohoPOP, file=here::here("data", "clean", "nosa_cohoPOP.rds"))
+saveRDS(nosa_stelPOP, file=here::here("data", "clean", "nosa_stelPOP.rds"))
+
+# set up popID data for MARSS models
+nosa_chin <- nosa_chin[-c(1, 3:9)]
+nosa_coho <- nosa_coho[-c(1, 3:9)]
+nosa_stel <- nosa_stel[-c(1, 3:9)]
 
 # set data wide (rows = popid/method, columns = year)
 nosa_chin <- panel_data(nosa_chin, id = popmethod, wave = Year)
