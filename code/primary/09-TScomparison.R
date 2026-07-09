@@ -25,3 +25,5 @@ plot(ssm_chin)
   # 29 y time series
 autoplot(ssm_chin, plot.type = "fitted.xtT")
 summary(ssm_chin)
+
+states_df <- tsSmooth(ssm_chin, type = "xtT")
