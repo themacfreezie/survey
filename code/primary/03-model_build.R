@@ -100,11 +100,23 @@ nosa_cohoPOP <- widen_panel(nosa_cohoPOP, separator = "_")
 nosa_stelPOP <- panel_data(nosa_stelPOP, id = PopID, wave = Year)
 nosa_stelPOP <- widen_panel(nosa_stelPOP, separator = "_")
 
+# gotta clean up coho and steelhead column order
+first_col <- "PopID"
+
+coho_yearcols <- setdiff(names(nosa_cohoPOP), first_col)
+coho_years <- as.numeric(gsub("lnnosa_", "", coho_yearcols))
+coho_sortedyearcols <- coho_yearcols[order(coho_years)]
+nosa_cohoPOP <- nosa_cohoPOP[, c(first_col, coho_sortedyearcols)]
+
+stel_yearcols <- setdiff(names(nosa_stelPOP), first_col)
+stel_years <- as.numeric(gsub("lnnosa_", "", stel_yearcols))
+stel_sortedyearcols <- stel_yearcols[order(stel_years)]
+nosa_stelPOP <- nosa_stelPOP[, c(first_col, stel_sortedyearcols)]
 
 # save these for later
-saveRDS(nosa_chinPOP, file=here::here("data", "clean", "nosa_chinPOP.rds"))
-saveRDS(nosa_cohoPOP, file=here::here("data", "clean", "nosa_cohoPOP.rds"))
-saveRDS(nosa_stelPOP, file=here::here("data", "clean", "nosa_stelPOP.rds"))
+save(nosa_chinPOP, file=here::here("data", "clean", "nosa_chinPOP.Rda"))
+save(nosa_cohoPOP, file=here::here("data", "clean", "nosa_cohoPOP.Rda"))
+save(nosa_stelPOP, file=here::here("data", "clean", "nosa_stelPOP.Rda"))
 
 # set up popID data for MARSS models
 nosa_chin <- nosa_chin[-c(1, 3:9)]
