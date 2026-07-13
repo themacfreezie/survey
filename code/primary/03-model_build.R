@@ -93,10 +93,13 @@ nosa_stelPOP <- nosa_stelPOP[-c(3:10)]
 # set data wide (rows = popid/method, columns = year)
 nosa_chinPOP <- panel_data(nosa_chinPOP, id = PopID, wave = Year)
 nosa_chinPOP <- widen_panel(nosa_chinPOP, separator = "_")
+
 nosa_cohoPOP <- panel_data(nosa_cohoPOP, id = PopID, wave = Year)
 nosa_cohoPOP <- widen_panel(nosa_cohoPOP, separator = "_")
+
 nosa_stelPOP <- panel_data(nosa_stelPOP, id = PopID, wave = Year)
 nosa_stelPOP <- widen_panel(nosa_stelPOP, separator = "_")
+
 
 # save these for later
 saveRDS(nosa_chinPOP, file=here::here("data", "clean", "nosa_chinPOP.rds"))
