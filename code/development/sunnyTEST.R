@@ -4,12 +4,12 @@ library(here)
 library(MARSS)
 library(panelr)
 
-here::i_am("code/sunnyTEST.R")
+here::i_am("code/development/sunnyTEST.R")
 options(max.print=2000)
 
 ## CREATING SYNTHETIC TIME SERIES
 ## Simple version -
-  # 2 poplations (1 large, 1 small)
+  # 2 populations (1 large, 1 small)
   # 4 methods (1 restricted to large pop, 1 to small pop, 2 for both pops)
   # most simple - 1 process error variance (Q)
   # slightly more complex - population level process variance

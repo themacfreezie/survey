@@ -22,6 +22,7 @@ low_counts <- as.numeric(low_count_ids)
 nosa <- nosa %>%
   filter(!MethodNameID %in% low_counts)
 table(nosa$MethodNameID)
+  # this should probably occur after the datasets are split up
 
 # new popid/method var
 nosa$popmethod <- paste0(as.character(nosa$PopID),"_", as.character(nosa$MethodNameID))
