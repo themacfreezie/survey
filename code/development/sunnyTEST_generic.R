@@ -6,7 +6,7 @@ library(MASS)
 library(panelr)
 library(tidyverse)
 
-here::i_am("code/development/sunnyTEST2.R")
+here::i_am("code/development/sunnyTEST_generic.R")
 options(max.print=2000)
 
 ## creating synthetic time series
@@ -29,6 +29,9 @@ V <- matrix(runif(M_methods * M_methods, min = -1, max = 1), nrow = M_methods, n
 V <- diag(diag(V))
 R <- V %*% t(V)
 R <- R + diag(0.1, M_methods)
+
+# generate observation bias for each method (e.g., between -1 and 1)
+bias_vector <- runif(M_methods, min = -1.5, max = 1.5)
 
 # simulate states (x_t,p)
 x <- matrix(0, nrow = T_steps, ncol = P_populations)
@@ -79,7 +82,7 @@ for (t in 2:T_steps) {
   }
 }
 
-# 3. build the final 3,000-row dataframe using fast vector indexing
+# build the final 3,000-row dataframe using fast vector indexing
 df_list <- list()
 
 for (p in 1:P_populations) {
@@ -92,6 +95,9 @@ for (p in 1:P_populations) {
   # extract the corresponding noise values based on the chosen method matrix coordinates
   # this matches the correct row (Time) and column (Method) from w_matrix
   p_noise <- w_matrix[matrix(c(1:T_steps, p_methods), ncol = 2)]
+  
+  # extract the corresponding true bias for the chosen methods
+  p_bias <- bias_vector[p_methods]
   
   # create a compact dataframe for this population
   df_list[[p]] <- data.frame(
@@ -108,14 +114,24 @@ df <- do.call(rbind, df_list)
 
 # grab variance terms
 df_popvar <- data.frame(
-  Population = paste0("Population_", 1:P_populations),
+  Population = paste0("PopulationVariance_", 1:P_populations),
   Process_Variance = diag(Q)
 )
+colnames(df_popvar) <- c("Parameter", "TRUEvalue")
 
 df_metvar <- data.frame(
-  Method = paste0("Method_", 1:M_methods),
+  Method = paste0("MethodVariance_", 1:M_methods),
   Observation_Variance = diag(R)
 )
+colnames(df_metvar) <- c("Parameter", "TRUEvalue")
+
+df_metbias <- data.frame(
+  Method = paste0("MethodBias_", 1:M_methods),
+  True_Bias = bias_vector
+)
+colnames(df_metbias) <- c("Parameter", "TRUEvalue")
+
+df_allpar <- rbind(df_popvar, df_metvar, df_metbias)
 
 # drop strings in pop and methods
 df$Population <- as.numeric(gsub("Population_", "", df$Population))
@@ -164,13 +180,22 @@ for(i in seq(length(pops))){
   Z.model[rows$population == pops[i], i] <- 1
 }
 
+# a
+scale <- sample(1:M_methods, 1)
+a.model <- matrix(list(0), n, 1)
+for(i in 1:length(a.model)){
+  if(rows$method[i] != scale){
+    a.model[i] <- paste0("a", rows$method[i])
+  }
+}
+
 # model list
 mod.list <- list(
   B = "identity",
   U = "zero",
   Q = "diagonal and unequal",
   Z = Z.model,
-  A = "zero",
+  A = a.model,
   R = R.model,
   x0 = "equal",
   V0 = "zero",
@@ -178,15 +203,14 @@ mod.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", "ssm_test.rds"))){
+if(!file.exists(here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
   ptm <- proc.time()
   ssm <- MARSS(test_data, model = mod.list, method = "kem", control = con.list)
-  saveRDS(ssm, file=here::here("data", "clean", "ssm_test.rds"))
+  saveRDS(ssm, file=here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
   time <- proc.time()[3] - ptm
   time
 }
-# load in ssm
-ssm <- readRDS(file=here::here("data", "clean", "ssm_test.rds"))
+ssm <- readRDS(file=here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
 
 # need to pull R. and Q. estimates from ssm
 fitted_matrices <- coef(ssm, type = "matrix")
@@ -194,10 +218,17 @@ fitted_Q <- fitted_matrices$Q
 fitted_Q <- diag(fitted_Q)
 fitted_R <- fitted_matrices$R
 fitted_R <- diag(fitted_R)
+fitted_A <- fitted_matrices$A
 
 # bootstrap vairance terms to create confidence intervals
-boot <- MARSSboot(ssm, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
-saveRDS(boot, file=here::here("data", "clean", "ssmBOOT_test.rds"))
+if(!file.exists(here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
+  ptm <- proc.time()
+  boot <- MARSSboot(ssm, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
+  saveRDS(boot, file=here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
+  time <- proc.time()[3] - ptm
+  time
+}
+boot <- readRDS(file=here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
 
 # extract parameters
 boot_params <- boot$boot.params
@@ -212,13 +243,37 @@ df_cis <- df_cis %>%
   mutate(
     Parameter = if_else(
       str_detect(Parameter, "^R\\.r"),
-      paste0("Method_", as.numeric(str_extract(Parameter, "(?<=r)[0-9]+"))),
+      paste0("MethodVariance_", as.numeric(str_extract(Parameter, "(?<=r)[0-9]+"))),
       Parameter
     ),
     Parameter = if_else(
       str_detect(Parameter, "^Q\\."),
-      paste0("Population_", as.numeric(str_extract(Parameter, "(?<=X)[0-9]+"))),
+      paste0("PopulationVariance_", as.numeric(str_extract(Parameter, "(?<=X)[0-9]+"))),
+      Parameter
+    ),
+    Parameter = if_else(
+      str_detect(Parameter, "^A\\.a"),
+      paste0("MethodBias_", as.numeric(str_extract(Parameter, "(?<=a)[0-9]+"))),
       Parameter
     )
   )
 
+# merge in true variance
+df_merged <- left_join(df_allpar, df_cis, by = "Parameter")
+df_merged  <- df_merged  %>% drop_na()
+
+# logical column checking if variance is within the CI
+df_merged <- df_merged %>%
+  mutate(
+    Within_CI = between(TRUEvalue, Lower_CI, Upper_CI)
+  )
+df_merged$type <- sub("_.*", "", df_merged$Parameter)
+
+# overall success rate
+capture_rate <- mean(df_merged$Within_CI, na.missing = TRUE) * 100
+cat("Percentage of true parameters within the CIs:", capture_rate, "%\n")
+
+type_pct <- df_merged %>%
+  group_by(type) %>%
+  summarise(Type_Pct = mean(Within_CI, na.rm = TRUE) * 100)
+print(type_pct)
