@@ -11,10 +11,10 @@ options(max.print=2000)
 
 ## creating synthetic time series
 # set seed for reproducibility
-set.seed(694201)
+set.seed(69420)
 
 # set params
-P_populations <- 75
+P_populations <- 30
 M_methods <- 15
 T_steps <- 40
 
@@ -46,7 +46,7 @@ for (t in 2:T_steps) {
     # upper and lower bounds based on nosa data
 }
 
-# generate sqequential observations (1 method per pop per time step)
+# generate sequential observations (1 method per pop per time step)
 
 # pre-generate the entire noise matrix for all time steps and methods
 # rows = T_steps, cols = M_methods
@@ -105,14 +105,14 @@ for (p in 1:P_populations) {
     Population = paste0("Population_", p),
     Method = paste0("Method_", p_methods),
     True_State = p_states,
-    Observation = p_states + p_noise
+    Observation = p_states + p_bias + p_noise
   )
 }
 
 # combine the list of 75 population chunks into one dataframe
 df <- do.call(rbind, df_list)
 
-# grab variance terms
+# grab true parameters
 df_popvar <- data.frame(
   Population = paste0("PopulationVariance_", 1:P_populations),
   Process_Variance = diag(Q)
@@ -166,7 +166,7 @@ test_data <- as.matrix(testW)
 
 ## model build
 # set controls
-con.list <- list(maxit = 1000, allow.degen = TRUE, trace = 1)
+con.list <- list(maxit = 3000, allow.degen = TRUE, trace = 1)
 
 # R
 n <- nrow(test_data)

@@ -10,10 +10,10 @@ here::i_am("code/development/sunnyTEST_endogenous.R")
 options(max.print=2000)
 
 ## creating synthetic time series
-set.seed(694201) # set seed for reproducibility
+# set.seed(69420) # set seed for reproducibility
 
 # set params
-P_populations <- 75
+P_populations <- 30
 M_methods <- 15
 T_steps <- 40
 max <- 3 # maximum number of large/small exclusive survey methods
@@ -49,6 +49,9 @@ V <- matrix(runif(M_methods * M_methods, min = -1, max = 1), nrow = M_methods, n
 V <- diag(diag(V))
 R <- V %*% t(V)
 R <- R + diag(0.1, M_methods)
+
+# generate observation bias for each method (e.g., between -1 and 1)
+bias_vector <- runif(M_methods, min = -1.5, max = 1.5)
 
 # simulate states (x_t,p) with overlapping tails
 x <- matrix(0, nrow = T_steps, ncol = P_populations)
@@ -114,19 +117,20 @@ for (p in 1:P_populations) {
   p_methods <- chosen_method_idx[, p]
   p_states <- x[, p]
   p_noise <- w_matrix[matrix(c(1:T_steps, p_methods), ncol = 2)]
+  p_bias <- bias_vector[p_methods]
   
   df_list[[p]] <- data.frame(
     Time = 1:T_steps,
     Population = paste0("Population_", p),
     Method = paste0("Method_", p_methods),
     True_State = p_states,
-    Observation = p_states + p_noise
+    Observation = p_states + p_bias + p_noise
   )
 }
 
 df <- do.call(rbind, df_list)
 
-# grab variance terms
+# grab true parameters
 df_popvar <- data.frame(Population = paste0("Population_", 1:P_populations), TRUEvariance = diag(Q))
 df_popvar$Population <- sprintf("%02d", as.numeric(gsub("Population_", "", df_popvar$Population)))
 df_popvar$Population <- as.numeric(df_popvar$Population)
@@ -134,6 +138,8 @@ colnames(pop_categories) <- c("Population", "Category")
 df_popvar <- df_popvar %>% 
   left_join(pop_categories, by = "Population") %>% 
   select(Population, Category, TRUEvariance)
+colnames(df_popvar) <- c("Parameter", "Category", "TRUEvalue")
+df_popvar$Parameter <- paste0("PopulationVariance_", df_popvar$Parameter)
 
 df_metvar <- data.frame(Method = paste0("Method_", 1:M_methods), TRUEvariance = diag(R))
 df_metvar$Method <- sprintf("%02d", as.numeric(gsub("Method_", "", df_metvar$Method)))
@@ -147,6 +153,26 @@ df_metvar <- df_metvar %>%
     )
   ) %>%
   select(Method, Category, TRUEvariance)
+colnames(df_metvar) <- c("Parameter", "Category", "TRUEvalue")
+df_metvar$Parameter <- paste0("MethodVariance_", df_metvar$Parameter)
+
+df_metbias <- data.frame(
+  Method = 1:M_methods,
+  True_Bias = bias_vector
+)
+df_metbias <- df_metbias %>%
+  mutate(
+    Category = case_when(
+      Method %in% exclusive_small_methods ~ "Exclusive to Small",
+      Method %in% exclusive_large_methods ~ "Exclusive to Large",
+      TRUE                                    ~ "Shared/Common"
+    )
+  ) %>%
+  select(Method, Category, True_Bias)
+colnames(df_metbias) <- c("Parameter", "Category", "TRUEvalue")
+df_metbias$Parameter <- paste0("MethodBias_", df_metbias$Parameter)
+
+df_allpar <- rbind(df_popvar, df_metvar, df_metbias)
 
 # drop strings and format variables
 df$Population <- sprintf("%02d", as.numeric(gsub("Population_", "", df$Population)))
@@ -154,10 +180,10 @@ df$Method <- sprintf("%02d", as.numeric(gsub("Method_", "", df$Method)))
 df$Time <- as.numeric(sprintf("%02d", df$Time)) + 1979
 df$popmethod <- paste0(df$Population, "_", df$Method)
 
-# Format variance references
-df_popvar$Parameter <- sprintf("Population_%02d", as.numeric(gsub("Population_", "", df_popvar$Population)))
-df_metvar$Parameter <- sprintf("Method_%02d", as.numeric(gsub("Method_", "", df_metvar$Method)))
-df_allvar <- rbind(df_popvar[, c("Parameter", "TRUEvariance", "Category")], df_metvar[, c("Parameter", "TRUEvariance", "Category")])
+# # Format variance references
+# df_popvar$Parameter <- sprintf("Population_%02d", as.numeric(gsub("Population_", "", df_popvar$Population)))
+# df_metvar$Parameter <- sprintf("Method_%02d", as.numeric(gsub("Method_", "", df_metvar$Method)))
+# df_allvar <- rbind(df_popvar[, c("Parameter", "TRUEvariance", "Category")], df_metvar[, c("Parameter", "TRUEvariance", "Category")])
 
 # transform data to wide format matrix
 test <- df[-c(2:4)]
@@ -171,7 +197,7 @@ test_data <- as.matrix(testW)
 
 ## model build
 # set controls
-con.list <- list(maxit = 1000, allow.degen = TRUE, trace = 1)
+con.list <- list(maxit = 2000, allow.degen = TRUE, trace = 1)
 
 # R
 n <- nrow(test_data)
@@ -223,6 +249,7 @@ fitted_Q <- fitted_matrices$Q
 fitted_Q <- diag(fitted_Q)
 fitted_R <- fitted_matrices$R
 fitted_R <- diag(fitted_R)
+fitted_A <- fitted_matrices$A
 
 # bootstrap vairance terms to create confidence intervals
 if(!file.exists(here::here("data", "clean", paste("ssmBOOT_endogenous-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
@@ -253,6 +280,11 @@ df_cis <- df_cis %>%
     Parameter = if_else(
       str_detect(Parameter, "^Q\\."),
       paste0("Population_", as.numeric(str_extract(Parameter, "(?<=X)[0-9]+"))),
+      Parameter
+    ),
+    Parameter = if_else(
+      str_detect(Parameter, "^A\\.a"),
+      paste0("MethodBias_", as.numeric(str_extract(Parameter, "(?<=a)[0-9]+"))),
       Parameter
     )
   )
