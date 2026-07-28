@@ -10,13 +10,13 @@ here::i_am("code/development/sunnyTEST_endogenous.R")
 options(max.print=2000)
 
 ## creating synthetic time series
-# set.seed(69420) # set seed for reproducibility
+set.seed(694201) # set seed for reproducibility
 
 # set params
-P_populations <- 30
-M_methods <- 15
+P_populations <- 50
+M_methods <- 10
 T_steps <- 40
-max <- 3 # maximum number of large/small exclusive survey methods
+max <- 2 # maximum number of large/small exclusive survey methods
 
 # assign populations to categories (25 each)
 pop_categories <- tibble(
@@ -197,7 +197,7 @@ test_data <- as.matrix(testW)
 
 ## model build
 # set controls
-con.list <- list(maxit = 2000, allow.degen = TRUE, trace = 1)
+con.list <- list(maxit = 3000, allow.degen = TRUE, trace = 1)
 
 # R
 n <- nrow(test_data)
@@ -229,6 +229,7 @@ mod.list <- list(
   A = a.model,
   R = R.model,
   x0 = "equal",
+  # x0 = matrix(0, nrow = length(pops), ncol = 1), # Anchor initial states to 0
   V0 = "zero",
   tinitx = 0
 )
@@ -302,14 +303,21 @@ df_cis <- df_cis %>%
   select(-Prefix, -Num_Padded)
 
 # merge in true variance
-df_merged <- left_join(df_allvar, df_cis, by = "Parameter")
+df_merged <- left_join(df_allpar, df_cis, by = "Parameter")
+df_merged  <- df_merged  %>% drop_na()
 
 # logical column checking if variance is within the CI
 df_merged <- df_merged %>%
   mutate(
     Within_CI = between(TRUEvariance, Lower_CI, Upper_CI)
   )
+df_merged$type <- sub("_.*", "", df_merged$Parameter)
 
 # overall success rate
 capture_rate <- mean(df_merged$Within_CI, na.missing = TRUE) * 100
 cat("Percentage of true variances within the CIs:", capture_rate, "%\n")
+
+type_pct <- df_merged %>%
+  group_by(type) %>%
+  summarise(Type_Pct = mean(Within_CI, na.rm = TRUE) * 100)
+print(type_pct)

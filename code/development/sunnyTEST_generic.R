@@ -11,11 +11,11 @@ options(max.print=2000)
 
 ## creating synthetic time series
 # set seed for reproducibility
-set.seed(69420)
+set.seed(694201)
 
 # set params
 P_populations <- 30
-M_methods <- 15
+M_methods <- 10
 T_steps <- 40
 
 # generate Q matrix (population level process variance)
@@ -198,6 +198,7 @@ mod.list <- list(
   A = a.model,
   R = R.model,
   x0 = "equal",
+  # x0 = matrix(0, nrow = length(pops), ncol = 1), # Anchor initial states to 0
   V0 = "zero",
   tinitx = 0
 )
