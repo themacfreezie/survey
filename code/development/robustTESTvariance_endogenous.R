@@ -220,7 +220,7 @@ fitted_R <- diag(fitted_R)
 if(!file.exists(here::here("data", "clean", paste("ssmBOOT_endogenous-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
   ptm <- proc.time()
   boot <- MARSSboot(ssm, 
-                    nboot=10, 
+                    nboot=100, 
                     output="parameters"
                     # sim = "parametric", 
                     # param.gen = "hessian"
