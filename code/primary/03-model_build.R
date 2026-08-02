@@ -14,15 +14,7 @@ nosa <- merge
 # how often are particular survey methods used
 counts <- table(nosa$MethodNameID)
 counts
-
-# will drop those methods for which fewer than 30 observations exist
-low_count_ids <- names(counts[counts < 10])
-low_counts <- as.numeric(low_count_ids)
-
-nosa <- nosa %>%
-  filter(!MethodNameID %in% low_counts)
-table(nosa$MethodNameID)
-  # this should probably occur after the datasets are split up
+  # some methods used very infrequently
 
 # new popid/method var
 nosa$popmethod <- paste0(as.character(nosa$PopID),"_", as.character(nosa$MethodNameID))
@@ -34,6 +26,44 @@ nosa$lnnosa <- log(nosa$NOSA + 1)
 nosa_chin <- nosa %>% filter(CommonName=="Chinook Salmon")
 nosa_coho <- nosa %>% filter(CommonName=="Coho Salmon")
 nosa_stel <- nosa %>% filter(CommonName=="Steelhead")
+
+# still issues with pop 11 somehow (chin)
+nosa_chin <- nosa_chin %>%
+  filter(TimeSeriesID != 599005)
+  # got it
+
+# how often are particular survey methods used
+counts_chin <- table(nosa_chin$MethodNameID)
+counts_chin
+  # 2 methods < 10 obs
+counts_coho <- table(nosa_coho$MethodNameID)
+counts_coho
+  # 2 methods < 10 obs
+counts_stel <- table(nosa_stel$MethodNameID)
+counts_stel
+  # 6 methods < 10 obs
+
+# will drop those methods for which fewer than 10 observations exist
+low_count_ids <- names(counts_chin[counts_chin < 10])
+low_counts_chin <- as.numeric(low_count_ids)
+
+nosa_chin <- nosa_chin %>%
+  filter(!MethodNameID %in% low_counts_chin)
+table(nosa_chin$MethodNameID)
+
+low_count_ids <- names(counts_coho[counts_coho < 10])
+low_counts_coho <- as.numeric(low_count_ids)
+
+nosa_coho <- nosa_coho %>%
+  filter(!MethodNameID %in% low_counts_coho)
+table(nosa_coho$MethodNameID)
+
+low_count_ids <- names(counts_stel[counts_stel < 10])
+low_counts_stel <- as.numeric(low_count_ids)
+
+nosa_stel <- nosa_stel %>%
+  filter(!MethodNameID %in% low_counts_stel)
+table(nosa_stel$MethodNameID)
 
 ## vital information
 methodsTable_chin <- nosa_chin %>% 
@@ -49,13 +79,11 @@ print(methodsTable_stel)
 ## per species
 # chinook
 length(unique(nosa_chin$PopID))
-  # 21 populations
+  # 22 populations
 unique(nosa_chin$MethodNameID)
 length(unique(nosa_chin$MethodNameID))
-  # 10 methods
+  # 9 methods
 table(nosa_chin$MethodNameID)
-  # method 14 only appears 8 times
-# nosa_chin <- nosa_chin[nosa_chin$MethodNameID != 14, ]
 
 # coho
 length(unique(nosa_coho$PopID))
@@ -64,10 +92,6 @@ unique(nosa_coho$MethodNameID)
 length(unique(nosa_coho$MethodNameID))
   # 10 methods
 table(nosa_coho$MethodNameID)
-  # method 9 only appears 26 times
-  # method 11 only appears 22 times
-# nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 9, ]
-# nosa_coho <- nosa_coho[nosa_coho$MethodNameID != 11, ]
 
 # steelhead
 length(unique(nosa_stel$PopID))

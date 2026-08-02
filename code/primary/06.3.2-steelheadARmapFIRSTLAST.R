@@ -12,11 +12,11 @@ library(stringr)
 library(tidyverse)
 library(tigris)
 
-here::i_am("code/primary/06.1.2-chinookARmapFIRSTLAST.R")
+here::i_am("code/primary/06.3.2-steelheadARmapFIRSTLAST.R")
 options(max.print=2000)
 
 # pull in AR data
-ARchin <- readRDS(here("data", "clean", "FLavgAR_chin.rds"))
+ARstel <- readRDS(here("data", "clean", "FLavgAR_stel.rds"))
 
 # pull in spatial layers
 gdb_path <- here("data", "raw", "WCR_Salmon_Steelhead_gdb_2015", "WCR_Salmon_Steelhead_gdb_2015.gdb")
@@ -28,21 +28,21 @@ sf_fish$DPS_IDtrunc <- substr(sf_fish$DPS_ID, 1, 5)
 sf_fish$DPStrunc <- str_remove(sf_fish$DPS, " - Outside legal area$")
 
 
-###### chinook
-ARchin <- ARchin %>%
+###### steelhead
+ARstel <- ARstel %>%
   filter(!is.na(NWFSC_POP_ID))
 
 sf_fish_combined <- sf_fish %>%
-  left_join(ARchin, by = "NWFSC_POP_ID")
+  left_join(ARstel, by = "NWFSC_POP_ID")
 
-sf_chin <- sf_fish_combined %>%
+sf_stel <- sf_fish_combined %>%
   filter(!is.na(first10_mean_a))
 
 # make sure crs is good
-sf_chin_nad83 <- st_transform(sf_chin, crs = 4269)
+sf_stel_nad83 <- st_transform(sf_stel, crs = 4269)
 
 # # can we make these contiguous?
-# contiguity_test <- sf_chin_nad83 %>%
+# contiguity_test <- sf_stel_nad83 %>%
 #   group_by(NWFSC_POP_ID) %>%
 #   summarize(geometry = st_union(SHAPE)) %>%
 #   mutate(
@@ -57,7 +57,7 @@ sf_chin_nad83 <- st_transform(sf_chin, crs = 4269)
 #   # it looks as though they are all contiguous..
 
 # can this be collapsed?
-sf_chin_nad83col <- sf_chin_nad83 %>%
+sf_stel_nad83col <- sf_stel_nad83 %>%
   group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
   summarize(
     first10mean_lnnosa = mean(first10_mean_lnnosa, na.rm = TRUE),
@@ -70,7 +70,7 @@ sf_chin_nad83col <- sf_chin_nad83 %>%
   )
 
 # Calculate % change from 'first10' to 'last10' variables
-sf_chin_nad83col <- sf_chin_nad83col%>%
+sf_stel_nad83col <- sf_stel_nad83col%>%
   mutate(
     # Percentage format (e.g., 15.4 for a 15.4% increase)
     change_a = last10mean_a - first10mean_a,
@@ -79,14 +79,14 @@ sf_chin_nad83col <- sf_chin_nad83col%>%
   )
 
 # create ESU outlines
-sf_outlines <- sf_chin_nad83col %>%
+sf_outlines <- sf_stel_nad83col %>%
   group_by(DPS_IDtrunc, DPStrunc) %>%
   summarize(SHAPE = st_union(SHAPE))
 
 # esu outlines?
 outline_panels_clipped <- lapply(1:nrow(sf_outlines), function(i) {
   focus_outline <- sf_outlines[i, ]
-  esu_data_clipped <- st_intersection(sf_chin_nad83col, focus_outline)
+  esu_data_clipped <- st_intersection(sf_stel_nad83col, focus_outline)
   ggplot() +
     geom_sf(data = esu_data_clipped, aes(fill = change_a), alpha = 0.7, color = "white", size = 0.1) +
     geom_sf(data = focus_outline, fill = NA, color = "black", linewidth = 1.2) +
@@ -103,7 +103,7 @@ esu_panels_clipped
 # I think it's 4 and 104
 
 # preplots
-bbox <- st_bbox(sf_chin_nad83col)
+bbox <- st_bbox(sf_stel_nad83col)
 region_states <- states(cb = TRUE, resolution = "20m") %>%
   filter(STUSPS %in% c("OR", "WA", "ID")) %>%
   st_transform(4269) # match main map's CRS (NAD83)
@@ -129,28 +129,40 @@ inset_context <- ggplot() +
   )
 
 # overlap
-sf_base <- sf_chin_nad83col %>% filter(NWFSC_POP_ID != 104)
-sf_stripe <- sf_chin_nad83col %>% filter(NWFSC_POP_ID == 104)
+sf_base   <- sf_stel_nad83col %>% filter(NWFSC_POP_ID != 104)
+# sf_stripe <- sf_stel_nad83col %>% filter(NWFSC_POP_ID == 104)
 # stripe layer: ONLY population 104
-shared_borders <- st_intersection(sf_outlines) %>% 
-  filter(n.overlaps > 1) %>% 
-  st_cast("MULTILINESTRING")
+suppressWarnings({
+  intersections <- st_intersection(sf_outlines, sf_outlines)
+})
+shared_borders <- intersections %>%
+  # Filter out geometries intersecting with themselves
+  filter(DPS_IDtrunc != DPS_IDtrunc.1) %>%
+  # Keep ONLY polygon elements to avoid random point/line artifact errors
+  filter(st_geometry_type(SHAPE) %in% c("POLYGON", "MULTIPOLYGON")) %>%
+  # Convert the shared polygon areas into their boundary lines
+  st_boundary() %>%
+  # Combine to prevent visual overlaps or double-drawing
+  st_union()
+# shared_borders <- st_intersection(sf_outlines) %>% 
+#   filter(n.overlaps > 1) %>% 
+#   st_cast("MULTILINESTRING")
 
 # plotting
 main_map <- ggplot() +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(data = sf_base, aes(fill = change_a), alpha = 0.8, color = "white", size = 0.1) +
-  geom_sf_pattern(
-    data = sf_stripe,
-    aes(pattern_fill = change_a), 
-    pattern = 'stripe',
-    pattern_color = NA,       # removes the default white border around stripes
-    pattern_density = 0.25,    # adjust for stripe thickness
-    pattern_spacing = 0.015,
-    pattern_angle = 45,
-    fill = NA,                # transparent fill so Pop 4's color shows between stripes
-    alpha = 1                 # keep stripes opaque to see their specific color clearly
-  ) +
+  # geom_sf_pattern(
+  #   data = sf_stripe,
+  #   aes(pattern_fill = change_a), 
+  #   pattern = 'stripe',
+  #   pattern_color = NA,       # removes the default white border around stripes
+  #   pattern_density = 0.25,    # adjust for stripe thickness
+  #   pattern_spacing = 0.015,
+  #   pattern_angle = 45,
+  #   fill = NA,                # transparent fill so Pop 4's color shows between stripes
+  #   alpha = 1                 # keep stripes opaque to see their specific color clearly
+  # ) +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
@@ -159,8 +171,7 @@ main_map <- ggplot() +
     name = "Bias"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Change in bias - Chinook surveys (1980-2024)",
-       caption = "Bias measured relative to 'Dam Counts' method, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
+  labs(title = "Change in bias - steelhead surveys (1980-2024)") +
   theme_minimal() +
   theme(
     plot.title = element_text(face = "bold", size = 28),
@@ -169,11 +180,11 @@ main_map <- ggplot() +
     axis.text.x = element_text(size = 18, color = "black"),
     axis.text.y= element_text(size = 18, color = "black"),
   ) 
-chin_a <- main_map + inset_element(inset_context, 
+stel_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
-chin_a
-# ggsave(here("output", "figures", "chin_a.png"), plot=chin_a, device="png", dpi=300)
+stel_a
+# ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=300)
 
 main_map <- ggplot() +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -197,8 +208,7 @@ main_map <- ggplot() +
     name = "Variance"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Change in varaince - Chinook surveys (1980-2024)",
-       caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
+  labs(title = "Change in varaince - steelhead surveys (1980-2024)") +
   theme_minimal() +
   theme(
     plot.title = element_text(face = "bold", size = 28),
@@ -207,11 +217,11 @@ main_map <- ggplot() +
     axis.text.x = element_text(size = 18, color = "black"),
     axis.text.y= element_text(size = 18, color = "black"),
   ) 
-chin_r <- main_map + inset_element(inset_context, 
+stel_r <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
-chin_r
-# ggsave(here("output", "figures", "chin_r.png"), plot=chin_r, device="png", dpi=300)
+stel_r
+# ggsave(here("output", "figures", "stel_r.png"), plot=stel_r, device="png", dpi=300)
 
 main_map <- ggplot() +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -235,9 +245,8 @@ main_map <- ggplot() +
     name = "Pct change"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Chinook",
-       # title = "Percent change in population size - Chinook (1980-2024)",
-       caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
+  labs(title = "Steelhead") +
+       # title = "Percent change in population size - steelhead (1980-2024)",
   theme_minimal() +
   theme(
     plot.title = element_text(face = "bold", size = 28),
@@ -246,9 +255,9 @@ main_map <- ggplot() +
     axis.text.x = element_text(size = 18, color = "black"),
     axis.text.y= element_text(size = 18, color = "black"),
   ) 
-chin_pop <- main_map + inset_element(inset_context, 
+stel_pop <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-chin_pop
-saveRDS(chin_pop, file = "chin_popPCT.rds")
-# ggsave(here("output", "figures", "chin_pop.png"), plot=chin_pop, device="png", dpi=300)
+stel_pop
+saveRDS(stel_pop, file = "stel_popPCT.rds")
+# ggsave(here("output", "figures", "stel_pop.png"), plot=stel_pop, device="png", dpi=300)
