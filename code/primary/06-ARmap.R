@@ -38,6 +38,7 @@ sf_coho <- sf_fish_combined %>%
 
 # test plot
 sf_coho_nad83 <- st_transform(sf_coho, crs = 4269)
+saveRDS(sf_coho_nad83, file=here::here("data", "clean", "sf_coho_nad83.rds"))
 
 # ggplot(data = sf_coho_nad83) +
 #   annotation_map_tile(type = "hotstyle", zoom = 10) + 
@@ -247,6 +248,7 @@ sf_chin <- sf_fish_combined %>%
 
 # make sure crs is good
 sf_chin_nad83 <- st_transform(sf_chin, crs = 4269)
+saveRDS(sf_chin_nad83, file=here::here("data", "clean", "sf_chin_nad83.rds"))
 
 # # can we make these contiguous?
 # contiguity_test <- sf_chin_nad83 %>%
@@ -540,6 +542,7 @@ sf_stel <- sf_fish_combined %>%
 
 # make sure crs is good
 sf_stel_nad83 <- st_transform(sf_stel, crs = 4269)
+saveRDS(sf_stel_nad83, file=here::here("data", "clean", "sf_stel_nad83.rds"))
 
 # # can we make these contiguous?
 # contiguity_test <- sf_stel_nad83 %>%

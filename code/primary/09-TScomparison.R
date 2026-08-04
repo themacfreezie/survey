@@ -1,4 +1,6 @@
 ## SET WORKING DIR & PACKAGES
+library(ggpattern)
+library(ggspatial)
 library(here)
 library(MARSS)
 library(panelr)
@@ -344,3 +346,83 @@ popdiff_stel <- plotdata_stel %>%
   )
 popdiff_stel$avg_netdiff <- popdiff_stel$total_net_difference/popdiff_stel$years_compared
 print(popdiff_stel)
+
+# pull in AR data as key to connect NWFSC pop IDs to ODFW pop IDs (silly)
+ARchin <- readRDS(here("data", "clean", "popavgAR_chin.rds"))
+chinIDkey <- ARchin[-c(2:13)]
+ARcoho <- readRDS(here("data", "clean", "popavgAR_coho.rds"))
+cohoIDkey <- ARcoho[-c(2:13)]
+ARstel <- readRDS(here("data", "clean", "popavgAR_stel.rds"))
+stelIDkey <- ARstel[-c(2:13)]
+
+# pull in spatial dataframes & merge w/ popdiff
+sf_chin <- readRDS(file=here::here("data", "clean", "sf_chin_nad83.rds"))
+popdiff_chin <- popdiff_chin %>% mutate(PopID = as.character(PopID))
+chinIDkey <- chinIDkey %>% mutate(PopID = as.character(PopID))
+popdiff_chin <- popdiff_chin %>%
+  left_join(chinIDkey, by = "PopID")
+sf_chin <- sf_chin %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+popdiff_chin <- popdiff_chin %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+sf_chin_combined <- sf_chin %>%
+  left_join(popdiff_chin, by = "NWFSC_POP_ID")
+
+sf_coho <- readRDS(file=here::here("data", "clean", "sf_coho_nad83.rds"))
+popdiff_coho <- popdiff_coho %>% mutate(PopID = as.character(PopID))
+cohoIDkey <- cohoIDkey %>% mutate(PopID = as.character(PopID))
+popdiff_coho <- popdiff_coho %>%
+  left_join(cohoIDkey, by = "PopID")
+sf_coho <- sf_coho %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+popdiff_coho <- popdiff_coho %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+sf_coho_combined <- sf_coho %>%
+  left_join(popdiff_coho, by = "NWFSC_POP_ID")
+
+sf_stel <- readRDS(file=here::here("data", "clean", "sf_stel_nad83.rds"))
+popdiff_stel <- popdiff_stel %>% mutate(PopID = as.character(PopID))
+stelIDkey <- stelIDkey %>% mutate(PopID = as.character(PopID))
+popdiff_stel <- popdiff_stel %>%
+  left_join(stelIDkey, by = "PopID")
+sf_stel <- sf_stel %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+popdiff_stel <- popdiff_stel %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+sf_stel_combined <- sf_stel %>%
+  left_join(popdiff_stel, by = "NWFSC_POP_ID")
+
+sf_fish_combined <- rbind(sf_chin_combined, sf_coho_combined)
+sf_fish_combined <- rbind(sf_fish_combined, sf_stel_combined)
+class(sf_fish_combined)
+
+# collapse
+sf_chin_combined <- sf_chin_combined %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
+  summarize(
+    total_net_difference = mean(total_net_difference, na.rm = TRUE),
+    total_absolute_difference  = mean(total_absolute_difference, na.rm = TRUE),
+    avg_netdiff = mean(avg_netdiff, na.rm = TRUE),
+    .groups = "drop"
+  )
+chinIDkey <- chinIDkey %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+sf_chin_combined <- sf_chin_combined %>%
+  left_join(chinIDkey, by = "NWFSC_POP_ID")
+
+sf_coho_combined <- sf_coho_combined %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
+  summarize(
+    total_net_difference = mean(total_net_difference, na.rm = TRUE),
+    total_absolute_difference  = mean(total_absolute_difference, na.rm = TRUE),
+    avg_netdiff = mean(avg_netdiff, na.rm = TRUE),
+    .groups = "drop"
+  )
+cohoIDkey <- cohoIDkey %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+sf_coho_combined <- sf_coho_combined %>%
+  left_join(cohoIDkey, by = "NWFSC_POP_ID")
+
+sf_stel_combined <- sf_stel_combined %>%
+  group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
+  summarize(
+    total_net_difference = mean(total_net_difference, na.rm = TRUE),
+    total_absolute_difference  = mean(total_absolute_difference, na.rm = TRUE),
+    avg_netdiff = mean(avg_netdiff, na.rm = TRUE),
+    .groups = "drop"
+  )
+stelIDkey <- stelIDkey %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
+sf_stel_combined <- sf_stel_combined %>%
+  left_join(stelIDkey, by = "NWFSC_POP_ID")
