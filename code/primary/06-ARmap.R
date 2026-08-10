@@ -529,7 +529,6 @@ chin_ARchoro_panel
 ggsave(here("output", "figures", "chin_ARchoro_panel.png"), plot=chin_ARchoro_panel, device="png", dpi=300)
 
 
-
 ###### steelhead
 ARstel <- ARstel %>%
   filter(!is.na(NWFSC_POP_ID))
