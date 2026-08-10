@@ -2,6 +2,7 @@
 library(ggpattern)
 library(ggspatial)
 library(here)
+library(MARSS)
 library(panelr)
 library(patchwork)
 library(readxl)
@@ -32,8 +33,11 @@ key_stel <- read_excel(here("data", "clean", "xtT_statekey.xlsx"), sheet = "stel
 load(file=here::here("data", "clean", "populations_list.Rda"))
 pop_list <- pop_list |> 
   filter(CommonPopName !="Lostine River Spring Chinook")
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Upper Willamette River ESU) Clackamas River - spring"] <- "Clackamas River - Spring"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Clackamas River - fall"] <- "Clackamas River - Fall"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Sandy River - late fall"] <- "Sandy River - Fall"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Sandy River - spring"] <- "Sandy River - Spring"
 pop_names <- pop_list[-c(1, 3, 4, 6:10)]
-# pop_namesESA <- pop_list[-c(1, 3, 5:10)]
 
 # check stuff out
 summary(ssm_chin)
@@ -147,27 +151,25 @@ plotdata_chin <- combineddata_chin %>%
     values_to = "Value"
   ) %>%
   mutate(Dataset = recode(Dataset, 
-                          "States_Value" = "States Chin", 
-                          "Nosa_Value" = "Nosa Chin"))
+                          "States_Value" = "Estimated State", 
+                          "Nosa_Value" = "Observed Value"))
 
 # drop estiamtes from before any observations were made
 plotdata_chin <- plotdata_chin %>%
   group_by(PopID) %>%
   filter(
-    trimws(Dataset) == "Nosa Chin" | 
-      (trimws(Dataset) == "States Chin" & Year >= min(Year[trimws(Dataset) == "Nosa Chin" & !is.na(Value)], na.rm = TRUE) &
-                                          Year <= max(Year[trimws(Dataset) == "Nosa Chin" & !is.na(Value)], na.rm = TRUE))) %>%
+    trimws(Dataset) == "Observed Value" | 
+      (trimws(Dataset) == "Estimated State" & Year >= min(Year[trimws(Dataset) == "Observed Value" & !is.na(Value)], na.rm = TRUE) &
+                                          Year <= max(Year[trimws(Dataset) == "Observed Value" & !is.na(Value)], na.rm = TRUE))) %>%
   ungroup()
 
 # pull in pop names
-# plotdata_chin <- plotdata_chin %>%
-#   mutate(PopID = as.character(PopID)) %>%
-#   left_join(
-#     pop_namesESA %>% mutate(PopID = as.character(PopID)),
-#     by = "PopID"
-#   ) %>%
-#   select(-PopID) %>%
-#   rename(PopID = ESAPOPNAME)
+plotdata_chin <- plotdata_chin %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  ) 
 
 ## coho
 combineddata_coho <- left_join(longstates_coho, longnosa_coho, by = c("PopID", "Year"))
@@ -179,27 +181,25 @@ plotdata_coho <- combineddata_coho %>%
     values_to = "Value"
   ) %>%
   mutate(Dataset = recode(Dataset, 
-                          "States_Value" = "States coho", 
-                          "Nosa_Value" = "Nosa coho"))
+                          "States_Value" = "Estimated State", 
+                          "Nosa_Value" = "Observed Value"))
 
 # drop estiamtes from before any observations were made
 plotdata_coho <- plotdata_coho %>%
   group_by(PopID) %>%
   filter(
-    trimws(Dataset) == "Nosa coho" | 
-      (trimws(Dataset) == "States coho" & Year >= min(Year[trimws(Dataset) == "Nosa coho" & !is.na(Value)], na.rm = TRUE) &
-                                          Year <= max(Year[trimws(Dataset) == "Nosa coho" & !is.na(Value)], na.rm = TRUE))) %>%
+    trimws(Dataset) == "Observed Value" | 
+      (trimws(Dataset) == "Estimated State" & Year >= min(Year[trimws(Dataset) == "Observed Value" & !is.na(Value)], na.rm = TRUE) &
+                                          Year <= max(Year[trimws(Dataset) == "Observed Value" & !is.na(Value)], na.rm = TRUE))) %>%
   ungroup()
 
-# # pull in pop names
-# plotdata_coho <- plotdata_coho %>%
-#   mutate(PopID = as.character(PopID)) %>%
-#   left_join(
-#     pop_names %>% mutate(PopID = as.character(PopID)),
-#     by = "PopID"
-#   ) %>%
-#   select(-PopID) %>%
-#   rename(PopID = COMMONPOPNAME)
+# pull in pop names
+plotdata_coho<- plotdata_coho %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  ) 
 
 # steelies
 combineddata_stel <- left_join(longstates_stel, longnosa_stel, by = c("PopID", "Year"))
@@ -211,38 +211,36 @@ plotdata_stel <- combineddata_stel %>%
     values_to = "Value"
   ) %>%
   mutate(Dataset = recode(Dataset, 
-                          "States_Value" = "States stel", 
-                          "Nosa_Value" = "Nosa stel"))
+                          "States_Value" = "Estimated State", 
+                          "Nosa_Value" = "Observed Value"))
 
 # drop estiamtes from before any observations were made
 plotdata_stel <- plotdata_stel %>%
   group_by(PopID) %>%
   filter(
-    trimws(Dataset) == "Nosa stel" | 
-      (trimws(Dataset) == "States stel" & Year >= min(Year[trimws(Dataset) == "Nosa stel" & !is.na(Value)], na.rm = TRUE) &
-                                          Year <= max(Year[trimws(Dataset) == "Nosa stel" & !is.na(Value)], na.rm = TRUE))) %>%
+    trimws(Dataset) == "Observed Value" | 
+      (trimws(Dataset) == "Estimated State" & Year >= min(Year[trimws(Dataset) == "Observed Value" & !is.na(Value)], na.rm = TRUE) &
+                                          Year <= max(Year[trimws(Dataset) == "Observed Value" & !is.na(Value)], na.rm = TRUE))) %>%
   ungroup()
 
-# # pull in pop names
-# plotdata_stel <- plotdata_stel %>%
-#   mutate(PopID = as.character(PopID)) %>%
-#   left_join(
-#     pop_names %>% mutate(PopID = as.character(PopID)),
-#     by = "PopID"
-#   ) %>%
-#   select(-PopID) %>%
-#   rename(PopID = COMMONPOPNAME)
+# pull in pop names
+plotdata_stel<- plotdata_stel %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  ) 
 
 # plot em up
 statecompare_chin <- ggplot(plotdata_chin, aes(x = Year, y = Value, color = Dataset)) +
   geom_line(linewidth = 0.8) +
-  facet_wrap(~ PopID, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
   theme_minimal() +
   labs(
     title = "Chinook Population Time Series Comparison (1980-2024)",
-    x = "Year",
-    y = "Recorded Value",
-    color = "Source Dataset"
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
   ) +
   theme(
     legend.position = "bottom",
@@ -252,13 +250,13 @@ statecompare_chin
 
 statecompare_coho <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Dataset)) +
   geom_line(linewidth = 0.8) +
-  facet_wrap(~ PopID, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
   theme_minimal() +
   labs(
     title = "Coho Population Time Series Comparison (1980-2024)",
-    x = "Year",
-    y = "Recorded Value",
-    color = "Source Dataset"
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
   ) +
   theme(
     legend.position = "bottom",
@@ -268,13 +266,30 @@ statecompare_coho
 
 statecompare_stel <- ggplot(plotdata_stel, aes(x = Year, y = Value, color = Dataset)) +
   geom_line(linewidth = 0.8) +
-  facet_wrap(~ PopID, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
   theme_minimal() +
   labs(
     title = "Steelhead Population Time Series Comparison (1980-2024)",
-    x = "Year",
-    y = "Recorded Value",
-    color = "Source Dataset"
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold") # Makes PopID headers bold
+  )
+statecompare_stel
+  # youngs bay is kind of ridiculous here (only 2 obs) - will drop from plot
+plotdata_stel2 <- plotdata_stel[plotdata_stel$COMMONPOPNAME != "Youngs Bay", ]
+statecompare_stel <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dataset)) +
+  geom_line(linewidth = 0.8) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
+  theme_minimal() +
+  labs(
+    title = "Steelhead Population Time Series Comparison (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
   ) +
   theme(
     legend.position = "bottom",
@@ -285,12 +300,16 @@ statecompare_stel
 # total difference between observed and estimated by population throughout study period
 # chinook
 popdiff_chin <- plotdata_chin %>%
+  group_by(PopID, Year, COMMONPOPNAME, Dataset) %>% 
+  mutate(row_id = row_number()) %>% 
+  ungroup() %>% 
   pivot_wider(
     names_from = Dataset, 
     values_from = Value
   ) %>%
+  select(-row_id) %>% 
   # fix spaces in the new column names so they are easier to work with
-    rename(Nosa = `Nosa Chin`, States = `States Chin`) %>%
+    rename(Nosa = `Observed Value`, States = `Estimated State`)  %>%
       mutate(
         yearly_diff = Nosa - States,          # estimates are over/under-counting
         abs_yearly_diff = abs(Nosa - States)  # magnitude of error, ignoring direction
@@ -307,12 +326,16 @@ print(popdiff_chin)
 
 # coho
 popdiff_coho <- plotdata_coho %>%
+  group_by(PopID, Year, COMMONPOPNAME, Dataset) %>% 
+  mutate(row_id = row_number()) %>% 
+  ungroup() %>% 
   pivot_wider(
     names_from = Dataset, 
     values_from = Value
   ) %>%
+  select(-row_id) %>% 
   # fix spaces in the new column names so they are easier to work with
-  rename(Nosa = `Nosa coho`, States = `States coho`) %>%
+  rename(Nosa = `Observed Value`, States = `Estimated State`)  %>%
   mutate(
     yearly_diff = Nosa - States,          # estimates are over/under-counting
     abs_yearly_diff = abs(Nosa - States)  # magnitude of error, ignoring direction
@@ -329,12 +352,16 @@ print(popdiff_coho)
 
 # steelhead
 popdiff_stel <- plotdata_stel %>%
+  group_by(PopID, Year, COMMONPOPNAME, Dataset) %>% 
+  mutate(row_id = row_number()) %>% 
+  ungroup() %>% 
   pivot_wider(
     names_from = Dataset, 
     values_from = Value
   ) %>%
+  select(-row_id) %>% 
   # fix spaces in the new column names so they are easier to work with
-  rename(Nosa = `Nosa stel`, States = `States stel`) %>%
+  rename(Nosa = `Observed Value`, States = `Estimated State`)  %>%
   mutate(
     yearly_diff = Nosa - States,          # estimates are over/under-counting
     abs_yearly_diff = abs(Nosa - States)  # magnitude of error, ignoring direction
