@@ -201,10 +201,10 @@ shared_borders <- st_intersection(sf_outlines_chin) %>%
 # plotting
 main_map <- ggplot() +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(data = sf_base, aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf(data = sf_base, aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf_pattern(
     data = sf_stripe,
-    aes(pattern_fill = avg_netdiff), 
+    aes(pattern_fill = total_net_difference), 
     pattern = 'stripe',
     pattern_color = NA,       # removes the default white border around stripes
     pattern_density = 0.25,    # adjust for stripe thickness
@@ -221,7 +221,7 @@ main_map <- ggplot() +
     name = "Difference"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Chinook - Average difference between observed and estimataed states",
+  labs(title = "Chinook - Sum of difference between observed and estimataed states",
        caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal()
 chin_avg <- main_map + inset_element(inset_context_chin, 
@@ -231,11 +231,11 @@ chin_avg
 
 main_map <- ggplot(data = sf_coho_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
   scale_fill_viridis_c(option = "inferno") + 
-  labs(title = "Coho - Average difference between observed\n and estimataed states",
+  labs(title = "Coho - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference") +
   theme_minimal()
@@ -246,11 +246,11 @@ coho_avg
 
 main_map <- ggplot(data = sf_stel_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
   scale_fill_viridis_c(option = "inferno") + 
-  labs(title = "Steelhead - Average difference between observed and estimataed states",
+  labs(title = "Steelhead - Sum of difference between observed and estimataed states",
        caption = "1980-2024",
        fill = "Difference") +
   theme_minimal()

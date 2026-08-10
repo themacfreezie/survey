@@ -125,7 +125,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 
-  labs(title = "Average precision - steelhead surveys (1980-2024)",
+  labs(title = "Average variance - steelhead surveys (1980-2024)",
        fill = "Variance") +
   theme_minimal() +
   theme(       
@@ -140,6 +140,30 @@ stel_r <- main_map + inset_element(inset_context,
                                    right = 0.98, top = 0.3)
 stel_r
 ggsave(here("output", "figures", "stel_r.png"), plot=stel_r, device="png", dpi=300)
+
+sf_stel_nad83col$precision <- (1/sf_stel_nad83col$mean_R)
+
+main_map <- ggplot(data = sf_stel_nad83col) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) + 
+  geom_sf(aes(fill = precision), alpha = 0.7) + 
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
+  coord_sf(crs = 4269) + 
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Average precision - steelhead surveys (1980-2024)",
+       fill = "Precision") +
+  theme_minimal() +
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 18),       
+    axis.text.x = element_text(size = 14, color = "black"),       
+    axis.text.y= element_text(size = 14, color = "black"),     
+  ) 
+stel_pre <- main_map + inset_element(inset_context, 
+                                   left = 0.7, bottom = 0.05, 
+                                   right = 0.98, top = 0.3)
+stel_pre
+ggsave(here("output", "figures", "stel_pre.png"), plot=stel_pre, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(

@@ -184,7 +184,7 @@ main_map <- ggplot() +
     name = "Variance"
   ) +
   coord_sf(crs = 4269) +
-  labs(title = "Average precision - Coho surveys (1980-2024)")
+  labs(title = "Average variance - Coho surveys (1980-2024)")
   theme_minimal() +
   theme(
     plot.title = element_text(face = "bold", size = 32),
@@ -198,6 +198,45 @@ coho_r <- main_map + inset_element(inset_context,
                                    right = 1.55, top = 0.5)
 coho_r
 # ggsave(here("output", "figures", "coho_r.png"), plot=coho_r, device="png", dpi=300)
+
+sf_base$precision <- (1/sf_base$mean_R)
+sf_stripe$precision <- (1/sf_stripe$mean_R)
+
+main_map <- ggplot() +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(data = sf_base, aes(fill = precision), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf_pattern(
+    data = sf_stripe,
+    aes(pattern_fill = precision), 
+    pattern = 'stripe',
+    pattern_color = NA,       # removes the default white border around stripes
+    pattern_density = 0.25,    # adjust for stripe thickness
+    pattern_spacing = 0.015,
+    pattern_angle = 45,
+    fill = NA,                # transparent fill so Pop 4's color shows between stripes
+    alpha = 1                 # keep stripes opaque to see their specific color clearly
+  ) +
+  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
+  geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
+  scale_fill_viridis_c(
+    option = "inferno", 
+    aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
+    name = "Precision"
+  ) +
+  coord_sf(crs = 4269) +
+  labs(title = "Average precision\n Coho surveys (1980-2024)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 32),
+    legend.title = element_text(size = 28),
+    legend.text = element_text(size = 20),
+    axis.text.x = element_text(size = 14, color = "black"),
+    axis.text.y= element_text(size = 14, color = "black"),
+  ) 
+coho_pre <- main_map + inset_element(inset_context, 
+                                     left = 0.7, bottom = 0.05, 
+                                     right = 0.98, top = 0.3)
+coho_pre
 
 main_map <- ggplot() +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
