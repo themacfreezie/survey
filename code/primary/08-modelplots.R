@@ -23,9 +23,9 @@ mod <- boot_chinM9
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(20:41)]
-df_a <- df[, -c(10:19)]
-df_r <- df[, -c(1:9)]
+df <- df[, -c(18:41)]
+df_a <- df[, -c(9:17)]
+df_r <- df[, -c(1:8)]
 
 # grab mean and sd
 names_a <- colnames(df_a)
@@ -441,7 +441,8 @@ stela_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
-  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 30))
 stela_bplot
 
 stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
@@ -470,7 +471,8 @@ stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
-  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 30))
 stelr_bplot
 
 stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +

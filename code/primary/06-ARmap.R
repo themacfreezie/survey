@@ -120,7 +120,7 @@ sf_outlines <- sf_coho_nad83col %>%
 # plotting
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(aes(fill = mean_a), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
   scale_fill_viridis_c(option = "inferno") + 
@@ -136,7 +136,7 @@ ggsave(here("output", "figures", "coho_a.png"), plot=coho_a, device="png", dpi=3
 
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
-  geom_sf(aes(fill = mean_R), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 
@@ -151,7 +151,7 @@ ggsave(here("output", "figures", "coho_r.png"), plot=coho_r, device="png", dpi=3
 
 main_map <- ggplot(data = sf_coho_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
-  geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_lnnosa), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 
@@ -601,7 +601,7 @@ inset_context <- ggplot() +
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
-  geom_sf(aes(fill = mean_a), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 
@@ -617,7 +617,7 @@ ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=3
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
-  geom_sf(aes(fill = mean_R), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 
@@ -635,7 +635,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
     type = "cartolight",
     zoom = 10
   ) + 
-  geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_lnnosa), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 

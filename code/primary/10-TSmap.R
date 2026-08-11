@@ -12,10 +12,13 @@ here::i_am("code/primary/10-TSmap.R")
 options(max.print=2000)
 
 # pull in diff data
-# save difference data
 load(file=here("data", "clean", "popdiff_chin.Rda"))
 load(file=here("data", "clean", "popdiff_coho.Rda"))
 load(file=here("data", "clean", "popdiff_stel.Rda"))
+
+load(file=here("data", "clean", "ESUdiff_chin.Rda"))
+load(file=here("data", "clean", "ESUdiff_coho.Rda"))
+load(file=here("data", "clean", "ESUdiff_stel.Rda"))
 
 # pull in AR data as key to connect NWFSC pop IDs to ODFW pop IDs (silly)
 ARchin <- readRDS(here("data", "clean", "popavgAR_chin.rds"))
@@ -224,10 +227,10 @@ main_map <- ggplot() +
   labs(title = "Chinook - Sum of difference between observed and estimataed states",
        caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal()
-chin_avg <- main_map + inset_element(inset_context_chin, 
+chin_dif <- main_map + inset_element(inset_context_chin, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-chin_avg
+chin_dif
 
 main_map <- ggplot(data = sf_coho_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -239,10 +242,10 @@ main_map <- ggplot(data = sf_coho_combined) +
        caption = "1980-2024",
        fill = "Difference") +
   theme_minimal()
-coho_avg <- main_map + inset_element(inset_context_coho, 
+coho_dif <- main_map + inset_element(inset_context_coho, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-coho_avg
+coho_dif
 
 main_map <- ggplot(data = sf_stel_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -254,7 +257,205 @@ main_map <- ggplot(data = sf_stel_combined) +
        caption = "1980-2024",
        fill = "Difference") +
   theme_minimal()
-stel_avg <- main_map + inset_element(inset_context_stel, 
+stel_dif <- main_map + inset_element(inset_context_stel, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-stel_avg 
+stel_dif 
+
+# let's get some ESU maps too
+ESUchin <- sf_outlines_chin %>%
+  left_join(ESUdiff_chin, by = c("DPStrunc" = "ESAPOPNAME"))
+ESUchin <- ESUchin[-c(1)]
+
+ESUcoho <- sf_outlines_coho %>%
+  left_join(ESUdiff_coho, by = c("DPStrunc" = "ESAPOPNAME"))
+ESUcoho <- ESUcoho[-c(1)]
+
+ESUstel <- sf_outlines_stel %>%
+  left_join(ESUdiff_stel, by = c("DPStrunc" = "ESAPOPNAME"))
+ESUstel <- ESUstel[-c(1)]
+
+# # overlap - for chinook
+sf_base <- ESUchin %>% filter(DPStrunc != "Salmon, Chinook (Upper Willamette River ESU)")
+sf_stripe <- ESUchin %>% filter(DPStrunc == "Salmon, Chinook (Upper Willamette River ESU)")
+shared_borders <- st_intersection(sf_outlines_chin) %>%
+  filter(n.overlaps > 1) %>%
+  st_cast("MULTILINESTRING")
+# 
+# # plots plots plots
+# main_map <- ggplot() +
+#   annotation_map_tile(type = "hotstyle", zoom = 10) +
+#   geom_sf(data = sf_base, aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) +
+#   geom_sf_pattern(
+#     data = sf_stripe,
+#     aes(pattern_fill = total_net_difference), 
+#     pattern = 'stripe',
+#     pattern_color = NA,       # removes the default white border around stripes
+#     pattern_density = 0.25,    # adjust for stripe thickness
+#     pattern_spacing = 0.015,
+#     pattern_angle = 45,
+#     fill = NA,                # transparent fill so Pop 4's color shows between stripes
+#     alpha = 1                 # keep stripes opaque to see their specific color clearly
+#   ) +
+#   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
+#   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
+#   scale_fill_viridis_c(
+#     option = "inferno", 
+#     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
+#     name = "Difference"
+#   ) +
+#   coord_sf(crs = 4269) +
+#   labs(title = "Chinook ESUs - Sum of difference between observed and estimataed states",
+#        caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
+#   theme_minimal()
+# chin_dif <- main_map + inset_element(inset_context_chin, 
+#                                      left = 0.7, bottom = 0.05, 
+#                                      right = 0.98, top = 0.3)
+# # main_map <- ggplot(data = ESUchin) +
+# #   annotation_map_tile(type = "hotstyle", zoom = 10) +
+# #   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
+# #   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) + 
+# #   coord_sf(crs = 4269) +
+# #   scale_fill_viridis_c(option = "inferno") + 
+# #   labs(title = "Chinook ESUs - Sum of difference between observed\n and estimataed states",
+# #        caption = "1980-2024",
+# #        fill = "Difference") +
+# #   theme_minimal()
+# # chin_dif <- main_map + inset_element(inset_context_chin, 
+# #                                      left = 0.85, bottom = 0.05, 
+# #                                      right = 1.1, top = 0.3)
+# chin_dif
+
+# overlap - for chinook
+poly_stripe <- st_union(sf_base, sf_stripe)
+  # isolate polygons
+sf_overlap_region <- st_intersection(sf_stripe, sf_base)
+  # extract overlap
+sf_non_overlap_region <- st_difference(ESUchin, sf_overlap_region)
+
+# plots plots plots
+main_map <- ggplot() +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(data = sf_base, aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf(data = sf_non_overlap_region, aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf_pattern(
+    data = sf_overlap_region,
+    aes(pattern_fill = total_net_difference), 
+    pattern = 'stripe',
+    pattern_color = NA,       
+    pattern_density = 0.25,    
+    pattern_spacing = 0.015,
+    pattern_angle = 45,
+    fill = NA,               
+    alpha = 1                 
+  ) +
+  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + 
+  geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   
+  scale_fill_viridis_c(
+    option = "inferno", 
+    aesthetics = c("fill", "pattern_fill"), 
+    name = "Difference"
+  ) +
+  coord_sf(crs = 4269) +
+  labs(
+    title = "Chinook ESUs - Sum of difference between observed and estimated states",
+    caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU"
+  ) +
+  theme_minimal()
+ESUchin_dif <- main_map + inset_element(inset_context_chin, 
+                                     left = 0.7, bottom = 0.05, 
+                                     right = 0.98, top = 0.3)
+ESUchin_dif
+
+main_map <- ggplot(data = ESUcoho) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
+  coord_sf(crs = 4269) +
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Coho ESUs - Sum of difference between observed\n and estimataed states",
+       caption = "1980-2024",
+       fill = "Difference") +
+  theme_minimal()
+ESUcoho_dif <- main_map + inset_element(inset_context_coho, 
+                                     left = 0.85, bottom = 0.05, 
+                                     right = 1.1, top = 0.3)
+ESUcoho_dif
+
+main_map <- ggplot(data = ESUstel) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
+  coord_sf(crs = 4269) +
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Steelhead ESUs - Sum of difference between observed\n and estimataed states",
+       caption = "1980-2024",
+       fill = "Difference") +
+  theme_minimal()
+ESUstel_dif <- main_map + inset_element(inset_context_stel, 
+                                     left = 0.85, bottom = 0.05, 
+                                     right = 1.1, top = 0.3)
+ESUstel_dif
+
+main_map <- ggplot() +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(data = sf_base, aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf(data = sf_non_overlap_region, aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf_pattern(
+    data = sf_overlap_region,
+    aes(pattern_fill = avg_netdiff), 
+    pattern = 'stripe',
+    pattern_color = NA,       
+    pattern_density = 0.25,    
+    pattern_spacing = 0.015,
+    pattern_angle = 45,
+    fill = NA,               
+    alpha = 1                 
+  ) +
+  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + 
+  geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   
+  scale_fill_viridis_c(
+    option = "inferno", 
+    aesthetics = c("fill", "pattern_fill"), 
+    name = "Difference - \nln(NOSA)"
+  ) +
+  coord_sf(crs = 4269) +
+  labs(
+    title = "Chinook ESUs - Average annual difference between observed and estimated states",
+    caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU"
+  ) +
+  theme_minimal()
+ESUchin_avg <- main_map + inset_element(inset_context_chin, 
+                                     left = 0.7, bottom = 0.05, 
+                                     right = 0.98, top = 0.3)
+ESUchin_avg
+
+main_map <- ggplot(data = ESUcoho) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
+  coord_sf(crs = 4269) +
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Coho ESUs - Average annual difference between observed\n and estimataed states",
+       caption = "1980-2024",
+       fill = "Difference - \nln(NOSA)") +
+  theme_minimal()
+ESUcoho_avg <- main_map + inset_element(inset_context_coho, 
+                                     left = 0.85, bottom = 0.05, 
+                                     right = 1.1, top = 0.3)
+ESUcoho_avg
+
+main_map <- ggplot(data = ESUstel) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
+  coord_sf(crs = 4269) +
+  scale_fill_viridis_c(option = "inferno") + 
+  labs(title = "Steelhead ESUs - Average annual difference between observed\n and estimataed states",
+       caption = "1980-2024",
+       fill = "Difference - \nln(NOSA)") +
+  theme_minimal()
+ESUstel_avg <- main_map + inset_element(inset_context_stel, 
+                                     left = 0.85, bottom = 0.05, 
+                                     right = 1.1, top = 0.3)
+ESUstel_avg
