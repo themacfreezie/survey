@@ -5,9 +5,9 @@ library(reshape2)
 library(tidyverse)
 
 # load model objects
-boot_chinM16 <- readRDS(here("data", "clean", "ssmBOOT_chinM16.rds"))
-boot_cohoM10 <- readRDS(here("data", "clean", "ssmBOOT_cohoM10.rds"))
-boot_stelM22 <- readRDS(here("data", "clean", "ssmBOOT_stelM22.rds"))
+# boot_chinM16 <- readRDS(here("data", "clean", "ssmBOOT_chinM16.rds"))
+# boot_cohoM10 <- readRDS(here("data", "clean", "ssmBOOT_cohoM10.rds"))
+# boot_stelM22 <- readRDS(here("data", "clean", "ssmBOOT_stelM22.rds"))
 
 boot_chinM9 <- readRDS(here("data", "clean", "ssmBOOT_chinM9.rds"))
 boot_cohoM9 <- readRDS(here("data", "clean", "ssmBOOT_cohoM9.rds"))
