@@ -93,10 +93,9 @@ esu_panels_clipped
 # preplots
 bbox <- st_bbox(sf_coho_nad83col)
 region_states <- states(cb = TRUE, resolution = "20m") %>%
-  filter(STUSPS %in% c("OR", "WA", "ID")) %>%
+  filter(STUSPS %in% c("OR", "WA")) %>%
   st_transform(4269) # match main map's CRS (NAD83)
-# these bounds roughly cover the columbia basin
-basin_xlim <- c(-125, -110)
+basin_xlim <- c(-125.0, -116.0)
 basin_ylim <- c(41.5, 49.5)
 
 # create the basin-centered inset
