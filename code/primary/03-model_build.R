@@ -76,6 +76,11 @@ methodsTable_stel <- nosa_stel %>%
   pivot_wider(names_from = "Year", values_from = "MethodNameID", id_cols = "PopID")
 print(methodsTable_stel)
 
+# save these for reference to model dat
+save(nosa_chin, file=here("data", "clean", "chin_modeldat.Rda"))
+save(nosa_coho, file=here("data", "clean", "coho_modeldat.Rda"))
+save(nosa_stel, file=here("data", "clean", "stel_modeldat.Rda"))
+
 ## per species
 # chinook
 length(unique(nosa_chin$PopID))

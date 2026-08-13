@@ -1,6 +1,8 @@
 ## SET WORKING DIR & PACKAGES
 # library(gganimate)
+library(DT)
 library(ggspatial)
+library(gt)
 library(here)
 library(RColorBrewer)
 library(readxl)
@@ -87,57 +89,77 @@ ggplot(all_data, aes(x = Year, y = lnnosa, color = factor(NWFSC_POP_ID), group =
     x = "Year"
   )
 
-# # bring in spatial data
-# # pull in spatial layers
-# gdb_path <- here("data", "raw", "WCR_Salmon_Steelhead_gdb_2015", "WCR_Salmon_Steelhead_gdb_2015.gdb")
-# st_layers(gdb_path)
-#   # I want 'fish' datalayer
-# sf_fish <- read_sf(dsn = gdb_path, layer = "fish")
-# sf_fish$DPS_IDtrunc <- substr(sf_fish$DPS_ID, 1, 5)
-#   # grab DPS_ID
-# sf_fish$DPStrunc <- str_remove(sf_fish$DPS, " - Outside legal area$")
-# 
-# # collapse to level of NWFSC_POP_ID
-# sf_fishLOOKUP <- sf_fish %>%
-#   st_make_valid() %>% 
-#   group_by(NWFSC_POP_ID, POPULATION, DPS_IDtrunc, DPStrunc) %>%
-#   summarize(SHAPE = st_union(SHAPE))
-# 
-# # combine
-# sf_fish_combined <- nosa_coho %>%
-#   left_join(sf_fishLOOKUP, by = "NWFSC_POP_ID")
-# 
-# sf_coho <- sf_fish_combined %>%
-#   filter(!is.na(NWFSC_POP_ID))
-# sf_coho <- st_as_sf(sf_coho, sf_column_name = "SHAPE")
-# sf_coho <- st_transform(sf_coho, crs = 4269)
-# 
-# sf_fish_combined <- nosa_chin %>%
-#   left_join(sf_fishLOOKUP, by = "NWFSC_POP_ID")
-# 
-# sf_chin <- sf_fish_combined %>%
-#   filter(!is.na(NWFSC_POP_ID))
-# sf_chin <- st_as_sf(sf_chin, sf_column_name = "SHAPE")
-# sf_chin <- st_transform(sf_chin, crs = 4269)
-# 
-# sf_fish_combined <- nosa_stel %>%
-#   left_join(sf_fishLOOKUP, by = "NWFSC_POP_ID")
-# 
-# sf_stel <- sf_fish_combined %>%
-#   filter(!is.na(NWFSC_POP_ID))
-# sf_stel <- st_as_sf(sf_stel, sf_column_name = "SHAPE")
-# sf_stel <- st_transform(sf_stel, crs = 4269)
-# 
-# # time lapse
-# anim_map <- ggplot(data = sf_coho) +
-#   annotation_map_tile(type = "osm", zoom = 8) + 
-#   geom_sf(aes(fill = NOSA, geometry = SHAPE), alpha = 0.7) +
-#   scale_fill_viridis_c(option = "plasma") +
-#   transition_time(Year) +
-#   labs(title = "Coho Salmon Abundance",
-#        subtitle = "Year: {as.integer(frame_time)}",
-#        caption = "Data: 1980-2024")
-# animate(anim_map, 
-#         nframes = 200, 
-#         fps = 10, 
-#         renderer = gifski_renderer())
+# methods by ESU
+load(here("data", "clean", "chin_modeldat.Rda"))
+load(here("data", "clean", "coho_modeldat.Rda"))
+load(here("data", "clean", "stel_modeldat.Rda"))
+
+# pop list
+load(here("data", "clean", "populations_list.Rda"))
+pop_list <- pop_list |> 
+  filter(CommonPopName != "Lostine River Spring Chinook")
+pop_list <- pop_list |> 
+  filter(WATERBODY != "Hood River traps: WF Moving Falls (45.571/-121.658), East Fork (45.502/-121.562), MF Parkdale Hatchery (45.524/-121.621)")
+pop_list <- pop_list |> 
+  filter(WATERBODY != "Upper Gorge Tributaries and Hood River")
+pop_list <- pop_list |> 
+  filter(WATERBODY != "North Fork Scappoose Creek, South Fork Scappoose Creek, and tributaries")
+
+# join
+chin_pops <- left_join(nosa_chin, pop_list, by = "PopID")
+chin_pops$ESAPOPNAME <- sub(".*\\((.*?)\\).*", "\\1", chin_pops$ESAPOPNAME)
+chin_pops <- chin_pops[chin_pops$ESAPOPNAME != "N/A", ]
+
+coho_pops <- left_join(nosa_coho, pop_list, by = "PopID")
+coho_pops$ESAPOPNAME <- sub(".*\\((.*?)\\).*", "\\1", coho_pops$ESAPOPNAME)
+coho_pops <- coho_pops[coho_pops$ESAPOPNAME != "N/A", ]
+
+stel_pops <- left_join(nosa_stel, pop_list, by = "PopID")
+stel_pops$ESAPOPNAME <- sub(".*\\((.*?)\\).*", "\\1", stel_pops$ESAPOPNAME)
+stel_pops <- stel_pops[stel_pops$ESAPOPNAME != "N/A", ]
+
+# table
+ESUmethods_chin <- table(chin_pops$MethodName, chin_pops$ESAPOPNAME)
+print(ESUmethods_chin)
+ESUmethods_chin <- as.data.frame.matrix(ESUmethods_chin)
+
+ESUmethods_coho <- table(coho_pops$MethodName, coho_pops$ESAPOPNAME)
+print(ESUmethods_coho)
+ESUmethods_coho <- as.data.frame.matrix(ESUmethods_coho)
+
+ESUmethods_stel <- table(stel_pops$MethodName, stel_pops$ESAPOPNAME)
+print(ESUmethods_stel)
+ESUmethods_stel <- as.data.frame.matrix(ESUmethods_stel)
+
+ESUmethods_chin_table <- ESUmethods_chin %>%
+  gt(rownames_to_stub = TRUE) %>% 
+  tab_header(
+    title = "Survey methods by ESU - Chinook salmon",
+  ) %>%
+  tab_options(
+    table.width = pct(100),
+    data_row.padding = px(5)    
+  )
+ESUmethods_chin_table
+
+ESUmethods_coho_table <- ESUmethods_coho %>%
+  gt(rownames_to_stub = TRUE) %>% 
+  tab_header(
+    title = "Survey methods by ESU - coho salmon",
+  ) %>%
+  tab_options(
+    table.width = pct(100),
+    data_row.padding = px(5)    
+  )
+ESUmethods_chin_table
+
+ESUmethods_stel_table <- ESUmethods_stel %>%
+  gt(rownames_to_stub = TRUE) %>% 
+  tab_header(
+    title = "Survey methods by DSP - steelhead trout",
+  ) %>%
+  tab_options(
+    table.width = pct(100),
+    data_row.padding = px(5)    
+  )
+ESUmethods_stel_table
