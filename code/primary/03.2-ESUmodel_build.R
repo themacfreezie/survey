@@ -271,4 +271,3 @@ if(!file.exists(here::here("data", "clean", paste("ssm_ESUstelM", scale, ".rds",
 }
 # load in ssm_ESUstel
 ssm_ESUstel <- readRDS(file=here::here("data", "clean", paste("ssm_ESUstelM", scale, ".rds", sep="")))
-ssm_ESUstel
