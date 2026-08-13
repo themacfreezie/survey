@@ -98,7 +98,7 @@ inset_context <- ggplot() +
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
-  geom_sf(aes(fill = mean_a), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 
@@ -121,7 +121,7 @@ ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=3
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
-  geom_sf(aes(fill = mean_R), alpha = 0.7) + 
+  geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 
@@ -145,7 +145,7 @@ sf_stel_nad83col$precision <- (1/sf_stel_nad83col$mean_R)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
-  geom_sf(aes(fill = precision), alpha = 0.7) + 
+  geom_sf(aes(fill = precision), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
   scale_fill_viridis_c(option = "inferno") + 

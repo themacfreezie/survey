@@ -388,7 +388,7 @@ main_map <- ggplot(data = ESUstel) +
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
   scale_fill_viridis_c(option = "inferno") + 
-  labs(title = "Steelhead ESUs - Sum of difference between observed\n and estimataed states",
+  labs(title = "Steelhead DSPs - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference") +
   theme_minimal()
@@ -451,7 +451,7 @@ main_map <- ggplot(data = ESUstel) +
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
   scale_fill_viridis_c(option = "inferno") + 
-  labs(title = "Steelhead ESUs - Average annual difference between observed\n and estimataed states",
+  labs(title = "Steelhead DSPs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference - \nln(NOSA)") +
   theme_minimal()

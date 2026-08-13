@@ -495,7 +495,7 @@ ESUcompare_stel <- ggplot(plotdata_stelESU, aes(x = Year, y = Value, color = Dat
   geom_line(linewidth = 0.8) +
   facet_wrap(~ ESAPOPNAME, scales = "free_y") + # 'free_y' adjusts vertical scales for each population
   labs(
-    title = "Steelhead ESU Time Series Comparison (1980-2024)",
+    title = "Steelhead DPS Time Series Comparison (1980-2024)",
     x = "",
     y = "ln(NOSA)",
     color = ""
