@@ -1,14 +1,10 @@
 ## SET WORKING DIR & PACKAGES
 library(ggpattern)
-library(ggspatial)
 library(here)
 library(MARSS)
 library(panelr)
-library(patchwork)
 library(readxl)
-library(sf)
 library(tidyverse)
-library(tigris)
 
 here::i_am("code/primary/09-TScomparison.R")
   # what do I mean by TS?

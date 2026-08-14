@@ -38,6 +38,53 @@ nosa_chin <- nosa %>% filter(CommonName=="Chinook Salmon")
 nosa_coho <- nosa %>% filter(CommonName=="Coho Salmon")
 nosa_stel <- nosa %>% filter(CommonName=="Steelhead")
 
+nosa_chinESU <- nosa_chin
+nosa_cohoESU <- nosa_coho
+nosa_stelESU <- nosa_stel
+
+# ESU level data
+nosa_chinESU$ESANAME <- sub(".*\\((.*?)\\).*", "\\1", nosa_chinESU$ESAPOPNAME)
+nosa_cohoESU$ESANAME <- sub(".*\\((.*?)\\).*", "\\1", nosa_cohoESU$ESAPOPNAME)
+nosa_stelESU$ESANAME <- sub(".*\\((.*?)\\).*", "\\1", nosa_stelESU$ESAPOPNAME)
+
+nosa_chinESU <- nosa_chinESU[-c(1, 3:6, 8:18)]
+nosa_cohoESU <- nosa_cohoESU[-c(1, 3:6, 8:18)]
+nosa_stelESU <- nosa_stelESU[-c(1, 3:6, 8:18)]
+
+nosa_chinESU <- nosa_chinESU %>%
+  group_by(Year, ESANAME) %>%
+  summarize(
+    NOSA = sum(NOSA, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+nosa_cohoESU <- nosa_cohoESU %>%
+  group_by(Year, ESANAME) %>%
+  summarize(
+    NOSA = sum(NOSA, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+nosa_stelESU <- nosa_stelESU %>%
+  group_by(Year, ESANAME) %>%
+  summarize(
+    NOSA = sum(NOSA, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+nosa_chinESU$lnnosa <- log(nosa_chinESU$NOSA + 1)
+nosa_cohoESU$lnnosa <- log(nosa_cohoESU$NOSA + 1)
+nosa_stelESU$lnnosa <- log(nosa_stelESU$NOSA + 1)
+
+nosa_chinESU <- nosa_chinESU[-c(3)]
+nosa_cohoESU <- nosa_cohoESU[-c(3)]
+nosa_stelESU <- nosa_stelESU[-c(3)]
+
+# save these for later
+save(nosa_chinESU, file=here::here("data", "clean", "nosa_chinESU.Rda"))
+save(nosa_cohoESU, file=here::here("data", "clean", "nosa_cohoESU.Rda"))
+save(nosa_stelESU, file=here::here("data", "clean", "nosa_stelESU.Rda"))
+
 # will drop those methods for which fewer than 10 observations exist
 counts_chin <- table(nosa_chin$MethodNameID)
 low_count_ids <- names(counts_chin[counts_chin < 10])
@@ -59,7 +106,6 @@ low_counts_stel <- as.numeric(low_count_ids)
 nosa_stel <- nosa_stel %>%
   filter(!MethodNameID %in% low_counts_stel)
 table(nosa_stel$MethodNameID)
-
 
 # set up popID data for MARSS models
 chin_dat <- nosa_chin[-c(1, 3:16)]
