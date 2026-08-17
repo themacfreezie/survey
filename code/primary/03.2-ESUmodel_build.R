@@ -317,3 +317,32 @@ if(!file.exists(here::here("data", "clean", paste("ssm_ESUstelM", scale, ".rds",
 }
 # load in ssm_ESUstel
 ssm_ESUstel <- readRDS(file=here::here("data", "clean", paste("ssm_ESUstelM", scale, ".rds", sep="")))
+  # odd results w/ deterministic x2 state
+
+strict_control <- list(
+  maxit = 10000,                # Increase max iterations from default
+  conv.test.slope.tol = 0.01,  # Strict slope check (per the alert)
+  abstol = 0.00001             # Absolute tolerance tightening
+)
+
+# run MARSS model
+if(!file.exists(here::here("data", "clean", paste("ssm_ESUstelM", scale, "-strict.rds", sep="")))){
+  ptm <- proc.time()
+  ssm_ESUstel <- MARSS(stel_dat, model = mod_stel.list, method = "kem", control = strict_control)
+  saveRDS(ssm_ESUstel, file=here::here("data", "clean", paste("ssm_ESUstelM", scale, "-strict.rds", sep="")))
+  stel_time <- proc.time()[3] - ptm
+  stel_time
+}
+# load in ssm_ESUstel
+ssm_ESUstel <- readRDS(file=here::here("data", "clean", paste("ssm_ESUstelM", scale, "-strict.rds", sep="")))
+  # same issue..
+
+# further invettigation
+nosa_stel$ESUNAME <- sub("\\).*$", ")", nosa_stel$ESAPOPNAME)
+nosa_stelUW <- nosa_stel[nosa_stel$ESUNAME == "Steelhead (Upper Willamette River DPS)", ]
+  # only one method (!) is used across ALL observations in this DPS
+  # I guess that means I can't really say much about it? the model can't distinguish b/w observation and process variance
+    # is this method seen anywhere else for this species? code 16...
+      # if it was seen in steelhead data elsewhere I could maybe force the parameter estimates from those pops...
+nosa_stelNOTUW <- nosa_stel[nosa_stel$ESUNAME != "Steelhead (Upper Willamette River DPS)", ]
+      # No it's not! I feel like this really means I can't say anything about it...

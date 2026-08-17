@@ -27,6 +27,15 @@ nosa_chin <- nosa %>% filter(CommonName=="Chinook Salmon")
 nosa_coho <- nosa %>% filter(CommonName=="Coho Salmon")
 nosa_stel <- nosa %>% filter(CommonName=="Steelhead")
 
+nosa_chin_methods <- nosa_chin[-c(4:11)]
+nosa_coho_methods <- nosa_coho[-c(4:11)]
+nosa_stel_methods <- nosa_stel[-c(4:11)]
+
+# save these for plotting bias adjustment
+save(nosa_chin_methods, file=here("data", "clean", "nosa_chin_methods.Rda"))
+save(nosa_coho_methods, file=here("data", "clean", "nosa_coho_methods.Rda"))
+save(nosa_stel_methods, file=here("data", "clean", "nosa_stel_methods.Rda"))
+
 # still issues with pop 11 somehow (chin)
 nosa_chin <- nosa_chin %>%
   filter(TimeSeriesID != 599005)
