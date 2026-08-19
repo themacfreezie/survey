@@ -11,6 +11,9 @@ here::i_am("code/primary/10-TSmap.R")
 # what do I mean by TS?
 options(max.print=2000)
 
+# set palette of choice
+palette <- "cividis"
+
 # pull in diff data
 load(file=here("data", "clean", "popdiff_chin.Rda"))
 load(file=here("data", "clean", "popdiff_coho.Rda"))
@@ -70,6 +73,8 @@ sf_fish_combined <- rbind(sf_fish_combined, sf_stel_combined)
 class(sf_fish_combined)
 
 # collapse
+## WARNING - all this needs to be rethought since it is using added natural log
+  # got to go back to 09-TScomparison.R
 sf_chin_combined <- sf_chin_combined %>%
   group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
   summarize(
@@ -219,7 +224,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Difference"
   ) +
@@ -230,14 +235,15 @@ main_map <- ggplot() +
 chin_dif <- main_map + inset_element(inset_context_chin, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-chin_dif
+# chin_dif
+  # unitl concerns regarding adding ln(NOSA) values can be addressed
 
 main_map <- ggplot(data = sf_coho_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference") +
@@ -245,14 +251,15 @@ main_map <- ggplot(data = sf_coho_combined) +
 coho_dif <- main_map + inset_element(inset_context_coho, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-coho_dif
+# coho_dif
+  # unitl concerns regarding adding ln(NOSA) values can be addressed
 
 main_map <- ggplot(data = sf_stel_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead - Sum of difference between observed and estimataed states",
        caption = "1980-2024",
        fill = "Difference") +
@@ -260,7 +267,8 @@ main_map <- ggplot(data = sf_stel_combined) +
 stel_dif <- main_map + inset_element(inset_context_stel, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-stel_dif 
+# stel_dif 
+  # unitl concerns regarding adding ln(NOSA) values can be addressed
 
 # let's get some ESU maps too
 ESUchin <- sf_outlines_chin %>%
@@ -300,7 +308,7 @@ shared_borders <- st_intersection(sf_outlines_chin) %>%
 #   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
 #   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
 #   scale_fill_viridis_c(
-#     option = "inferno", 
+#     option = palette, 
 #     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
 #     name = "Difference"
 #   ) +
@@ -316,7 +324,7 @@ shared_borders <- st_intersection(sf_outlines_chin) %>%
 # #   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
 # #   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) + 
 # #   coord_sf(crs = 4269) +
-# #   scale_fill_viridis_c(option = "inferno") + 
+# #   scale_fill_viridis_c(option = palette) + 
 # #   labs(title = "Chinook ESUs - Sum of difference between observed\n and estimataed states",
 # #        caption = "1980-2024",
 # #        fill = "Difference") +
@@ -352,7 +360,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + 
   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), 
     name = "Difference"
   ) +
@@ -372,7 +380,7 @@ main_map <- ggplot(data = ESUcoho) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho ESUs - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference") +
@@ -387,7 +395,7 @@ main_map <- ggplot(data = ESUstel) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead DSPs - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference") +
@@ -415,7 +423,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + 
   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), 
     name = "Difference - \nln(NOSA)"
   ) +
@@ -435,7 +443,7 @@ main_map <- ggplot(data = ESUcoho) +
   geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho ESUs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference - \nln(NOSA)") +
@@ -450,7 +458,7 @@ main_map <- ggplot(data = ESUstel) +
   geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead DSPs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
        fill = "Difference - \nln(NOSA)") +
