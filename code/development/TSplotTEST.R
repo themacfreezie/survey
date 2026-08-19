@@ -111,6 +111,9 @@ nosa_chin_plotted$A[nosa_chin_plotted$MethodNameID == 9] <- 0
   # accounts for reference method
 nosa_chin_plotted  <- nosa_chin_plotted %>%
   left_join(Rest, by = "MethodNameID")
+nosa_chin_plotted$lnnosaBIASADJUSTED <- nosa_chin_plotted$lnnosa + nosa_chin_plotted$A
+nosa_chin_plotted$lnnosaBIASADJUSTEDupper <- nosa_chin_plotted$upper + nosa_chin_plotted$A
+nosa_chin_plotted$lnnosaBIASADJUSTEDlower <- nosa_chin_plotted$lower + nosa_chin_plotted$A
 
 ggplot(data = nosa_chin_plotted, aes(x = Year, y = lnnosa, color = Dataset)) +
   geom_ribbon(
@@ -131,4 +134,45 @@ ggplot(data = nosa_chin_plotted, aes(x = Year, y = lnnosa, color = Dataset)) +
   theme(
     strip.text = element_text(face = "bold", size = 10),
     legend.position = "none"
+  )
+
+ggplot(data = nosa_chin_plotted, aes(x = Year)) +
+  # First Ribbon (Original)
+  geom_ribbon(
+    aes(ymin = lower, ymax = upper, fill = Dataset), 
+    alpha = 0.2, 
+    color = NA
+  ) +
+  # First Line (Original)
+  geom_line(aes(y = lnnosa, color = Dataset), linewidth = 1) +
+  
+  # Second Ribbon (Bias-Adjusted)
+  geom_ribbon(
+    aes(ymin = lnnosaBIASADJUSTEDlower, ymax = lnnosaBIASADJUSTEDupper, fill = "bias_adjusted"), 
+    alpha = 0.15, 
+    color = NA
+  ) +
+  # Second Line (Bias-Adjusted)
+  geom_line(
+    aes(y = lnnosaBIASADJUSTED, color = "bias_adjusted"), 
+    linewidth = 1, 
+    linetype = "dashed"
+  ) +
+  
+  # Configuration layers
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") +
+  theme_minimal() +
+  
+  # Color controls (Updated to include the new "bias_adjusted" key)
+  scale_color_manual(values = c("fitted" = "#1f77b4", "bias_adjusted" = "#ff7f0e")) +
+  scale_fill_manual(values = c("fitted" = "#1f77b4", "bias_adjusted" = "#ff7f0e")) +
+  
+  labs(
+    title = "Chinook - Fitted & Bias-Adjusted Values by ESU",
+    x = "Year",
+    y = "ln(NOSA)"
+  ) +
+  theme(
+    strip.text = element_text(face = "bold", size = 10),
+    legend.position = "bottom" # Turned legend on so you can see which line is which
   )
