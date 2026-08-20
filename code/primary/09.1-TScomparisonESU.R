@@ -414,7 +414,7 @@ plotdata_chin$Value <- exp(plotdata_chin$Value)
 plotdata_coho$Value <- exp(plotdata_coho$Value)
 plotdata_stel$Value <- exp(plotdata_stel$Value)
 
-# sumamrize
+# summarize
 plotdata_chinESU <- plotdata_chin %>%
   group_by(Year, Dataset, ESAPOPNAME) |> 
   summarise(

@@ -425,7 +425,7 @@ main_map <- ggplot() +
   scale_fill_viridis_c(
     option = palette, 
     aesthetics = c("fill", "pattern_fill"), 
-    name = "Difference - \nln(NOSA)"
+    name = "Difference - \nNOSA"
   ) +
   coord_sf(crs = 4269) +
   labs(
@@ -446,7 +446,7 @@ main_map <- ggplot(data = ESUcoho) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho ESUs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
-       fill = "Difference - \nln(NOSA)") +
+       fill = "Difference - \nNOSA") +
   theme_minimal()
 ESUcoho_avg <- main_map + inset_element(inset_context_coho, 
                                      left = 0.85, bottom = 0.05, 
@@ -461,9 +461,72 @@ main_map <- ggplot(data = ESUstel) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead DSPs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
-       fill = "Difference - \nln(NOSA)") +
+       fill = "Difference - \nNOSA") +
   theme_minimal()
 ESUstel_avg <- main_map + inset_element(inset_context_stel, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
 ESUstel_avg
+
+main_map <- ggplot() +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(data = sf_base, aes(fill = LNavg_netdiff), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf(data = sf_non_overlap_region, aes(fill = LNavg_netdiff), alpha = 0.8, color = "white", size = 0.1) +
+  geom_sf_pattern(
+    data = sf_overlap_region,
+    aes(pattern_fill = avg_netdiff), 
+    pattern = 'stripe',
+    pattern_color = NA,       
+    pattern_density = 0.25,    
+    pattern_spacing = 0.015,
+    pattern_angle = 45,
+    fill = NA,               
+    alpha = 1                 
+  ) +
+  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + 
+  geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) +   
+  scale_fill_viridis_c(
+    option = palette, 
+    aesthetics = c("fill", "pattern_fill"), 
+    name = "Difference - \nln(NOSA)"
+  ) +
+  coord_sf(crs = 4269) +
+  labs(
+    title = "Chinook ESUs - Average annual difference between observed and estimated states",
+    caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU"
+  ) +
+  theme_minimal()
+ESUchin_LNavg <- main_map + inset_element(inset_context_chin, 
+                                        left = 0.7, bottom = 0.05, 
+                                        right = 0.98, top = 0.3)
+ESUchin_LNavg
+
+main_map <- ggplot(data = ESUcoho) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(aes(fill = LNavg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
+  coord_sf(crs = 4269) +
+  scale_fill_viridis_c(option = palette) + 
+  labs(title = "Coho ESUs - Average annual difference between observed\n and estimataed states",
+       caption = "1980-2024",
+       fill = "Difference - \nln(NOSA)") +
+  theme_minimal()
+ESUcoho_LNavg <- main_map + inset_element(inset_context_coho, 
+                                        left = 0.85, bottom = 0.05, 
+                                        right = 1.1, top = 0.3)
+ESUcoho_LNavg
+
+main_map <- ggplot(data = ESUstel) +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(aes(fill = LNavg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
+  geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
+  coord_sf(crs = 4269) +
+  scale_fill_viridis_c(option = palette) + 
+  labs(title = "Steelhead DSPs - Average annual difference between observed\n and estimataed states",
+       caption = "1980-2024",
+       fill = "Difference - \nln(NOSA)") +
+  theme_minimal()
+ESUstel_LNavg <- main_map + inset_element(inset_context_stel, 
+                                        left = 0.85, bottom = 0.05, 
+                                        right = 1.1, top = 0.3)
+ESUstel_LNavg
