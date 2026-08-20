@@ -15,6 +15,10 @@ library(tigris)
 here::i_am("code/primary/06.3-steelheadARmap.R")
 options(max.print=2000)
 
+# set palette of choice
+palette <- "turbo"
+bivar_palette <- "Brown2"
+
 ARstel <- readRDS(here("data", "clean", "popavgAR_stel.rds"))
 
 # pull in spatial layers
@@ -101,7 +105,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average bias - steelhead surveys (1980-2024)",
        caption = "Bias measured relative to 'Dam Counts' method",
        fill = "Bias") +
@@ -124,7 +128,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average variance - steelhead surveys (1980-2024)",
        fill = "Variance") +
   theme_minimal() +
@@ -148,7 +152,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = precision), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average precision - steelhead surveys (1980-2024)",
        fill = "Precision") +
   theme_minimal() +
@@ -173,7 +177,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average population size - steelhead (1980-2024)",
        fill = "Pop. size") +
   theme_minimal() +
@@ -200,7 +204,7 @@ map <- ggplot() +
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
+  bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
     theme(       
       plot.title = element_text(face = "bold", size = 28),       
       legend.title = element_text(size = 28),       
@@ -209,7 +213,7 @@ map <- ggplot() +
       axis.text.y= element_text(size = 14, color = "black"),     
       )
 bi_theme()
-legend <- bi_legend(pal = "Brown2",
+legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
                     xlab = "Population",
                     ylab = "Variance",
@@ -232,7 +236,7 @@ map <- ggplot() +
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
+  bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
     theme(       
       plot.title = element_text(face = "bold", size = 28),       
       legend.title = element_text(size = 28),       
@@ -241,7 +245,7 @@ map <- ggplot() +
       axis.text.y= element_text(size = 14, color = "black"),     
       )
 bi_theme()
-legend <- bi_legend(pal = "Brown2",
+legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
                     xlab = "Population",
                     ylab = "Bias",
@@ -265,7 +269,7 @@ map <- ggplot() +
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
+  bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
     theme(       
       plot.title = element_text(face = "bold", size = 28),       
       legend.title = element_text(size = 28),       
@@ -274,7 +278,7 @@ map <- ggplot() +
       axis.text.y= element_text(size = 14, color = "black"),    
       )
 bi_theme()
-legend <- bi_legend(pal = "Brown2",
+legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
                     xlab = "Bias",
                     ylab = "Variance",
@@ -339,7 +343,7 @@ stel_AR_choro
 #   ggplot() +
 #     geom_sf(data = esu_data_clipped, aes(fill = mean_a), alpha = 0.7, color = "white", size = 0.1) +
 #     geom_sf(data = focus_outline, fill = NA, color = "black", linewidth = 1.2) +
-#     scale_fill_viridis_c(option = "inferno") +
+#     scale_fill_viridis_c(option = palette) +
 #     labs(title = focus_outline$DPStrunc) +
 #     theme_minimal() +
 #     theme(
@@ -403,7 +407,7 @@ stel_AR_choro
 #   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
 #   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
 #   scale_fill_viridis_c(
-#     option = "inferno", 
+#     option = palette, 
 #     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
 #     name = "Bias"
 #   ) +
@@ -441,7 +445,7 @@ stel_AR_choro
 #   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
 #   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
 #   scale_fill_viridis_c(
-#     option = "inferno", 
+#     option = palette, 
 #     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
 #     name = "Variance"
 #   ) +
@@ -479,7 +483,7 @@ stel_AR_choro
 #   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
 #   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
 #   scale_fill_viridis_c(
-#     option = "inferno", 
+#     option = palette, 
 #     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
 #     name = "Pop. size"
 #   ) +
@@ -503,7 +507,7 @@ stel_AR_choro
 # # # choropleth
 # data <- bi_class(sf_stel_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
 # 
-# legend <- bi_legend(pal = "Brown2",
+# legend <- bi_legend(pal = bivar_palette,
 #                     dim = 4,
 #                     xlab = "Population",
 #                     ylab = "Variance",
@@ -522,7 +526,7 @@ stel_AR_choro
 #     geom_sf(data = st_union(data), fill = "white", alpha = 0.7, color = NA) +
 #     geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
 #     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-#     bi_scale_fill(pal = "Brown2", dim = 4) +
+#     bi_scale_fill(pal = bivar_palette, dim = 4) +
 #     bi_theme() +
 #     labs(title = current_title) +
 #     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -556,7 +560,7 @@ stel_AR_choro
 #     # Highlight the specific DPS boundary for that facet
 #     geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 0.6) +
 #     
-#     scale_fill_viridis_c(option = "inferno", name = legend_name) +
+#     scale_fill_viridis_c(option = palette, name = legend_name) +
 #     
 #     # Facet by DPS - this ensures Pop 4 shows up in its DPS and 104 in its own
 #     facet_wrap(~DPStrunc, ncol = 2) +
@@ -631,7 +635,7 @@ stel_AR_choro
 #             color = "black", 
 #             linewidth = 0.8) +
 #     
-#     scale_fill_viridis_c(option = "inferno", 
+#     scale_fill_viridis_c(option = palette, 
 #                          name = legend_name,
 #                          # Ensure the scale limits are consistent across all plots
 #                          limits = range(data[[fill_var]], na.rm = TRUE)) +
@@ -679,7 +683,7 @@ stel_AR_choro
 # )
 # 
 # bi_legend_shared <- bi_legend(
-#   pal = "Brown2",
+#   pal = bivar_palette,
 #   dim = 4,
 #   xlab = "Bias",
 #   ylab = "Variance",
@@ -724,7 +728,7 @@ stel_AR_choro
 #       linewidth = 0.8
 #     ) +
 #     
-#     bi_scale_fill(pal = "Brown2", dim = 4) +
+#     bi_scale_fill(pal = bivar_palette, dim = 4) +
 #     
 #     labs(title = current_dps_name) +
 #     

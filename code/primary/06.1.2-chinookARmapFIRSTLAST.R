@@ -15,6 +15,9 @@ library(tigris)
 here::i_am("code/primary/06.1.2-chinookARmapFIRSTLAST.R")
 options(max.print=2000)
 
+# set palette of choice
+palette <- "turbo"
+
 # pull in AR data
 ARchin <- readRDS(here("data", "clean", "FLavgAR_chin.rds"))
 
@@ -90,7 +93,7 @@ outline_panels_clipped <- lapply(1:nrow(sf_outlines), function(i) {
   ggplot() +
     geom_sf(data = esu_data_clipped, aes(fill = change_a), alpha = 0.7, color = "white", size = 0.1) +
     geom_sf(data = focus_outline, fill = NA, color = "black", linewidth = 1.2) +
-    scale_fill_viridis_c(option = "inferno") +
+    scale_fill_viridis_c(option = palette) +
     labs(title = focus_outline$DPStrunc) +
     theme_minimal() +
     theme(
@@ -154,7 +157,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Bias"
   ) +
@@ -192,7 +195,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Variance"
   ) +
@@ -230,7 +233,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Pct change"
   ) +

@@ -15,6 +15,10 @@ library(tigris)
 here::i_am("code/primary/06.1-chinookARmap.R")
 options(max.print=2000)
 
+# set palette of choice
+palette <- "turbo"
+bivar_palette <- "Brown2"
+
 # pull in AR data
 ARchin <- readRDS(here("data", "clean", "popavgAR_chin.rds"))
 # ARchinFL <- readRDS(here("data", "clean", "FLavgAR_chin.rds"))
@@ -79,7 +83,7 @@ outline_panels_clipped <- lapply(1:nrow(sf_outlines), function(i) {
   ggplot() +
     geom_sf(data = esu_data_clipped, aes(fill = mean_a), alpha = 0.7, color = "white", size = 0.1) +
     geom_sf(data = focus_outline, fill = NA, color = "black", linewidth = 1.2) +
-    scale_fill_viridis_c(option = "inferno") +
+    scale_fill_viridis_c(option = palette) +
     labs(title = focus_outline$DPStrunc) +
     theme_minimal() +
     theme(
@@ -143,7 +147,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Bias"
   ) +
@@ -181,7 +185,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Variance"
   ) +
@@ -221,7 +225,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Precision"
   ) +
@@ -259,7 +263,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Pop. size"
   ) +
@@ -283,7 +287,7 @@ chin_pop
 # # choropleth
 data <- bi_class(sf_chin_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
 
-legend <- bi_legend(pal = "Brown2",
+legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
                     xlab = "Population",
                     ylab = "Variance",
@@ -302,7 +306,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = st_union(data), fill = "white", alpha = 0.7, color = NA) +
     geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_scale_fill(pal = bivar_palette, dim = 4) +
     bi_theme() +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -336,7 +340,7 @@ create_facet_plot <- function(data, fill_var, title_text, legend_name) {
     # Highlight the specific DPS boundary for that facet
     geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 0.6) +
     
-    scale_fill_viridis_c(option = "inferno", name = legend_name) +
+    scale_fill_viridis_c(option = palette, name = legend_name) +
     
     # Facet by DPS - this ensures Pop 4 shows up in its DPS and 104 in its own
     facet_wrap(~DPStrunc, ncol = 2) +
@@ -411,7 +415,7 @@ create_single_dps_plot <- function(current_dps_name, data, fill_var, title_prefi
             color = "black", 
             linewidth = 0.8) +
     
-    scale_fill_viridis_c(option = "inferno", 
+    scale_fill_viridis_c(option = palette, 
                          name = legend_name,
                          # Ensure the scale limits are consistent across all plots
                          limits = range(data[[fill_var]], na.rm = TRUE)) +
@@ -459,7 +463,7 @@ bi_data <- bi_class(
 )
 
 bi_legend_shared <- bi_legend(
-  pal = "Brown2",
+  pal = bivar_palette,
   dim = 4,
   xlab = "Bias",
   ylab = "Variance",
@@ -504,7 +508,7 @@ create_bivariate_dps_plot <- function(current_dps_name, data, legend) {
       linewidth = 0.8
     ) +
     
-    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_scale_fill(pal = bivar_palette, dim = 4) +
     
     labs(title = current_dps_name) +
     
@@ -569,7 +573,7 @@ sf_stripe_bi <- sf_bivariate %>% filter(NWFSC_POP_ID == 104)
 
 # 3. Create the Bivariate Legend
 # We'll use this as an inset later
-legend_bi <- bi_legend(pal = "Brown2",
+legend_bi <- bi_legend(pal = bivar_palette,
                        dim = 4,
                        xlab = "Population",
                        ylab = "Variance",
@@ -600,7 +604,7 @@ main_choro_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +
   # Use the bivariate scale for BOTH fill and pattern_fill
-  bi_scale_fill(pal = "Brown2", dim = 4, aesthetics = c("fill", "pattern_fill")) +
+  bi_scale_fill(pal = bivar_palette, dim = 4, aesthetics = c("fill", "pattern_fill")) +
   coord_sf(crs = 4269) +
   labs(caption = "Solid = Lower Columbia ESU | Striped = Upper Willamette ESU") +
   theme_minimal() +
@@ -635,7 +639,7 @@ sf_stripe_bi <- sf_bivariate %>% filter(NWFSC_POP_ID == 104)
 
 # 3. Create the Bivariate Legend
 # We'll use this as an inset later
-legend_bi <- bi_legend(pal = "Brown2",
+legend_bi <- bi_legend(pal = bivar_palette,
                        dim = 4,
                        xlab = "Bias",
                        ylab = "Variance",
@@ -666,7 +670,7 @@ main_choro_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +
   # Use the bivariate scale for BOTH fill and pattern_fill
-  bi_scale_fill(pal = "Brown2", dim = 4, aesthetics = c("fill", "pattern_fill")) +
+  bi_scale_fill(pal = bivar_palette, dim = 4, aesthetics = c("fill", "pattern_fill")) +
   coord_sf(crs = 4269) +
   labs(caption = "Solid = Lower Columbia ESU | Striped = Upper Willamette ESU") +
   theme_minimal() +

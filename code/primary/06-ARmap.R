@@ -15,6 +15,10 @@ library(tigris)
 here::i_am("code/primary/06-ARmap.R")
 options(max.print=2000)
 
+# set palette of choice
+palette <- "turbo"
+bivar_palette <- "Brown2"
+
 # pull in AR data
 ARchin <- readRDS(here("data", "clean", "popavgAR_chin.rds"))
 ARcoho <- readRDS(here("data", "clean", "popavgAR_coho.rds"))
@@ -44,7 +48,7 @@ saveRDS(sf_coho_nad83, file=here::here("data", "clean", "sf_coho_nad83.rds"))
 #   annotation_map_tile(type = "hotstyle", zoom = 10) + 
 #   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
 #   coord_sf(crs = 4269) + 
-#   scale_fill_viridis_c(option = "inferno") + # Provides a high-contrast, accessible gradient
+#   scale_fill_viridis_c(option = palette) + # Provides a high-contrast, accessible gradient
 #   labs(title = "Map of bias in coho populations",
 #        fill = "Mean bias") +
 #   theme_minimal()
@@ -53,7 +57,7 @@ saveRDS(sf_coho_nad83, file=here::here("data", "clean", "sf_coho_nad83.rds"))
 #   annotation_map_tile(type = "hotstyle", zoom = 10) + 
 #   geom_sf(aes(fill = mean_R), alpha = 0.7) + 
 #   coord_sf(crs = 4269) + 
-#   scale_fill_viridis_c(option = "inferno") + # Provides a high-contrast, accessible gradient
+#   scale_fill_viridis_c(option = palette) + # Provides a high-contrast, accessible gradient
 #   labs(title = "Map of precision in coho populations",
 #        fill = "Mean variance") +
 #   theme_minimal()
@@ -123,7 +127,7 @@ main_map <- ggplot(data = sf_coho_nad83col) +
   geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) +
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average bias - coho surveys (1980-2024)",
        caption = "Bias measured relative to 'Dam Counts' method",
        fill = "Bias") +
@@ -139,7 +143,7 @@ main_map <- ggplot(data = sf_coho_nad83col) +
   geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average precision - coho surveys (1980-2024)",
        fill = "Variance") +
   theme_minimal()
@@ -154,7 +158,7 @@ main_map <- ggplot(data = sf_coho_nad83col) +
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average population size - coho (1980-2024)",
        fill = "pop. size") +
   theme_minimal()
@@ -174,9 +178,9 @@ map <- ggplot() +
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
+  bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
   bi_theme()
-legend <- bi_legend(pal = "Brown2",
+legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
                     xlab = "Population",
                     ylab = "Variance",
@@ -216,7 +220,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_scale_fill(pal = bivar_palette, dim = 4) +
     bi_theme() +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -287,7 +291,7 @@ outline_panels_clipped <- lapply(1:nrow(sf_outlines), function(i) {
   ggplot() +
     geom_sf(data = esu_data_clipped, aes(fill = mean_a), alpha = 0.7, color = "white", size = 0.1) +
     geom_sf(data = focus_outline, fill = NA, color = "black", linewidth = 1.2) +
-    scale_fill_viridis_c(option = "inferno") +
+    scale_fill_viridis_c(option = palette) +
     labs(title = focus_outline$DPStrunc) +
     theme_minimal() +
     theme(
@@ -339,7 +343,7 @@ shared_borders <- st_intersection(sf_outlines) %>%
 #   geom_sf(aes(fill = mean_a), alpha = 0.7) + 
 #   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
 #   coord_sf(crs = 4269) + 
-#   scale_fill_viridis_c(option = "inferno") + 
+#   scale_fill_viridis_c(option = palette) + 
 #   labs(title = "Map of relative bias in chin populations",
 #        fill = "Mean relative bias") +
 #   theme_minimal()
@@ -364,7 +368,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Bias"
   ) +
@@ -395,7 +399,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Variance"
   ) +
@@ -426,7 +430,7 @@ main_map <- ggplot() +
   geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
-    option = "inferno", 
+    option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Pop. size"
   ) +
@@ -451,9 +455,9 @@ data <- bi_class(sf_chin_nad83col, x = mean_lnnosa, y = mean_R, style = "equal",
 #   ) + 
 #   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
 #   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-#   bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
+#   bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
 #   bi_theme()
-legend <- bi_legend(pal = "Brown2",
+legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
                     xlab = "Population",
                     ylab = "Variance",
@@ -493,7 +497,7 @@ outline_ids <- unique(sf_outlines$DPS_IDtrunc)
 #     geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
 #     # Outline
 #     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-#     bi_scale_fill(pal = "Brown2", dim = 4) +
+#     bi_scale_fill(pal = bivar_palette, dim = 4) +
 #     bi_theme() +
 #     labs(title = current_title) +
 #     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -513,7 +517,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = st_union(data), fill = "white", alpha = 0.7, color = NA) +
     geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_scale_fill(pal = bivar_palette, dim = 4) +
     bi_theme() +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -604,7 +608,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average bias - steelhead surveys (1980-2024)",
        caption = "Bias measured relative to 'Dam Counts' method",
        fill = "Bias") +
@@ -620,7 +624,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average precision - steelhead surveys (1980-2024)",
        fill = "Variance") +
   theme_minimal()
@@ -638,7 +642,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   coord_sf(crs = 4269) + 
-  scale_fill_viridis_c(option = "inferno") + 
+  scale_fill_viridis_c(option = palette) + 
   labs(title = "Average population size - steelhead (1980-2024)",
        fill = "Pop. size") +
   theme_minimal()
@@ -658,10 +662,10 @@ map <- ggplot() +
   ) + 
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  bi_scale_fill(pal = "Brown2", dim = 4) + # Choose a built-in bivariate palette
+  bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
   labs(title = "Average survey variance and average population size (1980-2024)")
   bi_theme()
-legend <- bi_legend(pal = "Brown2",
+legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
                     xlab = "Population",
                     ylab = "Variance",
@@ -701,7 +705,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    bi_scale_fill(pal = "Brown2", dim = 4) +
+    bi_scale_fill(pal = bivar_palette, dim = 4) +
     bi_theme() +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
