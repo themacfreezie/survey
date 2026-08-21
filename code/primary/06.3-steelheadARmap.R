@@ -113,9 +113,9 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   theme(       
     plot.title = element_text(face = "bold", size = 28),       
     legend.title = element_text(size = 28),       
-    legend.text = element_text(size = 18),       
-    axis.text.x = element_text(size = 14, color = "black"),       
-    axis.text.y= element_text(size = 14, color = "black"),     
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
   ) 
 stel_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
@@ -135,9 +135,9 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   theme(       
     plot.title = element_text(face = "bold", size = 28),       
     legend.title = element_text(size = 28),       
-    legend.text = element_text(size = 18),       
-    axis.text.x = element_text(size = 14, color = "black"),       
-    axis.text.y= element_text(size = 14, color = "black"),     
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
   ) 
 stel_r <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
@@ -184,9 +184,9 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   theme(       
     plot.title = element_text(face = "bold", size = 28),       
     legend.title = element_text(size = 28),       
-    legend.text = element_text(size = 18),       
-    axis.text.x = element_text(size = 14, color = "black"),       
-    axis.text.y= element_text(size = 14, color = "black"),     
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
   ) 
 stel_pop <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
@@ -205,13 +205,13 @@ map <- ggplot() +
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
-    theme(       
-      plot.title = element_text(face = "bold", size = 28),       
-      legend.title = element_text(size = 28),       
-      legend.text = element_text(size = 20),       
-      axis.text.x = element_text(size = 14, color = "black"),       
-      axis.text.y= element_text(size = 14, color = "black"),     
-      )
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  ) 
 bi_theme()
 legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
@@ -237,13 +237,13 @@ map <- ggplot() +
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
-    theme(       
-      plot.title = element_text(face = "bold", size = 28),       
-      legend.title = element_text(size = 28),       
-      legend.text = element_text(size = 20),       
-      axis.text.x = element_text(size = 14, color = "black"),       
-      axis.text.y= element_text(size = 14, color = "black"),     
-      )
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  ) 
 bi_theme()
 legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
@@ -270,13 +270,13 @@ map <- ggplot() +
   geom_sf(data, mapping = aes(fill = bi_class), color = "white", size = 0.1, show.legend = FALSE) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
   bi_scale_fill(pal = bivar_palette, dim = 4) + # Choose a built-in bivariate palette
-    theme(       
-      plot.title = element_text(face = "bold", size = 28),       
-      legend.title = element_text(size = 28),       
-      legend.text = element_text(size = 20),       
-      axis.text.x = element_text(size = 14, color = "black"),       
-      axis.text.y= element_text(size = 14, color = "black"),    
-      )
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  ) 
 bi_theme()
 legend <- bi_legend(pal = bivar_palette,
                     dim = 4,
@@ -293,6 +293,46 @@ stel_AR_choro <- final_plot + inset_element(inset_context,
 stel_AR_choro
 
 # iterated bias and precision by esu
+# bias
+outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+plot_list <- lapply(1:nrow(sf_outlines), function(i) {
+  
+  # select the single focus polygon
+  focus_polygon <- sf_outlines[i, ]
+  
+  # extract the title for this specific iteration
+  current_title <- focus_polygon$DPStrunc
+  
+  # "cookie cut" the data to the focus polygon boundary
+  # this removes all data outside the outline and clips bordering polygons
+  focus_data_clipped <- st_intersection(sf_stel_nad83col, focus_polygon)
+  
+  # build the map
+  p <- ggplot() +
+    annotation_map_tile(type = "hotstyle", zoom = 10) +
+    # Background: Full muted choropleth
+    geom_sf(data = sf_stel_nad83col, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = FALSE) +
+    # Shroud: Semi-opaque white layer
+    geom_sf(data = st_union(sf_stel_nad83col), fill = "white", alpha = 0.7, color = NA) +
+    # Highlight: Clipped data only
+    geom_sf(data = focus_data_clipped, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = TRUE) +
+    # Outline: Crisp black border
+    geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
+    coord_sf(crs = 4269) + 
+    scale_fill_viridis_c(option = palette, name = "Bias") + 
+    labs(title = current_title) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
+})
+
+doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
+  plot_annotation(title = "Average bias - steelhead surveys (1980 - 2024)",
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+stelBias_panel <- doink + inset_element(inset_context, 
+                                       left = 0.7, bottom = 0.05, 
+                                       right = 0.98, top = 0.3)
+stelBias_panel
+
+# Precision
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   
@@ -321,12 +361,6 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     scale_fill_viridis_c(option = palette, name = "Precision") + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
-  
-  
-  # combine with legend
-  # ggdraw() + 
-  #   draw_plot(p, 0, 0, 1, 1) + 
-  #   draw_plot(legend, 0.005, 0.65, 0.25, 0.25)
 })
 
 doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +

@@ -160,12 +160,12 @@ generate_species_plot <- function(data_sf, title_text, limits) {
     coord_sf(crs = 4269) +
     labs(title = title_text) +
     theme_minimal() +
-    theme(
-      plot.title   = element_text(face = "bold", size = 20),
-      axis.text.x  = element_text(size = 10, color = "black"),
-      axis.text.y  = element_text(size = 10, color = "black"),
-      legend.position = "none" # Suppress subpanel legends for clean layout
-    )
+    theme(       
+      plot.title = element_text(face = "bold", size = 28),       
+      legend.position = "none",       
+      axis.text.x = element_text(size = 16, color = "black"),       
+      axis.text.y= element_text(size = 16, color = "black"),     
+    ) 
   
   # Composite map with inset
   final_panel <- main_map + 

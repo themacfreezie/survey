@@ -176,13 +176,13 @@ main_map <- ggplot() +
   coord_sf(crs = 4269) +
   labs(title = "Change in bias - steelhead surveys (1980-2024)") +
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 28),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  )  
 stel_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
@@ -213,13 +213,13 @@ main_map <- ggplot() +
   coord_sf(crs = 4269) +
   labs(title = "Change in varaince - steelhead surveys (1980-2024)") +
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 28),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  )  
 stel_r <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
@@ -251,13 +251,13 @@ main_map <- ggplot() +
   labs(title = "Steelhead") +
        # title = "Percent change in population size - steelhead (1980-2024)",
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 28),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  )  
 stel_pop <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)

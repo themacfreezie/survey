@@ -152,13 +152,13 @@ main_map <- ggplot() +
   coord_sf(crs = 4269) +
   labs(title = "Average bias - Coho surveys (1980-2024)")
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 32),
-    legend.title = element_text(size = 28),
-    legend.text = element_text(size = 20),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+    theme(       
+      plot.title = element_text(face = "bold", size = 28),       
+      legend.title = element_text(size = 28),       
+      legend.text = element_text(size = 20),       
+      axis.text.x = element_text(size = 16, color = "black"),       
+      axis.text.y= element_text(size = 16, color = "black"),     
+    )  
 coho_a <- main_map + inset_element(inset_context, 
                                    left = 1.05, bottom = -0.2, 
                                    right = 1.55, top = 0.5)
@@ -189,13 +189,13 @@ main_map <- ggplot() +
   coord_sf(crs = 4269) +
   labs(title = "Average variance - Coho surveys (1980-2024)")
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 32),
-    legend.title = element_text(size = 28),
-    legend.text = element_text(size = 20),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+    theme(       
+      plot.title = element_text(face = "bold", size = 28),       
+      legend.title = element_text(size = 28),       
+      legend.text = element_text(size = 20),       
+      axis.text.x = element_text(size = 16, color = "black"),       
+      axis.text.y= element_text(size = 16, color = "black"),     
+    ) 
 coho_r <- main_map + inset_element(inset_context, 
                                    left = 1.05, bottom = -0.2, 
                                    right = 1.55, top = 0.5)
@@ -229,12 +229,12 @@ main_map <- ggplot() +
   coord_sf(crs = 4269) +
   labs(title = "Average precision\n Coho surveys (1980-2024)") +
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 32),
-    legend.title = element_text(size = 28),
-    legend.text = element_text(size = 20),
-    axis.text.x = element_text(size = 14, color = "black"),
-    axis.text.y= element_text(size = 14, color = "black"),
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
   ) 
 coho_pre <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
@@ -265,13 +265,13 @@ main_map <- ggplot() +
   coord_sf(crs = 4269) +
   labs(title = "Average population size - Coho (1980-2024)")
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 40),
-    legend.title = element_text(size = 28),
-    legend.text = element_text(size = 20),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+    theme(       
+      plot.title = element_text(face = "bold", size = 28),       
+      legend.title = element_text(size = 28),       
+      legend.text = element_text(size = 20),       
+      axis.text.x = element_text(size = 16, color = "black"),       
+      axis.text.y= element_text(size = 16, color = "black"),     
+    ) 
 coho_pop <- main_map + inset_element(inset_context, 
                                      left = 1.05, bottom = -0.2, 
                                      right = 1.55, top = 0.5)
@@ -303,13 +303,13 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     bi_scale_fill(pal = bivar_palette, dim = 4) +
     bi_theme() +
     labs(title = current_title) +
-    theme(
-      plot.title = element_text(face = "bold", size = 28),
-      legend.title = element_text(size = 28),
-      legend.text = element_text(size = 20),
-      axis.text.x = element_text(size = 14, color = "black"),
-      axis.text.y= element_text(size = 14, color = "black"),
-    )
+    theme(       
+      plot.title = element_text(face = "bold", size = 28),       
+      legend.title = element_text(size = 28),       
+      legend.text = element_text(size = 20),       
+      axis.text.x = element_text(size = 16, color = "black"),       
+      axis.text.y= element_text(size = 16, color = "black"),     
+    ) 
   ggdraw() + 
     draw_plot(p, 0, 0, 1, 1) + 
     draw_plot(legend, 0.7, 0.3, 0.25, 0.25)
@@ -346,13 +346,13 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     bi_scale_fill(pal = bivar_palette, dim = 4) +
     bi_theme() +
     labs(title = current_title) +
-    theme(
-      plot.title = element_text(face = "bold", size = 28),
-      legend.title = element_text(size = 28),
-      legend.text = element_text(size = 20),
-      axis.text.x = element_text(size = 14, color = "black"),
-      axis.text.y= element_text(size = 14, color = "black"),
-    )
+    theme(       
+      plot.title = element_text(face = "bold", size = 28),       
+      legend.title = element_text(size = 28),       
+      legend.text = element_text(size = 20),       
+      axis.text.x = element_text(size = 16, color = "black"),       
+      axis.text.y= element_text(size = 16, color = "black"),     
+    ) 
   ggdraw() + 
     draw_plot(p, 0, 0, 1, 1) + 
     draw_plot(legend, 0.7, 0.3, 0.25, 0.25)
@@ -389,13 +389,13 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     bi_scale_fill(pal = bivar_palette, dim = 4) +
     bi_theme() +
     labs(title = current_title) +
-    theme(
-      plot.title = element_text(face = "bold", size = 28),
-      legend.title = element_text(size = 28),
-      legend.text = element_text(size = 20),
-      axis.text.x = element_text(size = 14, color = "black"),
-      axis.text.y= element_text(size = 14, color = "black"),
-    )
+    theme(       
+      plot.title = element_text(face = "bold", size = 28),       
+      legend.title = element_text(size = 28),       
+      legend.text = element_text(size = 20),       
+      axis.text.x = element_text(size = 16, color = "black"),       
+      axis.text.y= element_text(size = 16, color = "black"),     
+    ) 
   ggdraw() + 
     draw_plot(p, 0, 0, 1, 1) + 
     draw_plot(legend, 0.7, 0.3, 0.25, 0.25)
@@ -406,235 +406,83 @@ coho_AR_choro <- doink + inset_element(inset_context,
                                          left = 0.7, bottom = 0.05, 
                                          right = 0.98, top = 0.3)
 coho_AR_choro
-# ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
+ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
 
-# # facet wraps
-# # 1. Prepare the data for faceting
-# # We want all populations in one object, ensuring 4 and 104 are distinct
-# sf_facet_data <- sf_coho_nad83col %>%
-#   mutate(is_overlap = NWFSC_POP_ID %in% c(4, 104))
-# 
-# # 2. Function to generate the faceted plots
-# create_facet_plot <- function(data, fill_var, title_text, legend_name) {
-#   ggplot() +
-#     # Background: Show the full basin outline in light gray for context in every facet
-#     geom_sf(data = sf_outlines, fill = "gray95", color = "gray80", size = 0.1) +
-#     
-#     # Foreground: Plot only the populations belonging to the facet's DPS
-#     geom_sf(data = data, aes(fill = !!sym(fill_var)), color = "white", size = 0.05) +
-#     
-#     # Highlight the specific DPS boundary for that facet
-#     geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 0.6) +
-#     
-#     scale_fill_viridis_c(option = palette, name = legend_name) +
-#     
-#     # Facet by DPS - this ensures Pop 4 shows up in its DPS and 104 in its own
-#     facet_wrap(~DPStrunc, ncol = 2) +
-#     
-#     labs(title = title_text,
-#          subtitle = "Populations 4 and 104 correctly separated by DPS assignment",
-#          caption = "Data: 1980-2024 Coho Surveys") +
-#     theme_minimal() +
-#     theme(
-#       strip.text = element_text(face = "bold", size = 9),
-#       legend.position = "right",
-#       panel.grid = element_blank()
-#     )
-# }
-# 
-# # 3. Generate the Bias Facet Plot
-# coho_a_facet <- create_facet_plot(
-#   sf_facet_data, 
-#   "mean_a", 
-#   "coho Survey Bias by DPS", 
-#   "Bias"
-# )
-# 
-# # 4. Generate the Precision Facet Plot
-# coho_r_facet <- create_facet_plot(
-#   sf_facet_data, 
-#   "mean_R", 
-#   "Coho Survey Precision by DPS", 
-#   "Variance"
-# )
-# 
-# # # Display the plots
-# # print(coho_a_facet)
-# # print(coho_r_facet)
-# 
-# # individual panels
-# # 1. Ensure the list of DPS is derived from the population data
-# # This ensures we iterate through each ESU identity
-# dps_list <- unique(sf_facet_data$DPStrunc)
-# 
-# # 2. Corrected function to isolate overlapping populations
-# create_single_dps_plot <- function(current_dps_name, data, fill_var, title_prefix, legend_name) {
-#   
-#   # CRITICAL STEP: Filter the population data FIRST
-#   # This ensures Pop 4 is in the LC plot and 104 is in the UW plot
-#   dps_data <- data %>% 
-#     filter(DPStrunc == current_dps_name)
-#   
-#   # Filter the outline to ONLY the boundary of the current ESU
-#   dps_outline <- sf_outlines %>% 
-#     filter(DPStrunc == current_dps_name)
-#   
-#   ggplot() +
-#     annotation_map_tile(type = "hotstyle", zoom = 10) +
-#     # Layer 1: Global Context
-#     # We show all ESU outlines in very faint gray as a base map
-#     geom_sf(data = sf_outlines, fill = "gray98", color = "gray90", size = 0.1) +
-#     
-#     # Layer 2: The Data
-#     # Only the populations belonging to THIS dps_name are drawn here.
-#     # Because Pop 4 and 104 have different DPStrunc values, they will never 
-#     # appear in the same plot object.
-#     geom_sf(data = dps_data, 
-#             aes(fill = !!sym(fill_var)), 
-#             color = "white", 
-#             size = 0.1) +
-#     
-#     # Layer 3: The Specific Highlight
-#     # Draw the heavy black outline ONLY for the current ESU
-#     geom_sf(data = dps_outline, 
-#             fill = NA, 
-#             color = "black", 
-#             linewidth = 0.8) +
-#     
-#     scale_fill_viridis_c(option = palette, 
-#                          name = legend_name,
-#                          # Ensure the scale limits are consistent across all plots
-#                          limits = range(data[[fill_var]], na.rm = TRUE)) +
-#     
-#     labs(
-#       title = current_dps_name,
-#     ) +
-#     theme_minimal() +
-#     theme(
-#       plot.title = element_text(face = "bold", size = 28),
-#       legend.title = element_text(size = 20),
-#       legend.text = element_text(size = 18),
-#       axis.text.x = element_text(size = 14, color = "black"),
-#       axis.text.y= element_text(size = 14, color = "black"),
-#       panel.grid = element_blank(),
-#       legend.position = "right"
-#     ) +
-#     inset_element(
-#       inset_context,
-#       left = 1.05, bottom = -0.2, 
-#       right = 1.55, top = 0.5
-#     )
-# }
-# 
-# # 3. Generate the individual plot lists
-# bias_plots_list <- lapply(dps_list, function(d) {
-#   create_single_dps_plot(d, sf_facet_data, "mean_a", "Bias", "Bias")
-# })
-# 
-# precision_plots_list <- lapply(dps_list, function(d) {
-#   create_single_dps_plot(d, sf_facet_data, "mean_R", "Precision", "Variance")
-# })
-# 
-# # To verify, you can call them specifically:
-# # Lower Columbia (contains Pop 4)
-# # Upper Willamette (contains Pop 104)
-# 
-# # panel bivariate choropleth
-# bi_data <- bi_class(
-#   sf_coho_nad83col,
-#   x = mean_a,
-#   y = mean_R,
-#   style = "equal",
-#   dim = 4
-# )
-# 
-# bi_legend_shared <- bi_legend(
-#   pal = bivar_palette,
-#   dim = 4,
-#   xlab = "Bias",
-#   ylab = "Variance",
-#   size = 8
-# ) +
-#   theme(
-#     plot.background = element_rect(color = "black", fill = "white", linewidth = 1),
-#     axis.title.x = element_text(size = 20, face = "bold"),
-#     axis.title.y = element_text(size = 20, face = "bold")
-#   )
-# 
-# create_bivariate_dps_plot <- function(current_dps_name, data, legend) {
-#   
-#   # Filter data for this DPS only
-#   dps_data <- data %>%
-#     filter(DPStrunc == current_dps_name)
-#   
-#   # Get corresponding outline
-#   dps_outline <- sf_outlines %>%
-#     filter(DPStrunc == current_dps_name)
-#   
-#   # Base plot
-#   p <- ggplot() +
-#     annotation_map_tile(type = "hotstyle", zoom = 10) +
-#     
-#     # Light background of all ESUs for context
-#     geom_sf(data = sf_outlines, fill = "gray98", color = "gray90", size = 0.1) +
-#     
-#     # Bivariate fill ONLY for this DPS
-#     geom_sf(
-#       data = dps_data,
-#       aes(fill = bi_class),
-#       color = "white",
-#       size = 0.1
-#     ) +
-#     
-#     # Highlight this DPS boundary
-#     geom_sf(
-#       data = dps_outline,
-#       fill = NA,
-#       color = "black",
-#       linewidth = 0.8
-#     ) +
-#     
-#     bi_scale_fill(pal = bivar_palette, dim = 4) +
-#     
-#     labs(title = current_dps_name) +
-#     
-#     theme_minimal() +
-#     theme(
-#       plot.title = element_text(face = "bold", size = 28),
-#       legend.title = element_text(size = 24),
-#       legend.text = element_text(size = 18),
-#       axis.text.x = element_text(size = 14, color = "black"),
-#       axis.text.y= element_text(size = 14, color = "black"),
-#       panel.grid = element_blank(),
-#       legend.position = "none"  # we add legend manually
-#     )
-# 
-#   
-#   # Combine main plot + legend
-#   combined <- ggdraw() +
-#     draw_plot(p, 0, 0, 1, 1) +
-#     draw_plot(legend, 0.7, 0.05, 0.35, 0.35)
-#   
-#   # ✅ Add inset here
-#   combined +
-#     inset_element(
-#       inset_context,
-#       left = 0.8, bottom = 0.4,
-#       right = 0.95, top = 0.65
-#     )
-# }
-# 
-# dps_list <- unique(bi_data$DPStrunc)
-# 
-# bivar_dps_plots <- lapply(dps_list, function(d) {
-#   create_bivariate_dps_plot(d, bi_data, bi_legend_shared)
-# })
-# 
-# bias_plots_list[[1]]
-# bias_plots_list[[2]]
-# 
-# precision_plots_list[[1]]
-# precision_plots_list[[2]]
-# 
-# bivar_dps_plots[[1]]
-# bivar_dps_plots[[2]]
+## iterated bias and precision by esu
+# bias
+outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+plot_list <- lapply(1:nrow(sf_outlines), function(i) {
+  
+  # select the single focus polygon
+  focus_polygon <- sf_outlines[i, ]
+  
+  # extract the title for this specific iteration
+  current_title <- focus_polygon$DPStrunc
+  
+  # "cookie cut" the data to the focus polygon boundary
+  # this removes all data outside the outline and clips bordering polygons
+  focus_data_clipped <- st_intersection(sf_coho_nad83col, focus_polygon)
+  
+  # build the map
+  p <- ggplot() +
+    annotation_map_tile(type = "hotstyle", zoom = 10) +
+    # Background: Full muted choropleth
+    geom_sf(data = sf_coho_nad83col, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = FALSE) +
+    # Shroud: Semi-opaque white layer
+    geom_sf(data = st_union(sf_coho_nad83col), fill = "white", alpha = 0.7, color = NA) +
+    # Highlight: Clipped data only
+    geom_sf(data = focus_data_clipped, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = TRUE) +
+    # Outline: Crisp black border
+    geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
+    coord_sf(crs = 4269) + 
+    scale_fill_viridis_c(option = palette, name = "Bias") + 
+    labs(title = current_title) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
+})
+
+doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
+  plot_annotation(title = "Average bias - coho surveys (1980 - 2024)",
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+cohoBias_panel <- doink + inset_element(inset_context, 
+                                        left = 0.7, bottom = 0.05, 
+                                        right = 0.98, top = 0.3)
+cohoBias_panel
+
+# Precision
+outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+plot_list <- lapply(1:nrow(sf_outlines), function(i) {
+  
+  # select the single focus polygon
+  focus_polygon <- sf_outlines[i, ]
+  
+  # extract the title for this specific iteration
+  current_title <- focus_polygon$DPStrunc
+  
+  # "cookie cut" the data to the focus polygon boundary
+  # this removes all data outside the outline and clips bordering polygons
+  focus_data_clipped <- st_intersection(sf_coho_nad83col, focus_polygon)
+  
+  # build the map
+  p <- ggplot() +
+    annotation_map_tile(type = "hotstyle", zoom = 10) +
+    # Background: Full muted choropleth
+    geom_sf(data = sf_coho_nad83col, mapping = aes(fill = precision), color = "white", size = 0.1, show.legend = FALSE) +
+    # Shroud: Semi-opaque white layer
+    geom_sf(data = st_union(sf_coho_nad83col), fill = "white", alpha = 0.7, color = NA) +
+    # Highlight: Clipped data only
+    geom_sf(data = focus_data_clipped, mapping = aes(fill = precision), color = "white", size = 0.1, show.legend = TRUE) +
+    # Outline: Crisp black border
+    geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
+    coord_sf(crs = 4269) + 
+    scale_fill_viridis_c(option = palette, name = "Precision") + 
+    labs(title = current_title) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
+})
+
+doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
+  plot_annotation(title = "Average precision - coho surveys (1980 - 2024)",
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+cohoPre_panel <- doink + inset_element(inset_context, 
+                                       left = 0.7, bottom = 0.05, 
+                                       right = 0.98, top = 0.3)
+cohoPre_panel

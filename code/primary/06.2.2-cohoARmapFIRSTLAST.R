@@ -165,13 +165,13 @@ main_map <- ggplot() +
   labs(title = "Change in bias - coho surveys (1980-2024)",
        caption = "Bias measured relative to 'Dam Counts' method, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 28),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  )  
 coho_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
@@ -203,13 +203,13 @@ main_map <- ggplot() +
   labs(title = "Change in varaince - coho surveys (1980-2024)",
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 28),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  )  
 coho_r <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
@@ -242,13 +242,13 @@ main_map <- ggplot() +
        # title = "Percent change in population size - coho (1980-2024)",
        ) +
   theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 28),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
-  ) 
+  theme(       
+    plot.title = element_text(face = "bold", size = 28),       
+    legend.title = element_text(size = 28),       
+    legend.text = element_text(size = 20),       
+    axis.text.x = element_text(size = 16, color = "black"),       
+    axis.text.y= element_text(size = 16, color = "black"),     
+  )  
 coho_pop <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
