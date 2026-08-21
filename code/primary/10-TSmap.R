@@ -12,7 +12,7 @@ here::i_am("code/primary/10-TSmap.R")
 options(max.print=2000)
 
 # set palette of choice
-palette <- "cividis"
+palette <- "turbo"
 
 # pull in diff data
 load(file=here("data", "clean", "popdiff_chin.Rda"))
