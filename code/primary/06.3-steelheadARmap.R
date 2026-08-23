@@ -19,6 +19,10 @@ options(max.print=2000)
 palette <- "turbo"
 bivar_palette <- "Brown2"
 
+# set crs of choice
+crsSET <- 4326
+
+# pull in AR data
 ARstel <- readRDS(here("data", "clean", "popavgAR_stel.rds"))
 
 # pull in spatial layers
@@ -29,7 +33,6 @@ sf_fish <- read_sf(dsn = gdb_path, layer = "fish")
 sf_fish$DPS_IDtrunc <- substr(sf_fish$DPS_ID, 1, 5)
 # grab DPS_ID
 sf_fish$DPStrunc <- str_remove(sf_fish$DPS, " - Outside legal area$")
-
 
 ###### steelhead
 ARstel <- ARstel %>%
@@ -42,7 +45,7 @@ sf_stel <- sf_fish_combined %>%
   filter(!is.na(mean_a))
 
 # make sure crs is good
-sf_stel_nad83 <- st_transform(sf_stel, crs = 4269)
+sf_stel_nad83 <- st_transform(sf_stel, crs = crsSET)
 
 # # can we make these contiguous?
 # contiguity_test <- sf_stel_nad83 %>%
@@ -78,7 +81,7 @@ sf_outlines <- sf_stel_nad83col %>%
 bbox <- st_bbox(sf_stel_nad83col)
 region_states <- states(cb = TRUE, resolution = "20m") %>%
   filter(STUSPS %in% c("OR", "WA", "ID")) %>%
-  st_transform(4269) # match main map's CRS (NAD83)
+  st_transform(crsSET) # match main map's CRS (NAD83)
 # these bounds roughly cover the columbia basin
 basin_xlim <- c(-125, -110)
 basin_ylim <- c(41.5, 49.5)
@@ -104,7 +107,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
   geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) + 
+  coord_sf(crs = crsSET) + 
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Average bias - steelhead surveys (1980-2024)",
        caption = "Bias measured relative to 'Dam Counts' method",
@@ -127,7 +130,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
   geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) + 
+  coord_sf(crs = crsSET) + 
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Average variance - steelhead surveys (1980-2024)",
        fill = "Variance") +
@@ -151,7 +154,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
   geom_sf(aes(fill = precision), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) + 
+  coord_sf(crs = crsSET) + 
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Average precision - steelhead surveys (1980-2024)",
        fill = "Precision") +
@@ -176,7 +179,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
   ) + 
   geom_sf(aes(fill = mean_lnnosa), alpha = 0.7) + 
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) + 
+  coord_sf(crs = crsSET) + 
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Average population size - steelhead (1980-2024)",
        fill = "Pop. size") +
@@ -318,7 +321,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = TRUE) +
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    coord_sf(crs = 4269) + 
+    coord_sf(crs = crsSET) + 
     scale_fill_viridis_c(option = palette, name = "Bias") + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -328,8 +331,8 @@ doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average bias - steelhead surveys (1980 - 2024)",
                   theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
 stelBias_panel <- doink + inset_element(inset_context, 
-                                       left = 0.7, bottom = 0.05, 
-                                       right = 0.98, top = 0.3)
+                                         left = 0.7, bottom = 0.05, 
+                                         right = 1.1, top = 0.35)
 stelBias_panel
 
 # Precision
@@ -357,7 +360,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = precision), color = "white", size = 0.1, show.legend = TRUE) +
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    coord_sf(crs = 4269) + 
+    coord_sf(crs = crsSET) + 
     scale_fill_viridis_c(option = palette, name = "Precision") + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -368,5 +371,5 @@ doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
                   theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
 stelPre_panel <- doink + inset_element(inset_context, 
                                             left = 0.7, bottom = 0.05, 
-                                            right = 0.98, top = 0.3)
+                                            right = 1.1, top = 0.35)
 stelPre_panel

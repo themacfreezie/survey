@@ -19,9 +19,11 @@ options(max.print=2000)
 palette <- "turbo"
 bivar_palette <- "Brown2"
 
+# set crs of choice
+crsSET <- 4326
+
 # pull in AR data
 ARchin <- readRDS(here("data", "clean", "popavgAR_chin.rds"))
-# ARchinFL <- readRDS(here("data", "clean", "FLavgAR_chin.rds"))
 
 # pull in spatial layers
 gdb_path <- here("data", "raw", "WCR_Salmon_Steelhead_gdb_2015", "WCR_Salmon_Steelhead_gdb_2015.gdb")
@@ -44,7 +46,7 @@ sf_chin <- sf_fish_combined %>%
   filter(!is.na(mean_a))
 
 # make sure crs is good
-sf_chin_nad83 <- st_transform(sf_chin, crs = 4269)
+sf_chin_nad83 <- st_transform(sf_chin, crs = crsSET)
 
 # # can we make these contiguous?
 # contiguity_test <- sf_chin_nad83 %>%
@@ -99,7 +101,7 @@ esu_panels_clipped
 bbox <- st_bbox(sf_chin_nad83col)
 region_states <- states(cb = TRUE, resolution = "20m") %>%
   filter(STUSPS %in% c("OR", "WA", "ID")) %>%
-  st_transform(4269) # match main map's CRS (NAD83)
+  st_transform(crsSET) # match main map's CRS (NAD83)
 # these bounds roughly cover the columbia basin
 basin_xlim <- c(-125, -110)
 basin_ylim <- c(41.5, 49.5)
@@ -151,7 +153,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Bias"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Average bias - Chinook surveys (1980-2024)",
        caption = "Bias measured relative to 'Dam Counts' method, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
@@ -189,7 +191,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Variance"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Average variance - Chinook surveys (1980-2024)",
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
@@ -229,7 +231,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Precision"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Average precision - Chinook surveys (1980-2024)",
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
@@ -267,7 +269,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Pop. size"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Average population size - Chinook (1980-2024)",
        caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal() +
@@ -333,30 +335,26 @@ chin_ARchoro_panel
 # bias
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
-  
-  # select the single focus polygon
+
+  # select the focus ESU outline
   focus_polygon <- sf_outlines[i, ]
-  
-  # extract the title for this specific iteration
   current_title <- focus_polygon$DPStrunc
+  current_esu_id <- focus_polygon$DPS_IDtrunc # Get the specific ID
   
-  # "cookie cut" the data to the focus polygon boundary
-  # this removes all data outside the outline and clips bordering polygons
-  focus_data_clipped <- st_intersection(sf_chin_nad83col, focus_polygon)
+  # tabular filter FIRST, then clip spatially
+  focus_data_clipped <- sf_chin_nad83col %>%
+    filter(DPS_IDtrunc == current_esu_id) %>% # Prevents data leaking across panels
+    st_intersection(focus_polygon)
   
-  # build the map
+  # plot it up
   p <- ggplot() +
     annotation_map_tile(type = "hotstyle", zoom = 10) +
-    # Background: Full muted choropleth
     geom_sf(data = sf_chin_nad83col, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = FALSE) +
-    # Shroud: Semi-opaque white layer
     geom_sf(data = st_union(sf_chin_nad83col), fill = "white", alpha = 0.7, color = NA) +
-    # Highlight: Clipped data only
     geom_sf(data = focus_data_clipped, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = TRUE) +
-    # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    coord_sf(crs = 4269) + 
-    scale_fill_viridis_c(option = palette, name = "Bias") + 
+    coord_sf(crs = crsSET) +
+    scale_fill_viridis_c(option = palette, name = "Bias") +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
@@ -365,8 +363,8 @@ doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average bias - Chinook surveys (1980 - 2024)",
                   theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
 chinBias_panel <- doink + inset_element(inset_context, 
-                                        left = 0.7, bottom = 0.05, 
-                                        right = 0.98, top = 0.3)
+                                        left = 1.5, bottom = 0.05, 
+                                        right = 2, top = 0.7)
 chinBias_panel
 
 sf_chin_nad83col$precision <- (1/sf_chin_nad83col$mean_R)
@@ -374,29 +372,25 @@ sf_chin_nad83col$precision <- (1/sf_chin_nad83col$mean_R)
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   
-  # select the single focus polygon
+  # select the focus ESU outline
   focus_polygon <- sf_outlines[i, ]
-  
-  # extract the title for this specific iteration
   current_title <- focus_polygon$DPStrunc
+  current_esu_id <- focus_polygon$DPS_IDtrunc # Get the specific ID
   
-  # "cookie cut" the data to the focus polygon boundary
-  # this removes all data outside the outline and clips bordering polygons
-  focus_data_clipped <- st_intersection(sf_chin_nad83col, focus_polygon)
+  # tabular filter FIRST, then clip spatially
+  focus_data_clipped <- sf_chin_nad83col %>%
+    filter(DPS_IDtrunc == current_esu_id) %>% # Prevents data leaking across panels
+    st_intersection(focus_polygon)
   
-  # build the map
+  # plot it up
   p <- ggplot() +
     annotation_map_tile(type = "hotstyle", zoom = 10) +
-    # Background: Full muted choropleth
     geom_sf(data = sf_chin_nad83col, mapping = aes(fill = precision), color = "white", size = 0.1, show.legend = FALSE) +
-    # Shroud: Semi-opaque white layer
     geom_sf(data = st_union(sf_chin_nad83col), fill = "white", alpha = 0.7, color = NA) +
-    # Highlight: Clipped data only
     geom_sf(data = focus_data_clipped, mapping = aes(fill = precision), color = "white", size = 0.1, show.legend = TRUE) +
-    # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    coord_sf(crs = 4269) + 
-    scale_fill_viridis_c(option = palette, name = "Precision") + 
+    coord_sf(crs = crsSET) +
+    scale_fill_viridis_c(option = palette, name = "Precision") +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
@@ -405,6 +399,6 @@ doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average precision - Chinook surveys (1980 - 2024)",
                   theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
 chinPre_panel <- doink + inset_element(inset_context, 
-                                       left = 0.7, bottom = 0.05, 
-                                       right = 0.98, top = 0.3)
+                                       left = 1.5, bottom = 0.05, 
+                                       right = 2, top = 0.7)
 chinPre_panel

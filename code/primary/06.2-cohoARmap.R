@@ -15,6 +15,9 @@ library(tigris)
 here::i_am("code/primary/06.2-cohoARmap.R")
 options(max.print=2000)
 
+# set crs of choice
+crsSET <- 4326
+
 # set palette of choice
 palette <- "turbo"
 bivar_palette <- "Brown2"
@@ -31,7 +34,6 @@ sf_fish$DPS_IDtrunc <- substr(sf_fish$DPS_ID, 1, 5)
 # grab DPS_ID
 sf_fish$DPStrunc <- str_remove(sf_fish$DPS, " - Outside legal area$")
 
-
 ###### coho
 ARcoho <- ARcoho %>%
   filter(!is.na(NWFSC_POP_ID))
@@ -43,7 +45,7 @@ sf_coho <- sf_fish_combined %>%
   filter(!is.na(mean_a))
 
 # make sure crs is good
-sf_coho_nad83 <- st_transform(sf_coho, crs = 4269)
+sf_coho_nad83 <- st_transform(sf_coho, crs = crsSET)
 
 # # can we make these contiguous?
 # contiguity_test <- sf_coho_nad83 %>%
@@ -98,7 +100,7 @@ esu_panels_clipped
 bbox <- st_bbox(sf_coho_nad83col)
 region_states <- states(cb = TRUE, resolution = "20m") %>%
   filter(STUSPS %in% c("OR", "WA")) %>%
-  st_transform(4269) # match main map's CRS (NAD83)
+  st_transform(crsSET) # match main map's CRS (NAD83)
 basin_xlim <- c(-125.0, -116.0)
 basin_ylim <- c(41.5, 49.5)
 
@@ -119,38 +121,35 @@ inset_context <- ggplot() +
     plot.margin = margin(1, 1, 1, 1)
   )
 
-# overlap
-sf_base <- sf_coho_nad83col %>% filter(NWFSC_POP_ID != 104)
-sf_stripe <- sf_coho_nad83col %>% filter(NWFSC_POP_ID == 104)
-  # stripe layer: ONLY population 104
-shared_borders <- st_intersection(sf_outlines) %>% 
-  filter(n.overlaps > 1) %>% 
-  st_cast("MULTILINESTRING")
+# # overlap
+# sf_base <- sf_coho_nad83col %>% filter(NWFSC_POP_ID != 104)
+# sf_stripe <- sf_coho_nad83col %>% filter(NWFSC_POP_ID == 104)
+#   # stripe layer: ONLY population 104
+# shared_borders <- st_intersection(sf_outlines) %>% 
+#   filter(n.overlaps > 1) %>% 
+#   st_cast("MULTILINESTRING")
+
+# make sure crs is explicitly defined and geometry is referenced
+sf_coho_nad83col <- st_transform(sf_coho_nad83col, crs = crsSET)
+sf_outlines <- st_transform(sf_outlines, crs = crsSET)
+
+sf_coho_nad83col <- st_set_geometry(sf_coho_nad83col, "SHAPE")
+sf_outlines <- st_set_geometry(sf_outlines, "SHAPE")
 
 # plotting
-main_map <- ggplot() +
-  annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(data = sf_base, aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) +
-  geom_sf_pattern(
-    data = sf_stripe,
-    aes(pattern_fill = mean_a), 
-    pattern = 'stripe',
-    pattern_color = NA,       # removes the default white border around stripes
-    pattern_density = 0.25,    # adjust for stripe thickness
-    pattern_spacing = 0.015,
-    pattern_angle = 45,
-    fill = NA,                # transparent fill so Pop 4's color shows between stripes
-    alpha = 1                 # keep stripes opaque to see their specific color clearly
-  ) +
-  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
+main_map <- ggplot(data = sf_coho_nad83col) +
+  coord_sf(crs = crsSET) +
+  annotation_map_tile(type = "hotstyle", 
+                      zoom = 10
+                      ) +
+  geom_sf(aes(fill = mean_a), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
     option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Bias"
   ) +
-  coord_sf(crs = 4269) +
-  labs(title = "Average bias - Coho surveys (1980-2024)")
+  labs(title = "Average bias - Coho surveys (1980-2024)") +
   theme_minimal() +
     theme(       
       plot.title = element_text(face = "bold", size = 28),       
@@ -165,28 +164,19 @@ coho_a <- main_map + inset_element(inset_context,
 coho_a
 # ggsave(here("output", "figures", "coho_a.png"), plot=coho_a, device="png", dpi=300)
 
-main_map <- ggplot() +
-  annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(data = sf_base, aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) +
-  geom_sf_pattern(
-    data = sf_stripe,
-    aes(pattern_fill = mean_R), 
-    pattern = 'stripe',
-    pattern_color = NA,       # removes the default white border around stripes
-    pattern_density = 0.25,    # adjust for stripe thickness
-    pattern_spacing = 0.015,
-    pattern_angle = 45,
-    fill = NA,                # transparent fill so Pop 4's color shows between stripes
-    alpha = 1                 # keep stripes opaque to see their specific color clearly
+main_map <- ggplot(data = sf_coho_nad83col) +
+  coord_sf(crs = crsSET) +
+  annotation_map_tile(type = "hotstyle", 
+                      zoom = 10
   ) +
-  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
+  geom_sf(aes(fill = mean_R), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
     option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Variance"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Average variance - Coho surveys (1980-2024)")
   theme_minimal() +
     theme(       
@@ -202,31 +192,25 @@ coho_r <- main_map + inset_element(inset_context,
 coho_r
 # ggsave(here("output", "figures", "coho_r.png"), plot=coho_r, device="png", dpi=300)
 
-sf_base$precision <- (1/sf_base$mean_R)
-sf_stripe$precision <- (1/sf_stripe$mean_R)
+# sf_base$precision <- (1/sf_base$mean_R)
+# sf_stripe$precision <- (1/sf_stripe$mean_R)
 
-main_map <- ggplot() +
-  annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(data = sf_base, aes(fill = precision), alpha = 0.8, color = "white", size = 0.1) +
-  geom_sf_pattern(
-    data = sf_stripe,
-    aes(pattern_fill = precision), 
-    pattern = 'stripe',
-    pattern_color = NA,       # removes the default white border around stripes
-    pattern_density = 0.25,    # adjust for stripe thickness
-    pattern_spacing = 0.015,
-    pattern_angle = 45,
-    fill = NA,                # transparent fill so Pop 4's color shows between stripes
-    alpha = 1                 # keep stripes opaque to see their specific color clearly
+# precision variable
+sf_coho_nad83col$precision <- (1/sf_coho_nad83col$mean_R)
+
+main_map <- ggplot(data = sf_coho_nad83col) +
+  coord_sf(crs = crsSET) +
+  annotation_map_tile(type = "hotstyle", 
+                      zoom = 10
   ) +
-  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
+  geom_sf(aes(fill = precision), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
     option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Precision"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Average precision\n Coho surveys (1980-2024)") +
   theme_minimal() +
   theme(       
@@ -241,28 +225,19 @@ coho_pre <- main_map + inset_element(inset_context,
                                      right = 0.98, top = 0.3)
 coho_pre
 
-main_map <- ggplot() +
-  annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(data = sf_base, aes(fill = mean_lnnosa), alpha = 0.8, color = "white", size = 0.1) +
-  geom_sf_pattern(
-    data = sf_stripe,
-    aes(pattern_fill = mean_lnnosa), 
-    pattern = 'stripe',
-    pattern_color = NA,       # removes the default white border around stripes
-    pattern_density = 0.25,    # adjust for stripe thickness
-    pattern_spacing = 0.015,
-    pattern_angle = 45,
-    fill = NA,                # transparent fill so Pop 4's color shows between stripes
-    alpha = 1                 # keep stripes opaque to see their specific color clearly
+main_map <- ggplot(data = sf_coho_nad83col) +
+  coord_sf(crs = crsSET) +
+  annotation_map_tile(type = "hotstyle", 
+                      zoom = 10
   ) +
-  geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) + # Shared internal DPS borders (dashed)
+  geom_sf(aes(fill = mean_lnnosa), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +   # Standard DPS outlines (solid)
   scale_fill_viridis_c(
     option = palette, 
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Pop. size"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Average population size - Coho (1980-2024)")
   theme_minimal() +
     theme(       
@@ -406,7 +381,7 @@ coho_AR_choro <- doink + inset_element(inset_context,
                                          left = 0.7, bottom = 0.05, 
                                          right = 0.98, top = 0.3)
 coho_AR_choro
-ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
+# ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
 
 ## iterated bias and precision by esu
 # bias
@@ -434,7 +409,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = TRUE) +
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    coord_sf(crs = 4269) + 
+    coord_sf(crs = crsSET) + 
     scale_fill_viridis_c(option = palette, name = "Bias") + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -444,8 +419,8 @@ doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average bias - coho surveys (1980 - 2024)",
                   theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
 cohoBias_panel <- doink + inset_element(inset_context, 
-                                        left = 0.7, bottom = 0.05, 
-                                        right = 0.98, top = 0.3)
+                                        left = 0.85, bottom = 0.05, 
+                                        right = 1.15, top = 0.3)
 cohoBias_panel
 
 # Precision
@@ -473,7 +448,7 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = precision), color = "white", size = 0.1, show.legend = TRUE) +
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
-    coord_sf(crs = 4269) + 
+    coord_sf(crs = crsSET) + 
     scale_fill_viridis_c(option = palette, name = "Precision") + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
@@ -483,6 +458,6 @@ doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average precision - coho surveys (1980 - 2024)",
                   theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
 cohoPre_panel <- doink + inset_element(inset_context, 
-                                       left = 0.7, bottom = 0.05, 
-                                       right = 0.98, top = 0.3)
+                                       left = 0.85, bottom = 0.05, 
+                                       right = 1.15, top = 0.3)
 cohoPre_panel
