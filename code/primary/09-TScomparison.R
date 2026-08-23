@@ -284,6 +284,7 @@ statecompare_coho
 #   )
 # statecompare_stel
   # youngs bay is kind of ridiculous here (only 2 obs) - will drop from plot
+
 plotdata_stel2 <- plotdata_stel[plotdata_stel$COMMONPOPNAME != "Youngs Bay", ]
 statecompare_stel <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dataset)) +
   geom_line(linewidth = 0.8) +

@@ -14,6 +14,9 @@ options(max.print=2000)
 # set palette of choice
 palette <- "turbo"
 
+# set crs of choice
+crsSET <- 4326
+
 # pull in diff data
 load(file=here("data", "clean", "popdiff_chin.Rda"))
 load(file=here("data", "clean", "popdiff_coho.Rda"))
@@ -115,7 +118,7 @@ sf_stel_combined <- sf_stel_combined %>%
 bbox_chin <- st_bbox(sf_chin_combined)
 region_states_chin <- states(cb = TRUE, resolution = "20m") %>%
   filter(STUSPS %in% c("OR", "WA", "ID")) %>%
-  st_transform(4269) # match main map's CRS (NAD83)
+  st_transform(crsSET) # match main map's CRS (NAD83)
 # these bounds roughly cover the columbia basin
 basin_xlim_chin <- c(-125, -110)
 basin_ylim_chin <- c(41.5, 49.5)
@@ -123,7 +126,7 @@ basin_ylim_chin <- c(41.5, 49.5)
 bbox_coho <- st_bbox(sf_coho_combined)
 region_states_coho <- states(cb = TRUE, resolution = "20m") %>%
   filter(STUSPS %in% c("OR", "WA")) %>%
-  st_transform(4269) # match main map's CRS (NAD83)
+  st_transform(crsSET) # match main map's CRS (NAD83)
 # these bounds roughly cover the columbia basin
 basin_xlim_coho <- c(-125.0, -116.0)
 basin_ylim_coho <- c(41.5, 49.5)
@@ -131,7 +134,7 @@ basin_ylim_coho <- c(41.5, 49.5)
 bbox_stel <- st_bbox(sf_stel_combined)
 region_states_stel <- states(cb = TRUE, resolution = "20m") %>%
   filter(STUSPS %in% c("OR", "WA", "ID")) %>%
-  st_transform(4269) # match main map's CRS (NAD83)
+  st_transform(crsSET) # match main map's CRS (NAD83)
 # these bounds roughly cover the columbia basin
 basin_xlim_stel <- c(-125, -110)
 basin_ylim_stel <- c(41.5, 49.5)
@@ -228,7 +231,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
     name = "Difference"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(title = "Chinook - Sum of difference between observed and estimataed states",
        caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
   theme_minimal()
@@ -242,7 +245,7 @@ main_map <- ggplot(data = sf_coho_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
@@ -258,7 +261,7 @@ main_map <- ggplot(data = sf_stel_combined) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead - Sum of difference between observed and estimataed states",
        caption = "1980-2024",
@@ -312,7 +315,7 @@ shared_borders <- st_intersection(sf_outlines_chin) %>%
 #     aesthetics = c("fill", "pattern_fill"), # Apply one scale to BOTH fill and pattern_fill
 #     name = "Difference"
 #   ) +
-#   coord_sf(crs = 4269) +
+#   coord_sf(crs = crsSET) +
 #   labs(title = "Chinook ESUs - Sum of difference between observed and estimataed states",
 #        caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU") +
 #   theme_minimal()
@@ -323,7 +326,7 @@ shared_borders <- st_intersection(sf_outlines_chin) %>%
 # #   annotation_map_tile(type = "hotstyle", zoom = 10) +
 # #   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
 # #   geom_sf(data = sf_outlines_chin, fill = NA, color = "black", linewidth = 1.2) + 
-# #   coord_sf(crs = 4269) +
+# #   coord_sf(crs = crsSET) +
 # #   scale_fill_viridis_c(option = palette) + 
 # #   labs(title = "Chinook ESUs - Sum of difference between observed\n and estimataed states",
 # #        caption = "1980-2024",
@@ -364,7 +367,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), 
     name = "Difference"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(
     title = "Chinook ESUs - Sum of difference between observed and estimated states",
     caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU"
@@ -379,7 +382,7 @@ main_map <- ggplot(data = ESUcoho) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho ESUs - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
@@ -394,7 +397,7 @@ main_map <- ggplot(data = ESUstel) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = total_net_difference), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead DSPs - Sum of difference between observed\n and estimataed states",
        caption = "1980-2024",
@@ -427,7 +430,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), 
     name = "Difference - \nNOSA"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(
     title = "Chinook ESUs - Average annual difference between observed and estimated states",
     caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU"
@@ -442,7 +445,7 @@ main_map <- ggplot(data = ESUcoho) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho ESUs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
@@ -457,7 +460,7 @@ main_map <- ggplot(data = ESUstel) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = avg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead DSPs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
@@ -474,7 +477,7 @@ main_map <- ggplot() +
   geom_sf(data = sf_non_overlap_region, aes(fill = LNavg_netdiff), alpha = 0.8, color = "white", size = 0.1) +
   geom_sf_pattern(
     data = sf_overlap_region,
-    aes(pattern_fill = avg_netdiff), 
+    aes(pattern_fill = LNavg_netdiff), 
     pattern = 'stripe',
     pattern_color = NA,       
     pattern_density = 0.25,    
@@ -490,7 +493,7 @@ main_map <- ggplot() +
     aesthetics = c("fill", "pattern_fill"), 
     name = "Difference - \nln(NOSA)"
   ) +
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   labs(
     title = "Chinook ESUs - Average annual difference between observed and estimated states",
     caption = "1980-2024, Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU"
@@ -505,7 +508,7 @@ main_map <- ggplot(data = ESUcoho) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = LNavg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_coho, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Coho ESUs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
@@ -520,7 +523,7 @@ main_map <- ggplot(data = ESUstel) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
   geom_sf(aes(fill = LNavg_netdiff), alpha = 0.8, color = "white", size = 0.1) + 
   geom_sf(data = sf_outlines_stel, fill = NA, color = "black", linewidth = 1.2) + 
-  coord_sf(crs = 4269) +
+  coord_sf(crs = crsSET) +
   scale_fill_viridis_c(option = palette) + 
   labs(title = "Steelhead DSPs - Average annual difference between observed\n and estimataed states",
        caption = "1980-2024",
