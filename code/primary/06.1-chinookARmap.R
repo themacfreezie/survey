@@ -38,6 +38,7 @@ sf_fish$DPStrunc <- str_remove(sf_fish$DPS, " - Outside legal area$")
 ###### chinook
 ARchin <- ARchin %>%
   filter(!is.na(NWFSC_POP_ID))
+ARchin_popref <- ARchin[-c(2:7, 10:13)]
 
 sf_fish_combined <- sf_fish %>%
   left_join(ARchin, by = "NWFSC_POP_ID")
@@ -47,6 +48,10 @@ sf_chin <- sf_fish_combined %>%
 
 # make sure crs is good
 sf_chin_nad83 <- st_transform(sf_chin, crs = crsSET)
+
+ggplot() +
+  annotation_map_tile(type = "hotstyle", zoom = 10) +
+  geom_sf(data = sf_chin_nad83)
 
 # # can we make these contiguous?
 # contiguity_test <- sf_chin_nad83 %>%

@@ -544,7 +544,7 @@ TEST_ESUdiff_chin <- TEST_ESUdiff_chin |>
     LNtotal_absolute_difference = log(total_absolute_difference),
     LNavg_netdiff = log(avg_netdiff)
   )
-
+load(file=here("data", "clean", "popdiff_chin.Rda"))
 
 # total difference between observed and estimated by ESU throughout study period
 # chinook
