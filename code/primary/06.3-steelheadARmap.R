@@ -47,20 +47,20 @@ sf_stel <- sf_fish_combined %>%
 # make sure crs is good
 sf_stel_nad83 <- st_transform(sf_stel, crs = crsSET)
 
-# # can we make these contiguous?
-# contiguity_test <- sf_stel_nad83 %>%
-#   group_by(NWFSC_POP_ID) %>%
-#   summarize(geometry = st_union(SHAPE)) %>%
-#   mutate(
-#     # break multipolygons into individual polygons and count them
-#     piece_count = lengths(st_cast(geometry, "POLYGON", warn = FALSE)),
-#     is_contiguous = piece_count == 1
-#   )
-# 
-# # view groups that are NOT contiguous
-# non_contiguous <- filter(contiguity_test, !is_contiguous)
-# print(non_contiguous)
-#   # it looks as though they are all contiguous..
+# can we make these contiguous?
+contiguity_test <- sf_stel_nad83 %>%
+  group_by(NWFSC_POP_ID) %>%
+  summarize(geometry = st_union(SHAPE)) %>%
+  mutate(
+    # break multipolygons into individual polygons and count them
+    piece_count = lengths(st_cast(geometry, "POLYGON", warn = FALSE)),
+    is_contiguous = piece_count == 1
+  )
+
+# view groups that are NOT contiguous
+non_contiguous <- filter(contiguity_test, !is_contiguous)
+print(non_contiguous)
+  # it looks as though they are all contiguous..
 
 # can this be collapsed?
 sf_stel_nad83col <- sf_stel_nad83 %>%

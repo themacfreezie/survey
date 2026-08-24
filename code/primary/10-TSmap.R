@@ -42,6 +42,8 @@ popdiff_chin <- popdiff_chin %>% mutate(PopID = as.character(PopID))
 chinIDkey <- chinIDkey %>% mutate(PopID = as.character(PopID))
 popdiff_chin <- popdiff_chin %>%
   left_join(chinIDkey, by = "PopID")
+duplicated(popdiff_chin)
+popdiff_chin <- unique(popdiff_chin)
 sf_chin <- sf_chin %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
 popdiff_chin <- popdiff_chin %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
 sf_chin_combined <- sf_chin %>%
@@ -54,6 +56,8 @@ popdiff_coho <- popdiff_coho %>% mutate(PopID = as.character(PopID))
 cohoIDkey <- cohoIDkey %>% mutate(PopID = as.character(PopID))
 popdiff_coho <- popdiff_coho %>%
   left_join(cohoIDkey, by = "PopID")
+duplicated(popdiff_coho)
+popdiff_coho <- unique(popdiff_coho)
 sf_coho <- sf_coho %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
 popdiff_coho <- popdiff_coho %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
 sf_coho_combined <- sf_coho %>%
@@ -66,6 +70,8 @@ popdiff_stel <- popdiff_stel %>% mutate(PopID = as.character(PopID))
 stelIDkey <- stelIDkey %>% mutate(PopID = as.character(PopID))
 popdiff_stel <- popdiff_stel %>%
   left_join(stelIDkey, by = "PopID")
+duplicated(popdiff_stel)
+popdiff_stel <- unique(popdiff_stel)
 sf_stel <- sf_stel %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
 popdiff_stel <- popdiff_stel %>% mutate(NWFSC_POP_ID = as.character(NWFSC_POP_ID))
 sf_stel_combined <- sf_stel %>%
