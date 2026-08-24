@@ -151,7 +151,7 @@ ESUmethods_coho_table <- ESUmethods_coho %>%
     table.width = pct(100),
     data_row.padding = px(5)    
   )
-ESUmethods_chin_table
+ESUmethods_coho_table
 
 ESUmethods_stel_table <- ESUmethods_stel %>%
   gt(rownames_to_stub = TRUE) %>% 
