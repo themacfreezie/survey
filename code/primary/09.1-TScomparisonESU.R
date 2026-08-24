@@ -437,6 +437,11 @@ plotdata_stelESU <- plotdata_stel %>%
 # some zero values in the 2010s - looks like monitoring stopped in the upper willamette and then the snake later?
 plotdata_stelESU <- plotdata_stelESU[plotdata_stelESU$Value != 0, ]
 
+# set these aside..
+TESTdata_chinESU <- plotdata_chinESU
+TESTdata_cohoESU <- plotdata_cohoESU
+TESTdata_stelESU <- plotdata_stelESU
+
 # back to log space
 plotdata_chinESU$Value <- log(plotdata_chinESU$Value)
 plotdata_cohoESU$Value <- log(plotdata_cohoESU$Value)
@@ -511,6 +516,35 @@ ESUcompare_stel <- ggplot(plotdata_stelESU, aes(x = Year, y = Value, color = Dat
     panel.grid = element_blank()
   )
 ESUcompare_stel
+
+## TEST PART - meant to be cut
+TEST_ESUdiff_chin <- TESTdata_chinESU %>%
+  pivot_wider(
+    id_cols = c(Year, ESAPOPNAME),
+    names_from = Dataset,
+    values_from = Value
+  ) |> 
+  rename(Nosa = `Observation`, States = `State Estimate`)  %>%
+  mutate(
+    yearly_diff = Nosa - States,          # estimates are over/under-counting
+    abs_yearly_diff = abs(Nosa - States)  # magnitude of error, ignoring direction
+  ) %>%
+  # group by population to calculate the total totals
+  group_by(ESAPOPNAME) %>%
+  summarize(
+    total_net_difference = sum(yearly_diff, na.rm = TRUE),
+    total_absolute_difference = sum(abs_yearly_diff, na.rm = TRUE),
+    years_compared = sum(!is.na(yearly_diff)) # how many years actually had data for both
+  )
+TEST_ESUdiff_chin$avg_netdiff <- TEST_ESUdiff_chin$total_net_difference/TEST_ESUdiff_chin$years_compared
+TEST_ESUdiff_chin <- TEST_ESUdiff_chin |> 
+  group_by(ESAPOPNAME) %>%  
+  mutate(
+    LNtotal_net_difference = log(total_net_difference),
+    LNtotal_absolute_difference = log(total_absolute_difference),
+    LNavg_netdiff = log(avg_netdiff)
+  )
+
 
 # total difference between observed and estimated by ESU throughout study period
 # chinook
