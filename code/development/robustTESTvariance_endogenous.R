@@ -221,9 +221,9 @@ if(!file.exists(here::here("data", "clean", paste("ssmBOOT_endogenous-P", P_popu
   ptm <- proc.time()
   boot <- MARSSboot(ssm, 
                     nboot=100, 
-                    output="parameters"
-                    # sim = "parametric", 
-                    # param.gen = "hessian"
+                    output="parameters",
+                    sim = "parametric",
+                    param.gen = "hessian"
                     )
   saveRDS(boot, file=here::here("data", "clean", paste("ssmBOOT_endogenous-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
   time <- proc.time()[3] - ptm
