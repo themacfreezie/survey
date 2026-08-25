@@ -172,7 +172,7 @@ main_map <- ggplot() +
 chin_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
-chin_a
+# chin_a
 # ggsave(here("output", "figures", "chin_a.png"), plot=chin_a, device="png", dpi=300)
 
 main_map <- ggplot() +
@@ -210,7 +210,7 @@ main_map <- ggplot() +
 chin_r <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-chin_r
+# chin_r
 
 sf_base$precision <- (1/sf_base$mean_R)
 sf_stripe$precision <- (1/sf_stripe$mean_R)
@@ -250,7 +250,7 @@ main_map <- ggplot() +
 chin_pre <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
-chin_pre
+# chin_pre
 # ggsave(here("output", "figures", "chin_r.png"), plot=chin_r, device="png", dpi=300)
 
 main_map <- ggplot() +
@@ -288,7 +288,7 @@ main_map <- ggplot() +
 chin_pop <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-chin_pop
+# chin_pop
 # ggsave(here("output", "figures", "chin_pop.png"), plot=chin_pop, device="png", dpi=300)
 
 # # choropleth
@@ -332,7 +332,7 @@ doink <- wrap_plots(plot_list, ncol = 2)
 chin_ARchoro_panel <- doink + inset_element(inset_context, 
                                             left = 0.7, bottom = 0.05, 
                                             right = 0.98, top = 0.3)
-chin_ARchoro_panel
+# chin_ARchoro_panel
 # ggsave(here("output", "figures", "chin_ARchoro_panel.png"), plot=chin_ARchoro_panel, device="png", dpi=300)
 
 # iterated bias and precision by esu - ISSUE HERE WITH SHARED POLYGON

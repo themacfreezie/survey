@@ -8,6 +8,7 @@ options(max.print=2000)
 
 # import table from excel
 df <- read_excel(here("data", "clean", "AR_methods.xlsx"), sheet = "Final")
+  # MUST CHANGE THIS IS VALUES HAVE CHANGED
 
 # create table
 neat_table <- df %>%

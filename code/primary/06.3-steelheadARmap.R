@@ -123,7 +123,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
 stel_a <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
-stel_a
+# stel_a
 ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
@@ -145,7 +145,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
 stel_r <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
-stel_r
+# stel_r
 ggsave(here("output", "figures", "stel_r.png"), plot=stel_r, device="png", dpi=300)
 
 sf_stel_nad83col$precision <- (1/sf_stel_nad83col$mean_R)
@@ -169,7 +169,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
 stel_pre <- main_map + inset_element(inset_context, 
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
-stel_pre
+# stel_pre
 ggsave(here("output", "figures", "stel_pre.png"), plot=stel_pre, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
@@ -194,7 +194,7 @@ main_map <- ggplot(data = sf_stel_nad83col) +
 stel_pop <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-stel_pop
+# stel_pop
 ggsave(here("output", "figures", "stel_pop.png"), plot=stel_pop, device="png", dpi=300)
 
 # choropleths
@@ -228,7 +228,7 @@ final_plot <- ggdraw() +
 stel_Rpop_choro <- final_plot + inset_element(inset_context, 
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
-stel_Rpop_choro
+# stel_Rpop_choro
 
 data <- bi_class(sf_stel_nad83col, x = mean_lnnosa, y = mean_a, style = "equal", dim = 4)
 # bi_class creates a new 'bi_class' column based on quantiles of two variables
@@ -260,7 +260,7 @@ final_plot <- ggdraw() +
 stel_Apop_choro <- final_plot + inset_element(inset_context, 
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
-stel_Apop_choro
+# stel_Apop_choro
 
 
 data <- bi_class(sf_stel_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
@@ -293,7 +293,7 @@ final_plot <- ggdraw() +
 stel_AR_choro <- final_plot + inset_element(inset_context, 
                                            left = 0.7, bottom = 0.05, 
                                            right = 0.98, top = 0.3)
-stel_AR_choro
+# stel_AR_choro
 
 # iterated bias and precision by esu
 # bias

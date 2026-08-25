@@ -382,7 +382,7 @@ main_map <- ggplot() +
 ESUchin_dif <- main_map + inset_element(inset_context_chin, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-ESUchin_dif
+# ESUchin_dif
 
 main_map <- ggplot(data = ESUcoho) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -397,7 +397,7 @@ main_map <- ggplot(data = ESUcoho) +
 ESUcoho_dif <- main_map + inset_element(inset_context_coho, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-ESUcoho_dif
+# ESUcoho_dif
 
 main_map <- ggplot(data = ESUstel) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -412,7 +412,7 @@ main_map <- ggplot(data = ESUstel) +
 ESUstel_dif <- main_map + inset_element(inset_context_stel, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-ESUstel_dif
+# ESUstel_dif
 
 main_map <- ggplot() +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -445,7 +445,7 @@ main_map <- ggplot() +
 ESUchin_avg <- main_map + inset_element(inset_context_chin, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-ESUchin_avg
+# ESUchin_avg
 
 main_map <- ggplot(data = ESUcoho) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -460,7 +460,7 @@ main_map <- ggplot(data = ESUcoho) +
 ESUcoho_avg <- main_map + inset_element(inset_context_coho, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-ESUcoho_avg
+# ESUcoho_avg
 
 main_map <- ggplot(data = ESUstel) +
   annotation_map_tile(type = "hotstyle", zoom = 10) +
@@ -475,7 +475,7 @@ main_map <- ggplot(data = ESUstel) +
 ESUstel_avg <- main_map + inset_element(inset_context_stel, 
                                      left = 0.85, bottom = 0.05, 
                                      right = 1.1, top = 0.3)
-ESUstel_avg
+# ESUstel_avg
 
 main_map <- ggplot() +
   annotation_map_tile(type = "hotstyle", zoom = 10) +

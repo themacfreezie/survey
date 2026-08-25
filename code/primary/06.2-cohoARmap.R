@@ -161,7 +161,7 @@ main_map <- ggplot(data = sf_coho_nad83col) +
 coho_a <- main_map + inset_element(inset_context, 
                                    left = 1.05, bottom = -0.2, 
                                    right = 1.55, top = 0.5)
-coho_a
+# coho_a
 # ggsave(here("output", "figures", "coho_a.png"), plot=coho_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_coho_nad83col) +
@@ -189,7 +189,7 @@ main_map <- ggplot(data = sf_coho_nad83col) +
 coho_r <- main_map + inset_element(inset_context, 
                                    left = 1.05, bottom = -0.2, 
                                    right = 1.55, top = 0.5)
-coho_r
+# coho_r
 # ggsave(here("output", "figures", "coho_r.png"), plot=coho_r, device="png", dpi=300)
 
 # sf_base$precision <- (1/sf_base$mean_R)
@@ -223,7 +223,7 @@ main_map <- ggplot(data = sf_coho_nad83col) +
 coho_pre <- main_map + inset_element(inset_context, 
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
-coho_pre
+# coho_pre
 
 main_map <- ggplot(data = sf_coho_nad83col) +
   coord_sf(crs = crsSET) +
@@ -250,7 +250,7 @@ main_map <- ggplot(data = sf_coho_nad83col) +
 coho_pop <- main_map + inset_element(inset_context, 
                                      left = 1.05, bottom = -0.2, 
                                      right = 1.55, top = 0.5)
-coho_pop
+# coho_pop
 # ggsave(here("output", "figures", "coho_pop.png"), plot=coho_pop, device="png", dpi=300)
 
 # # choropleths
@@ -294,7 +294,7 @@ doink <- wrap_plots(plot_list, ncol = 2)
 coho_Rpop_choro <- doink + inset_element(inset_context, 
                                             left = 0.7, bottom = 0.05, 
                                             right = 0.98, top = 0.3)
-coho_Rpop_choro
+# coho_Rpop_choro
 # ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
 
 data <- bi_class(sf_coho_nad83col, x = mean_lnnosa, y = mean_a, style = "equal", dim = 4)
@@ -337,7 +337,7 @@ doink <- wrap_plots(plot_list, ncol = 2)
 coho_Apop_choro <- doink + inset_element(inset_context, 
                                          left = 0.7, bottom = 0.05, 
                                          right = 0.98, top = 0.3)
-coho_Apop_choro
+# coho_Apop_choro
 # ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
 
 data <- bi_class(sf_coho_nad83col, x = mean_a, y = mean_R, style = "equal", dim = 4)
@@ -380,7 +380,7 @@ doink <- wrap_plots(plot_list, ncol = 2)
 coho_AR_choro <- doink + inset_element(inset_context, 
                                          left = 0.7, bottom = 0.05, 
                                          right = 0.98, top = 0.3)
-coho_AR_choro
+# coho_AR_choro
 # ggsave(here("output", "figures", "coho_ARchoro_panel.png"), plot=coho_ARchoro_panel, device="png", dpi=300)
 
 ## iterated bias and precision by esu
