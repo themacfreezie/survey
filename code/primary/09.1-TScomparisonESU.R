@@ -1,6 +1,10 @@
 ## SET WORKING DIR & PACKAGES
+library(DT)
 library(ggpattern)
+library(gt)
 library(here)
+library(knitr)
+library(kableExtra)
 library(MARSS)
 library(panelr)
 library(readxl)
@@ -656,3 +660,40 @@ print(ESUdiff_stel)
 save(ESUdiff_chin, file=here("data", "clean", "ESUdiff_chin.Rda"))
 save(ESUdiff_coho, file=here("data", "clean", "ESUdiff_coho.Rda"))
 save(ESUdiff_stel, file=here("data", "clean", "ESUdiff_stel.Rda"))
+
+ESUdiff <- rbind(ESUdiff_chin, ESUdiff_coho)
+ESUdiff <- rbind(ESUdiff, ESUdiff_stel)
+ESUdiff <- ESUdiff[-c(6:8)]
+
+ESUdiff <- ESUdiff %>% 
+  ungroup() %>% 
+  extract(
+    col = ESAPOPNAME,
+    into = c("Species", "ESU_DPS"),
+    regex = "^(?:Salmon,\\s*)?([^(]+?)\\s*\\(([^)]+)\\)",
+    remove = TRUE # Set to FALSE if you want to keep the original ESAPOPNAME column too
+  ) |> 
+  mutate(Species = str_to_title(Species)) %>%
+  mutate(Species = ifelse(duplicated(Species), "", Species))
+
+ESUdiff_table <- ESUdiff %>%
+  ungroup() %>%
+  gt(rownames_to_stub = FALSE) %>%
+  tab_header(
+    title = "ESU/DPS-level difference between NOSA observations and fitted estimates",
+  ) %>%
+  cols_move_to_start(columns = c(Species, ESU_DPS, years_compared, total_absolute_difference, total_net_difference, avg_netdiff)) %>% 
+  fmt_number(columns = c(total_net_difference, total_absolute_difference, avg_netdiff), decimals = 0) %>% 
+  cols_label(
+    Species = "Species",
+    ESU_DPS = "ESU/DPS",
+    total_net_difference = "Total net difference",
+    total_absolute_difference = "Total absolute difference",
+    avg_netdiff = "Average net difference",
+    years_compared = "Years of surveys"
+  ) %>% 
+  tab_options(
+    table.width = pct(100),
+    data_row.padding = px(5)    
+  )
+ESUdiff_table

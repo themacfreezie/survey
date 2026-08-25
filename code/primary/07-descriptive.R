@@ -156,7 +156,7 @@ ESUmethods_coho_table
 ESUmethods_stel_table <- ESUmethods_stel %>%
   gt(rownames_to_stub = TRUE) %>% 
   tab_header(
-    title = "Survey methods by DSP - steelhead trout",
+    title = "Survey methods by DPS - steelhead trout",
   ) %>%
   tab_options(
     table.width = pct(100),
