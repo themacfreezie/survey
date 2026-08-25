@@ -190,7 +190,7 @@ for(i in seq(length(pops))){
 mod.list <- list(
   B = "identity",
   U = "zero",
-  Q = "diagonal and unequal",
+  Q = "equalvarcov",
   Z = Z.model,
   A = "zero",
   R = R.model,

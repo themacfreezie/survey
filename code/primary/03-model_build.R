@@ -227,7 +227,7 @@ for(i in seq(length(pops_chin))){
 mod_chin.list <- list(
   B = "identity",
   U = "zero",
-  Q = "diagonal and unequal",
+  Q = "equalvarcov",
   Z = Z_chin.model,
   A = a_chin.model,
   R = R_chin.model,
@@ -275,7 +275,7 @@ for(i in seq(length(pops_coho))){
 mod_coho.list <- list(
   B = "identity",
   U = "zero",
-  Q = "diagonal and unequal",
+  Q = "equalvarcov",
   Z = Z_coho.model,
   A = a_coho.model,
   R = R_coho.model,
@@ -323,7 +323,7 @@ for(i in seq(length(pops_stel))){
 mod_stel.list <- list(
   B = "identity",
   U = "zero",
-  Q = "diagonal and unequal",
+  Q = "equalvarcov",
   Z = Z_stel.model,
   A = a_stel.model,
   R = R_stel.model,
