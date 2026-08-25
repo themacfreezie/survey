@@ -546,14 +546,14 @@ ssm_stel_u2z3 <- MARSS(nosa_stel, model = mod_stel_u2z3.list, method = "kem", co
 
 # check fit
 ssm_stel_u1z1$AICc
-# 1590.313
+  # 1336.101
 ssm_stel_u1z2$AICc
-# 1648.042
+  # 1343.792
 ssm_stel_u1z3$AICc
-# 1569.68
+  # 1215.657 - best fit for steelhead
 ssm_stel_u2z1$AICc
-# 1615.852
+  # 1375.884
 ssm_stel_u2z2$AICc
-# 1675.852
+  # 1385.541
 ssm_stel_u2z3$AICc
-# 1600.009
+  # 1251.642
