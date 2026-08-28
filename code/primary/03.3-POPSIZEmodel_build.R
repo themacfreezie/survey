@@ -820,17 +820,26 @@ POPSIZE4ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE4ssm_
 ssm_chin$AICc
   # 1569.68
 POPSIZE2ssm_chin$AICc
+  # 1311.923
 POPSIZE3ssm_chin$AICc
+  # 1101.455
 POPSIZE4ssm_chin$AICc
+  # 789.3597
 
 ssm_coho$AICc
   # 2218.874
 POPSIZE2ssm_coho$AICc
+  # 1902.292
 POPSIZE3ssm_coho$AICc
+  # 1566.761
 POPSIZE4ssm_coho$AICc
+  # 1182.417
 
 ssm_stel$AICc
   # 1215.657
 POPSIZE2ssm_stel$AICc
+  # 876.4969
 POPSIZE3ssm_stel$AICc
+  # 597.2161
 POPSIZE4ssm_stel$AICc
+  # 301.0077
