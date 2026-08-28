@@ -19,14 +19,6 @@ nosa_chin <- nosa %>% filter(CommonName=="Chinook Salmon")
 nosa_coho <- nosa %>% filter(CommonName=="Coho Salmon")
 nosa_stel <- nosa %>% filter(CommonName=="Steelhead")
 
-# what is average population observation per species (this is rough)
-mean(nosa_chin$lnnosa)
-  # 5.563811
-mean(nosa_coho$lnnosa)
-  # 7.537512
-mean(nosa_stel$lnnosa)
-  # 6.786005
-
 # create scale variable to track whether a population is observed to be "large" or "small" based on average
 nosa_chin$scale <- ifelse(nosa_chin$lnnosa > mean(nosa_chin$lnnosa), "L", "S")
 nosa_coho$scale <- ifelse(nosa_coho$lnnosa > mean(nosa_coho$lnnosa), "L", "S")
@@ -48,31 +40,36 @@ nosa_chin <- nosa_chin %>%
   filter(TimeSeriesID != 599005)
 
 # how often are particular survey methods used
-counts_chin <- table(nosa_chin$MethodSizeID)
+counts_chin <- table(nosa_chin$MethodNameID)
 counts_chin
-# 4 methods < 10 obs
-counts_coho <- table(nosa_coho$MethodSizeID)
+  # 2 methods < 10 obs
+counts_coho <- table(nosa_coho$MethodNameID)
 counts_coho
-# 5 methods < 10 obs
-counts_stel <- table(nosa_stel$MethodSizeID)
+  # 2 methods < 10 obs
+counts_stel <- table(nosa_stel$MethodNameID)
 counts_stel
-# 7 methods < 10 obs
+  # 6 methods < 10 obs
 
 # will drop those methods for which fewer than 10 observations exist
-low_counts_chin <- names(counts_chin[counts_chin < 10])
+  # underlying must be the same for AICc comparsions to these drops will be based off MethodNameID, not MethodSizeID
+  # this the same as non-split models
+low_count_ids <- names(counts_chin[counts_chin < 10])
+low_counts_chin <- as.numeric(low_count_ids)
 nosa_chin <- nosa_chin %>%
-  filter(!MethodSizeID %in% low_counts_chin)
-table(nosa_chin$MethodSizeID)
+  filter(!MethodNameID %in% low_counts_chin)
+table(nosa_chin$MethodNameID)
 
-low_counts_coho <- names(counts_coho[counts_coho < 10])
+low_count_ids <- names(counts_coho[counts_coho < 10])
+low_counts_coho <- as.numeric(low_count_ids)
 nosa_coho <- nosa_coho %>%
-  filter(!MethodSizeID %in% low_counts_coho)
-table(nosa_coho$MethodSizeID)
+  filter(!MethodNameID %in% low_counts_coho)
+table(nosa_coho$MethodNameID)
 
-low_counts_stel <- names(counts_stel[counts_stel < 10])
+low_count_ids <- names(counts_stel[counts_stel < 10])
+low_counts_stel <- as.numeric(low_count_ids)
 nosa_stel <- nosa_stel %>%
-  filter(!MethodSizeID %in% low_counts_stel)
-table(nosa_stel$MethodSizeID)
+  filter(!MethodNameID %in% low_counts_stel)
+table(nosa_stel$MethodNameID)
 
 ## per species
 # chinook
@@ -80,21 +77,21 @@ length(unique(nosa_chin$PopID))
   # 22 populations
 unique(nosa_chin$MethodSizeID)
 length(unique(nosa_chin$MethodSizeID))
-  # 14 methods
+  # 16 methods
 
 # coho
 length(unique(nosa_coho$PopID))
   # 29 populations
 unique(nosa_coho$MethodSizeID)
 length(unique(nosa_coho$MethodSizeID))
-  # 17 methods
+  # 20 methods
 
 # steelhead
 length(unique(nosa_stel$PopID))
   # 23 populations
 unique(nosa_stel$MethodSizeID)
 length(unique(nosa_stel$MethodSizeID))
-  # 13 methods
+  # 14 methods
 
 # set up popID data for MARSS models
 nosa_chin <- nosa_chin[-c(1, 3:9, 11, 12)]
@@ -147,7 +144,7 @@ diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 scale <- "9S"
   # sets relative value against which other survey methods will be scaled
   # 9 -> dam counts - accurate (according to parsons and Skalski)
-    #9s is the only 9 method that appears across all three species
+    # 9s is the only 9 method that appears across all three species
 a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(a_chin.model)){
   if(nosa_chin_rows$method[i] != scale){
@@ -284,23 +281,6 @@ ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chinM9.rds"))
 ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM9.rds"))
 ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM9.rds"))
 
-# check for best fit
-# check fit
-ssm_chin$AICc
-  # 1569.68
-POPSIZE2ssm_chin$AICc
-  # 1296.671 - best fit
-
-ssm_coho$AICc
-  # 2218.874
-POPSIZE2ssm_coho$AICc
-  # 1871.073 - best fit
-
-ssm_stel$AICc
-  # 1215.657
-POPSIZE2ssm_stel$AICc
-  # 873.6264 - best fit
-
 ## SEPARATING SURVEY METHODS BY POPSIZE IS MUCH BETTER FIT
   # Okay, but to what extent do I slice the data - i.e. small and large, small medium large, etc?
 
@@ -344,36 +324,24 @@ nosa_stel$popmethod <- paste0(as.character(nosa_stel$PopID),"_", as.character(no
 nosa_chin <- nosa_chin %>%
   filter(TimeSeriesID != 599005)
 
-# how often are particular survey methods used
-    # losing some more information here... 
-counts_chin <- table(nosa_chin$MethodSizeID)
-counts_chin
-  # 7 methods < 10 obs
-counts_coho <- table(nosa_coho$MethodSizeID)
-counts_coho
-  # 14 methods < 10 obs
-counts_stel <- table(nosa_stel$MethodSizeID)
-counts_stel
-  # 10 methods < 10 obs
-
-# will drop those methods for which fewer than 10 observations exist
-low_counts_chin <- names(counts_chin[counts_chin < 10])
+# # will drop those methods for which fewer than 10 observations exist
+low_count_ids <- names(counts_chin[counts_chin < 10])
+low_counts_chin <- as.numeric(low_count_ids)
 nosa_chin <- nosa_chin %>%
-  filter(!MethodSizeID %in% low_counts_chin)
-table(nosa_chin$MethodSizeID)
-  # dropped 30 obs
+  filter(!MethodNameID %in% low_counts_chin)
+table(nosa_chin$MethodNameID)
 
-low_counts_coho <- names(counts_coho[counts_coho < 10])
+low_count_ids <- names(counts_coho[counts_coho < 10])
+low_counts_coho <- as.numeric(low_count_ids)
 nosa_coho <- nosa_coho %>%
-  filter(!MethodSizeID %in% low_counts_coho)
-table(nosa_coho$MethodSizeID)
-  # dropped 66 obs
+  filter(!MethodNameID %in% low_counts_coho)
+table(nosa_coho$MethodNameID)
 
-low_counts_stel <- names(counts_stel[counts_stel < 10])
+low_count_ids <- names(counts_stel[counts_stel < 10])
+low_counts_stel <- as.numeric(low_count_ids)
 nosa_stel <- nosa_stel %>%
-  filter(!MethodSizeID %in% low_counts_stel)
-table(nosa_stel$MethodSizeID)
-  # dropped 43 obs
+  filter(!MethodNameID %in% low_counts_stel)
+table(nosa_stel$MethodNameID)
 
 ## per species
 # chinook
@@ -381,21 +349,21 @@ length(unique(nosa_chin$PopID))
   # 22 populations
 unique(nosa_chin$MethodSizeID)
 length(unique(nosa_chin$MethodSizeID))
-  # 19 methods
+  # 24 methods
 
 # coho
 length(unique(nosa_coho$PopID))
   # 29 populations
 unique(nosa_coho$MethodSizeID)
 length(unique(nosa_coho$MethodSizeID))
-  # 18 methods
+  # 29 methods
 
 # steelhead
 length(unique(nosa_stel$PopID))
   # 23 populations
 unique(nosa_stel$MethodSizeID)
 length(unique(nosa_stel$MethodSizeID))
-  # 16 methods
+  # 20 methods
 
 # set up popID data for MARSS models
 nosa_chin <- nosa_chin[-c(1, 3:9, 11, 12)]
@@ -422,11 +390,7 @@ nosa_chin <- as.matrix(nosa_chin)
 nosa_coho <- nosa_coho[,order(colnames(nosa_coho))]
 nosa_coho_rows <- as.data.frame(stringr::str_split_fixed(nosa_coho$popmethod, "_", 2))
 colnames(nosa_coho_rows) <- c("popid", "method")
-nosa_coho <- nosa_coho[-c(44)]
-  # lost 1985 and 1986 entirely from dropping observations
-nosa_coho$lnnosa_1985 <- NA_real_
-nosa_coho$lnnosa_1986 <- NA_real_
-nosa_coho <- nosa_coho[,order(colnames(nosa_coho))]
+nosa_coho <- nosa_coho[-c(46)]
 colnames(nosa_coho) <- substr(colnames(nosa_coho), 8, 11)
 years <- colnames(nosa_coho)
 nosa_coho <- as.matrix(nosa_coho)
@@ -450,9 +414,9 @@ diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 
 # a
 scale <- "9S"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-#9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
+  # 9 -> dam counts - accurate (according to parsons and Skalski)
+  # 9s is the only 9 method that appears across all three species
 a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(a_chin.model)){
   if(nosa_chin_rows$method[i] != scale){
@@ -584,24 +548,6 @@ if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale, ".
 # load in ssm_stel
 POPSIZE3ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale, ".rds", sep="")))
 
-# check for best fit
-POPSIZE2ssm_chin$AICc
-  # 1296.671
-POPSIZE3ssm_chin$AICc
-  # 1064.819 - best fit
-
-POPSIZE2ssm_coho$AICc
-  # 1871.073
-POPSIZE3ssm_coho$AICc
-  # 1463.444 - best fit
-
-POPSIZE2ssm_stel$AICc
-  # 873.6264
-POPSIZE3ssm_stel$AICc
-  # 580.8163 - best fit
-
-## SEPARATING SURVEY METHODS BY POPSIZE IS MUCH BETTER FIT
-  # Okay, but to what extent do I slice the data - i.e. small and large, small medium large, etc?
 
 ## repeat the above process but with quarters
 # pull in data
@@ -646,36 +592,24 @@ nosa_stel$popmethod <- paste0(as.character(nosa_stel$PopID),"_", as.character(no
 nosa_chin <- nosa_chin %>%
   filter(TimeSeriesID != 599005)
 
-# how often are particular survey methods used
-# losing some more information here... 
-counts_chin <- table(nosa_chin$MethodSizeID)
-counts_chin
-  # 11 methods < 10 obs
-counts_coho <- table(nosa_coho$MethodSizeID)
-counts_coho
-  # 17 methods < 10 obs
-counts_stel <- table(nosa_stel$MethodSizeID)
-counts_stel
-  # 15 methods < 10 obs
-
-# will drop those methods for which fewer than 10 observations exist
-low_counts_chin <- names(counts_chin[counts_chin < 10])
+# # will drop those methods for which fewer than 10 observations exist
+low_count_ids <- names(counts_chin[counts_chin < 10])
+low_counts_chin <- as.numeric(low_count_ids)
 nosa_chin <- nosa_chin %>%
-  filter(!MethodSizeID %in% low_counts_chin)
-table(nosa_chin$MethodSizeID)
-  # dropped 46 obs
+  filter(!MethodNameID %in% low_counts_chin)
+table(nosa_chin$MethodNameID)
 
-low_counts_coho <- names(counts_coho[counts_coho < 10])
+low_count_ids <- names(counts_coho[counts_coho < 10])
+low_counts_coho <- as.numeric(low_count_ids)
 nosa_coho <- nosa_coho %>%
-  filter(!MethodSizeID %in% low_counts_coho)
-table(nosa_coho$MethodSizeID)
-  # dropped 87 obs
+  filter(!MethodNameID %in% low_counts_coho)
+table(nosa_coho$MethodNameID)
 
-low_counts_stel <- names(counts_stel[counts_stel < 10])
+low_count_ids <- names(counts_stel[counts_stel < 10])
+low_counts_stel <- as.numeric(low_count_ids)
 nosa_stel <- nosa_stel %>%
-  filter(!MethodSizeID %in% low_counts_stel)
-table(nosa_stel$MethodSizeID)
-  # dropped 64 obs
+  filter(!MethodNameID %in% low_counts_stel)
+table(nosa_stel$MethodNameID)
 
 ## per species
 # chinook
@@ -683,21 +617,21 @@ length(unique(nosa_chin$PopID))
   # 22 populations
 unique(nosa_chin$MethodSizeID)
 length(unique(nosa_chin$MethodSizeID))
-  # 23 methods
+  # 32 methods
 
 # coho
 length(unique(nosa_coho$PopID))
   # 29 populations
 unique(nosa_coho$MethodSizeID)
 length(unique(nosa_coho$MethodSizeID))
-  # 22 methods
+  # 36 methods
 
 # steelhead
 length(unique(nosa_stel$PopID))
   # 23 populations
 unique(nosa_stel$MethodSizeID)
 length(unique(nosa_stel$MethodSizeID))
-  # 18 methods
+  # 26 methods
 
 # set up popID data for MARSS models
 nosa_chin <- nosa_chin[-c(1, 3:9, 11, 12)]
@@ -747,10 +681,10 @@ R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(R_chin.model) <- paste0("r", nosa_chin_rows$method)
 
 # a
-scale <- "9S"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-#9s is the only 9 method that appears across all three species
+scale <- "9Q2"
+  # sets relative value against which other survey methods will be scaled
+  # 9 -> dam counts - accurate (according to parsons and Skalski)
+  # 9Q2 and 9Q1 are the only 9 methods that appear across all three species
 a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(a_chin.model)){
   if(nosa_chin_rows$method[i] != scale){
@@ -785,7 +719,7 @@ R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(R_coho.model) <- paste0("r", nosa_coho_rows$method)
 
 # a
-scale <- "9S"
+scale <- "9Q2"
 a_coho.model <- matrix(list(0), n_coho, 1)
 for(i in 1:length(a_coho.model)){
   if(nosa_coho_rows$method[i] != scale){
@@ -820,7 +754,7 @@ R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(R_stel.model) <- paste0("r", nosa_stel_rows$method)
 
 # a
-scale <- "9S"
+scale <- "9Q2"
 a_stel.model <- matrix(list(0), n_stel, 1)
 for(i in 1:length(a_stel.model)){
   if(nosa_stel_rows$method[i] != scale){
@@ -883,14 +817,20 @@ if(!file.exists(here::here("data", "clean", paste("POPSIZE4ssm_stelM", scale, ".
 POPSIZE4ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE4ssm_stelM", scale, ".rds", sep="")))
 
 # check for best fit
+ssm_chin$AICc
+  # 1569.68
+POPSIZE2ssm_chin$AICc
 POPSIZE3ssm_chin$AICc
-  # 1064.819
 POPSIZE4ssm_chin$AICc
 
+ssm_coho$AICc
+  # 2218.874
+POPSIZE2ssm_coho$AICc
 POPSIZE3ssm_coho$AICc
-  # 1463.444
 POPSIZE4ssm_coho$AICc
 
+ssm_stel$AICc
+  # 1215.657
+POPSIZE2ssm_stel$AICc
 POPSIZE3ssm_stel$AICc
-  # 580.8163
 POPSIZE4ssm_stel$AICc
