@@ -19,6 +19,7 @@ nosa_chin <- nosa %>% filter(CommonName=="Chinook Salmon")
 nosa_coho <- nosa %>% filter(CommonName=="Coho Salmon")
 nosa_stel <- nosa %>% filter(CommonName=="Steelhead")
 
+### CHINOOK
 # dividing into halfs and thirds requires sixths
 cutoffs <- quantile(nosa_chin$lnnosa, probs = c(1/6, 1/3, 1/2, 2/3, 5/6), na.rm = TRUE)
 nosa_chin$scale <- ifelse(nosa_chin$lnnosa <= cutoffs[1], "Q1",
