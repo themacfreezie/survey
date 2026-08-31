@@ -215,3 +215,8 @@ if(!file.exists(here::here("data", "clean", paste("POPSIZE5ssm_chinM", scale5, "
 }
 # load in ssm_chin
 POPSIZE5ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE5ssm_chinM", scale5, "S5TEST.rds", sep="")))
+
+# check for best fit
+POPSIZE1ssm_chin$AICc
+POPSIZE3ssm_chin$AICc
+POPSIZE5ssm_chin$AICc
