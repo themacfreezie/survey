@@ -16,29 +16,24 @@ nosa$lnnosa <- log(nosa$NOSA + 1)
 
 # different species
 nosa_chin <- nosa %>% filter(CommonName=="Chinook Salmon")
-nosa_coho <- nosa %>% filter(CommonName=="Coho Salmon")
-nosa_stel <- nosa %>% filter(CommonName=="Steelhead")
 
-# dividing into halfs, thirds, and fourths requires twelvths
-cutoffs <- quantile(nosa_chin$lnnosa, probs = c(1/12, 1/6, 1/4, 1/3, 5/12, 1/2, 7/12, 2/3, 3/4, 5/6, 11/12), na.rm = TRUE)
-nosa_chin$scale <- ifelse(nosa_chin$lnnosa <= cutoffs[1], "Q1",
+# create scale variable to track whether a population is observed to be "large" or "small" based on average
+nosa_chin$scale2 <- ifelse(nosa_chin$lnnosa > mean(nosa_chin$lnnosa), "L", "S")
+  # is there some issue with basing "large" and "small" off nosa observations when they may be directionally biased?
+# create scale variable to track whether a population is observed to be in what quarter
+  # I think this is the only way to make the models comparable..
+cutoffs <- quantile(nosa_chin$lnnosa, probs = c(1/4, 1/2, 3/4), na.rm = TRUE)
+nosa_chin$scale4 <- ifelse(nosa_chin$lnnosa <= cutoffs[1], "Q1",
                           ifelse(nosa_chin$lnnosa <= cutoffs[2], "Q2",
-                                 ifelse(nosa_chin$lnnosa <= cutoffs[3], "Q3",
-                                        ifelse(nosa_chin$lnnosa <= cutoffs[4], "Q4",
-                                               ifelse(nosa_chin$lnnosa <= cutoffs[5], "Q5", 
-                                                      ifelse(nosa_chin$lnnosa <= cutoffs[6], "Q6",
-                                                             ifelse(nosa_chin$lnnosa <= cutoffs[7], "Q7",
-                                                                    ifelse(nosa_chin$lnnosa <= cutoffs[8], "Q8",
-                                                                           ifelse(nosa_chin$lnnosa <= cutoffs[9], "Q9",
-                                                                                  ifelse(nosa_chin$lnnosa <= cutoffs[10], "Q10",
-                                                                                         ifelse(nosa_chin$lnnosa <= cutoffs[11], "Q11", "Q12"
-                                               )))))))))))
+                                 ifelse(nosa_chin$lnnosa <= cutoffs[3], "Q3", "Q4")))
+# select highest level scale
+nosa_chin$prime <- nosa_chin$scale4
 
 # new method varIDs including size
-nosa_chin$MethodSizeID<- paste0(as.character(nosa_chin$MethodNameID),"", as.character(nosa_chin$scale))
+nosa_chin$MethodSizeIDprime <- paste0(as.character(nosa_chin$MethodNameID),"", as.character(nosa_chin$prime))
 
 # new popid/method var
-nosa_chin$popmethod <- paste0(as.character(nosa_chin$PopID),"_", as.character(nosa_chin$MethodSizeID))
+nosa_chin$popmethod_prime <- paste0(as.character(nosa_chin$PopID),"_", as.character(nosa_chin$MethodSizeIDprime))
 
 # still issues with pop 11 somehow (chin)
 nosa_chin <- nosa_chin %>%
@@ -50,48 +45,49 @@ counts_chin
   # 2 methods < 10 obs
 
 # will drop those methods for which fewer than 10 observations exist
-# underlying must be the same for AICc comparsions to these drops will be based off MethodNameID, not MethodSizeID
+# underlying must be the same for AICc comparsions to these drops will be based off MethodNameID, not MethodSizeIDprime
+# this the same as non-split models
 low_count_ids <- names(counts_chin[counts_chin < 10])
 low_counts_chin <- as.numeric(low_count_ids)
 nosa_chin <- nosa_chin %>%
   filter(!MethodNameID %in% low_counts_chin)
 table(nosa_chin$MethodNameID)
 
+## per species
+# chinook
+  length(unique(nosa_chin$PopID))
+    # 22 populations
+  unique(nosa_chin$MethodSizeIDprime)
+  length(unique(nosa_chin$MethodSizeIDprime))
+    # 32 methods
+
+# # need keys to link different scales
+# nosa_chin2 <- nosa_chin[-c(1, 3:10, 12:(ncol(nosa_chin)-1))]
+# nosa_chin2 <- panel_data(nosa_chin2, id = popmethod_prime, wave = Year)
+# nosa_chin2 <- widen_panel(nosa_chin2, separator = "_")
+  
 # set up popID data for MARSS models
 nosa_chin <- nosa_chin[-c(1, 3:9, 11:(ncol(nosa_chin)-1))]
 
 # set data wide (rows = popid/method, columns = year)
-nosa_chin <- panel_data(nosa_chin, id = popmethod, wave = Year)
+nosa_chin <- panel_data(nosa_chin, id = popmethod_prime, wave = Year)
 nosa_chin <- widen_panel(nosa_chin, separator = "_")
 
 # some resorting and cleaning
 nosa_chin <- nosa_chin[,order(colnames(nosa_chin))]
-nosa_chin_rows <- as.data.frame(stringr::str_split_fixed(nosa_chin$popmethod, "_", 2))
-colnames(nosa_chin_rows) <- c("popid", "method")
-nosa_chin_rows$methodNo <- sub("(^\\d+)Q.*", "\\1", nosa_chin_rows$method)
-nosa_chin_rows$nth <- sub("^\\d+(Q.*)", "\\1", nosa_chin_rows$method)
-
-nosa_chin_rows$method2 <- ifelse(nosa_chin_rows$nth %in% c("Q1", "Q2", "Q3", "Q4", "Q5", "Q6"), "S", "L")
-nosa_chin_rows$method2 <- paste0(nosa_chin_rows$methodNo, "",nosa_chin_rows$method2)
-
-nosa_chin_rows$method3 <- ifelse(nosa_chin_rows$nth %in% c("Q1", "Q2", "Q3", "Q4"), "S", 
-                                 ifelse(nosa_chin_rows$nth %in% c("Q5", "Q6", "Q7", "Q8"), "M", "L"
-                                 ))
-nosa_chin_rows$method3 <- paste0(nosa_chin_rows$methodNo, "",nosa_chin_rows$method3)
-
-nosa_chin_rows$method4 <- ifelse(nosa_chin_rows$nth %in% c("Q1", "Q2", "Q3"), "Q1", 
-                                 ifelse(nosa_chin_rows$nth %in% c("Q4", "Q5", "Q6"), "Q2",
-                                        ifelse(nosa_chin_rows$nth %in% c("Q7", "Q8", "Q9"), "Q3", "Q4"
-                                 ))) 
-nosa_chin_rows$method4 <- paste0(nosa_chin_rows$methodNo, "",nosa_chin_rows$method4)
-
+nosa_chin_rows <- as.data.frame(stringr::str_split_fixed(nosa_chin$popmethod_prime, "_", 2))
+colnames(nosa_chin_rows) <- c("popid", "method4")
+nosa_chin_rows$method1 <- sub("(^\\d+)Q.*", "\\1", nosa_chin_rows$method4)
+nosa_chin_rows$method2 <- sub("^\\d+(Q.*)", "\\1", nosa_chin_rows$method4)
+nosa_chin_rows$method2 <- ifelse(nosa_chin_rows$method2 %in% c("Q1", "Q2"), "S", "L")
+nosa_chin_rows$method2 <- paste0(nosa_chin_rows$method1, "",nosa_chin_rows$method2)
 nosa_chin <- nosa_chin[-c(46)]
 colnames(nosa_chin) <- substr(colnames(nosa_chin), 8, 11)
 years <- colnames(nosa_chin)
 nosa_chin <- as.matrix(nosa_chin)
 
 # set controls
-con.list <- list(maxit = 1000, allow.degen = TRUE)
+con.list <- list(maxit = 10000, allow.degen = TRUE)
 
 # build model chinook
 # R
@@ -100,22 +96,18 @@ POPSIZE4R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(POPSIZE4R_chin.model) <- paste0("r", nosa_chin_rows$method4)
 
 n_chin <- nrow(nosa_chin)
-POPSIZE3R_chin.model <- matrix(list(0), n_chin, n_chin)
-diag(POPSIZE3R_chin.model) <- paste0("r", nosa_chin_rows$method3)
-
-n_chin <- nrow(nosa_chin)
 POPSIZE2R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(POPSIZE2R_chin.model) <- paste0("r", nosa_chin_rows$method2)
 
 n_chin <- nrow(nosa_chin)
 POPSIZE1R_chin.model <- matrix(list(0), n_chin, n_chin)
-diag(POPSIZE1R_chin.model) <- paste0("r", nosa_chin_rows$methodNo)
+diag(POPSIZE1R_chin.model) <- paste0("r", nosa_chin_rows$method1)
 
 # a
 scale4 <- "9Q2"
-  # sets relative value against which other survey methods will be scaled
-  # 9 -> dam counts - accurate (according to parsons and Skalski)
-  # 9s is the only 9 method that appears across all three species
+# sets relative value against which other survey methods will be scaled
+# 9 -> dam counts - accurate (according to parsons and Skalski)
+# 9s is the only 9 method that appears across all three species
 POPSIZE4a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(POPSIZE4a_chin.model)){
   if(nosa_chin_rows$method4[i] != scale4){
@@ -123,17 +115,10 @@ for(i in 1:length(POPSIZE4a_chin.model)){
   }
 }
 
-scale3 <- "9M"
-  # sets relative value against which other survey methods will be scaled
-POPSIZE3a_chin.model <- matrix(list(0), n_chin, 1)
-for(i in 1:length(POPSIZE3a_chin.model)){
-  if(nosa_chin_rows$method3[i] != scale3){
-    POPSIZE3a_chin.model[i] <- paste0("a", nosa_chin_rows$method3[i])
-  }
-}
-
 scale2 <- "9S"
-  # sets relative value against which other survey methods will be scaled
+# sets relative value against which other survey methods will be scaled
+# 9 -> dam counts - accurate (according to parsons and Skalski)
+# 9s is the only 9 method that appears across all three species
 POPSIZE2a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(POPSIZE2a_chin.model)){
   if(nosa_chin_rows$method2[i] != scale2){
@@ -142,11 +127,13 @@ for(i in 1:length(POPSIZE2a_chin.model)){
 }
 
 scale1 <- "9"
-  # sets relative value against which other survey methods will be scaled
+# sets relative value against which other survey methods will be scaled
+# 9 -> dam counts - accurate (according to parsons and Skalski)
+# 9s is the only 9 method that appears across all three species
 POPSIZE1a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(POPSIZE1a_chin.model)){
-  if(nosa_chin_rows$methodNo[i] != scale1){
-    POPSIZE1a_chin.model[i] <- paste0("a", nosa_chin_rows$methodNo[i])
+  if(nosa_chin_rows$method1[i] != scale1){
+    POPSIZE1a_chin.model[i] <- paste0("a", nosa_chin_rows$method1[i])
   }
 }
 
@@ -177,18 +164,6 @@ POPSIZE2mod_chin.list <- list(
   Z = Z_chin.model,
   A = POPSIZE2a_chin.model,
   R = POPSIZE2R_chin.model,
-  x0 = "equal",
-  V0 = "zero",
-  tinitx = 0
-)
-
-POPSIZE3mod_chin.list <- list(
-  B = "identity",
-  U = "zero",
-  Q = "equalvarcov",
-  Z = Z_chin.model,
-  A = POPSIZE3a_chin.model,
-  R = POPSIZE3R_chin.model,
   x0 = "equal",
   V0 = "zero",
   tinitx = 0
@@ -229,18 +204,7 @@ if(!file.exists(here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "
 # load in ssm_chin
 POPSIZE2ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "S4TEST.rds", sep="")))
 
-# large, medium, and small
-if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S4TEST.rds", sep="")))){
-  ptm <- proc.time()
-  POPSIZE3ssm_chin <- MARSS(nosa_chin, model = POPSIZE3mod_chin.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE3ssm_chin, file=here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S4TEST.rds", sep="")))
-  chin_time <- proc.time()[3] - ptm
-  chin_time
-}
-# load in ssm_chin
-POPSIZE3ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S4TEST.rds", sep="")))
-
-# four quarters
+# 4 quarters
 if(!file.exists(here::here("data", "clean", paste("POPSIZE4ssm_chinM", scale4, "S4TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE4ssm_chin <- MARSS(nosa_chin, model = POPSIZE4mod_chin.list, method = "kem", control = con.list)
@@ -254,5 +218,4 @@ POPSIZE4ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE4ssm_
 # check for best fit
 POPSIZE1ssm_chin$AICc
 POPSIZE2ssm_chin$AICc
-POPSIZE3ssm_chin$AICc
 POPSIZE4ssm_chin$AICc
