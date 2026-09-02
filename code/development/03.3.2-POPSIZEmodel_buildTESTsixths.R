@@ -4,7 +4,7 @@ library(MARSS)
 library(panelr)
 library(tidyverse)
 
-here::i_am("code/development/03.3.2-POPSIZEmodel_buildTESTquarters.R")
+here::i_am("code/development/03.3.2-POPSIZEmodel_buildTESTsixths.R")
 options(max.print=2000)
 
 # pull in data
@@ -74,6 +74,8 @@ nosa_chin_rows$method3 <- ifelse(nosa_chin_rows$nth %in% c("Q1", "Q2"), "S",
                                         ))
 nosa_chin_rows$method3 <- paste0(nosa_chin_rows$methodNo, "",nosa_chin_rows$method3)
 
+nosa_chin_rows$method6 <- nosa_chin_rows$method
+
 nosa_chin <- nosa_chin[-c(46)]
 colnames(nosa_chin) <- substr(colnames(nosa_chin), 8, 11)
 years <- colnames(nosa_chin)
@@ -84,6 +86,10 @@ con.list <- list(maxit = 1000, allow.degen = TRUE)
 
 # build model chinook
 # R
+n_chin <- nrow(nosa_chin)
+POPSIZE6R_chin.model <- matrix(list(0), n_chin, n_chin)
+diag(POPSIZE6R_chin.model) <- paste0("r", nosa_chin_rows$method6)
+
 n_chin <- nrow(nosa_chin)
 POPSIZE3R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(POPSIZE3R_chin.model) <- paste0("r", nosa_chin_rows$method3)
@@ -97,10 +103,19 @@ POPSIZE1R_chin.model <- matrix(list(0), n_chin, n_chin)
 diag(POPSIZE1R_chin.model) <- paste0("r", nosa_chin_rows$methodNo)
 
 # a
+scale6 <- "9Q3"
+  # sets relative value against which other survey methods will be scaled
+    # 9 -> dam counts - accurate (according to parsons and Skalski)
+    # 9s is the only 9 method that appears across all three species
+POPSIZE6a_chin.model <- matrix(list(0), n_chin, 1)
+for(i in 1:length(POPSIZE6a_chin.model)){
+  if(nosa_chin_rows$method6[i] != scale6){
+    POPSIZE6a_chin.model[i] <- paste0("a", nosa_chin_rows$method6[i])
+  }
+}
+
 scale3 <- "9M"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE3a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(POPSIZE3a_chin.model)){
   if(nosa_chin_rows$method3[i] != scale3){
@@ -109,9 +124,7 @@ for(i in 1:length(POPSIZE3a_chin.model)){
 }
 
 scale2 <- "9S"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE2a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(POPSIZE2a_chin.model)){
   if(nosa_chin_rows$method2[i] != scale2){
@@ -120,9 +133,7 @@ for(i in 1:length(POPSIZE2a_chin.model)){
 }
 
 scale1 <- "9"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE1a_chin.model <- matrix(list(0), n_chin, 1)
 for(i in 1:length(POPSIZE1a_chin.model)){
   if(nosa_chin_rows$methodNo[i] != scale1){
@@ -174,44 +185,69 @@ POPSIZE3mod_chin.list <- list(
   tinitx = 0
 )
 
+POPSIZE6mod_chin.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "equalvarcov",
+  Z = Z_chin.model,
+  A = POPSIZE6a_chin.model,
+  R = POPSIZE6R_chin.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
 # run MARSS models - chin
 # agnostic to pop size
-if(!file.exists(here::here("data", "clean", paste("POPSIZE1ssm_chinM", scale1, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE1ssm_chinM", scale1, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE1ssm_chin <- MARSS(nosa_chin, model = POPSIZE1mod_chin.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE1ssm_chin, file=here::here("data", "clean", paste("POPSIZE1ssm_chinM", scale1, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE1ssm_chin, file=here::here("data", "clean", paste("POPSIZE1ssm_chinM", scale1, "S6TEST.rds", sep="")))
   chin_time <- proc.time()[3] - ptm
   chin_time
 }
 # load in ssm_chin
-POPSIZE1ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE1ssm_chinM", scale1, "S3TEST.rds", sep="")))
+POPSIZE1ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE1ssm_chinM", scale1, "S6TEST.rds", sep="")))
 
 # large and small
-if(!file.exists(here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE2ssm_chin <- MARSS(nosa_chin, model = POPSIZE2mod_chin.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE2ssm_chin, file=here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE2ssm_chin, file=here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "S6TEST.rds", sep="")))
   chin_time <- proc.time()[3] - ptm
   chin_time
 }
 # load in ssm_chin
-POPSIZE2ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "S3TEST.rds", sep="")))
+POPSIZE2ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE2ssm_chinM", scale2, "S6TEST.rds", sep="")))
 
 # large, medium, and small
-if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE3ssm_chin <- MARSS(nosa_chin, model = POPSIZE3mod_chin.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE3ssm_chin, file=here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE3ssm_chin, file=here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S6TEST.rds", sep="")))
   chin_time <- proc.time()[3] - ptm
   chin_time
 }
 # load in ssm_chin
-POPSIZE3ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S3TEST.rds", sep="")))
+POPSIZE3ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_chinM", scale3, "S6TEST.rds", sep="")))
+
+# sixths
+if(!file.exists(here::here("data", "clean", paste("POPSIZE6ssm_chinM", scale6, "S6TEST.rds", sep="")))){
+  ptm <- proc.time()
+  POPSIZE6ssm_chin <- MARSS(nosa_chin, model = POPSIZE6mod_chin.list, method = "kem", control = con.list)
+  saveRDS(POPSIZE6ssm_chin, file=here::here("data", "clean", paste("POPSIZE6ssm_chinM", scale6, "S6TEST.rds", sep="")))
+  chin_time <- proc.time()[3] - ptm
+  chin_time
+}
+# load in ssm_chin
+POPSIZE6ssm_chin <- readRDS(file=here::here("data", "clean", paste("POPSIZE6ssm_chinM", scale6, "S6TEST.rds", sep="")))
 
 # check for best fit
 POPSIZE1ssm_chin$AICc
 POPSIZE2ssm_chin$AICc
 POPSIZE3ssm_chin$AICc
+POPSIZE6ssm_chin$AICc
+
 
 ### COHO
 # dividing into halfs and thirds requires sixths
@@ -264,6 +300,8 @@ nosa_coho_rows$method3 <- ifelse(nosa_coho_rows$nth %in% c("Q1", "Q2"), "S",
                                  ))
 nosa_coho_rows$method3 <- paste0(nosa_coho_rows$methodNo, "",nosa_coho_rows$method3)
 
+nosa_coho_rows$method6 <- nosa_coho_rows$method
+
 nosa_coho <- nosa_coho[-c(46)]
 colnames(nosa_coho) <- substr(colnames(nosa_coho), 8, 11)
 years <- colnames(nosa_coho)
@@ -272,8 +310,12 @@ nosa_coho <- as.matrix(nosa_coho)
 # set controls
 con.list <- list(maxit = 1000, allow.degen = TRUE)
 
-# build model cohoook
+# build model coho
 # R
+n_coho <- nrow(nosa_coho)
+POPSIZE6R_coho.model <- matrix(list(0), n_coho, n_coho)
+diag(POPSIZE6R_coho.model) <- paste0("r", nosa_coho_rows$method6)
+
 n_coho <- nrow(nosa_coho)
 POPSIZE3R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(POPSIZE3R_coho.model) <- paste0("r", nosa_coho_rows$method3)
@@ -287,10 +329,19 @@ POPSIZE1R_coho.model <- matrix(list(0), n_coho, n_coho)
 diag(POPSIZE1R_coho.model) <- paste0("r", nosa_coho_rows$methodNo)
 
 # a
+scale6 <- "9Q3"
+  # sets relative value against which other survey methods will be scaled
+    # 9 -> dam counts - accurate (according to parsons and Skalski)
+    # 9s is the only 9 method that appears across all three species
+POPSIZE6a_coho.model <- matrix(list(0), n_coho, 1)
+for(i in 1:length(POPSIZE6a_coho.model)){
+  if(nosa_coho_rows$method6[i] != scale6){
+    POPSIZE6a_coho.model[i] <- paste0("a", nosa_coho_rows$method6[i])
+  }
+}
+
 scale3 <- "9M"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE3a_coho.model <- matrix(list(0), n_coho, 1)
 for(i in 1:length(POPSIZE3a_coho.model)){
   if(nosa_coho_rows$method3[i] != scale3){
@@ -299,9 +350,7 @@ for(i in 1:length(POPSIZE3a_coho.model)){
 }
 
 scale2 <- "9S"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE2a_coho.model <- matrix(list(0), n_coho, 1)
 for(i in 1:length(POPSIZE2a_coho.model)){
   if(nosa_coho_rows$method2[i] != scale2){
@@ -310,9 +359,7 @@ for(i in 1:length(POPSIZE2a_coho.model)){
 }
 
 scale1 <- "9"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE1a_coho.model <- matrix(list(0), n_coho, 1)
 for(i in 1:length(POPSIZE1a_coho.model)){
   if(nosa_coho_rows$methodNo[i] != scale1){
@@ -364,44 +411,68 @@ POPSIZE3mod_coho.list <- list(
   tinitx = 0
 )
 
+POPSIZE6mod_coho.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "equalvarcov",
+  Z = Z_coho.model,
+  A = POPSIZE6a_coho.model,
+  R = POPSIZE6R_coho.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
 # run MARSS models - coho
 # agnostic to pop size
-if(!file.exists(here::here("data", "clean", paste("POPSIZE1ssm_cohoM", scale1, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE1ssm_cohoM", scale1, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE1ssm_coho <- MARSS(nosa_coho, model = POPSIZE1mod_coho.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE1ssm_coho, file=here::here("data", "clean", paste("POPSIZE1ssm_cohoM", scale1, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE1ssm_coho, file=here::here("data", "clean", paste("POPSIZE1ssm_cohoM", scale1, "S6TEST.rds", sep="")))
   coho_time <- proc.time()[3] - ptm
   coho_time
 }
 # load in ssm_coho
-POPSIZE1ssm_coho <- readRDS(file=here::here("data", "clean", paste("POPSIZE1ssm_cohoM", scale1, "S3TEST.rds", sep="")))
+POPSIZE1ssm_coho <- readRDS(file=here::here("data", "clean", paste("POPSIZE1ssm_cohoM", scale1, "S6TEST.rds", sep="")))
 
 # large and small
-if(!file.exists(here::here("data", "clean", paste("POPSIZE2ssm_cohoM", scale2, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE2ssm_cohoM", scale2, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE2ssm_coho <- MARSS(nosa_coho, model = POPSIZE2mod_coho.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE2ssm_coho, file=here::here("data", "clean", paste("POPSIZE2ssm_cohoM", scale2, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE2ssm_coho, file=here::here("data", "clean", paste("POPSIZE2ssm_cohoM", scale2, "S6TEST.rds", sep="")))
   coho_time <- proc.time()[3] - ptm
   coho_time
 }
 # load in ssm_coho
-POPSIZE2ssm_coho <- readRDS(file=here::here("data", "clean", paste("POPSIZE2ssm_cohoM", scale2, "S3TEST.rds", sep="")))
+POPSIZE2ssm_coho <- readRDS(file=here::here("data", "clean", paste("POPSIZE2ssm_cohoM", scale2, "S6TEST.rds", sep="")))
 
 # large, medium, and small
-if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_cohoM", scale3, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_cohoM", scale3, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE3ssm_coho <- MARSS(nosa_coho, model = POPSIZE3mod_coho.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE3ssm_coho, file=here::here("data", "clean", paste("POPSIZE3ssm_cohoM", scale3, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE3ssm_coho, file=here::here("data", "clean", paste("POPSIZE3ssm_cohoM", scale3, "S6TEST.rds", sep="")))
   coho_time <- proc.time()[3] - ptm
   coho_time
 }
 # load in ssm_coho
-POPSIZE3ssm_coho <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_cohoM", scale3, "S3TEST.rds", sep="")))
+POPSIZE3ssm_coho <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_cohoM", scale3, "S6TEST.rds", sep="")))
+
+# sixths
+if(!file.exists(here::here("data", "clean", paste("POPSIZE6ssm_cohoM", scale6, "S6TEST.rds", sep="")))){
+  ptm <- proc.time()
+  POPSIZE6ssm_coho <- MARSS(nosa_coho, model = POPSIZE6mod_coho.list, method = "kem", control = con.list)
+  saveRDS(POPSIZE6ssm_coho, file=here::here("data", "clean", paste("POPSIZE6ssm_cohoM", scale6, "S6TEST.rds", sep="")))
+  coho_time <- proc.time()[3] - ptm
+  coho_time
+}
+# load in ssm_coho
+POPSIZE6ssm_coho <- readRDS(file=here::here("data", "clean", paste("POPSIZE6ssm_cohoM", scale6, "S6TEST.rds", sep="")))
 
 # check for best fit
 POPSIZE1ssm_coho$AICc
 POPSIZE2ssm_coho$AICc
 POPSIZE3ssm_coho$AICc
+POPSIZE6ssm_coho$AICc
 
 
 ### STEL
@@ -455,6 +526,8 @@ nosa_stel_rows$method3 <- ifelse(nosa_stel_rows$nth %in% c("Q1", "Q2"), "S",
                                  ))
 nosa_stel_rows$method3 <- paste0(nosa_stel_rows$methodNo, "",nosa_stel_rows$method3)
 
+nosa_stel_rows$method6 <- nosa_stel_rows$method
+
 nosa_stel <- nosa_stel[-c(46)]
 colnames(nosa_stel) <- substr(colnames(nosa_stel), 8, 11)
 years <- colnames(nosa_stel)
@@ -463,8 +536,12 @@ nosa_stel <- as.matrix(nosa_stel)
 # set controls
 con.list <- list(maxit = 1000, allow.degen = TRUE)
 
-# build model stelook
+# build model steelhead
 # R
+n_stel <- nrow(nosa_stel)
+POPSIZE6R_stel.model <- matrix(list(0), n_stel, n_stel)
+diag(POPSIZE6R_stel.model) <- paste0("r", nosa_stel_rows$method6)
+
 n_stel <- nrow(nosa_stel)
 POPSIZE3R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(POPSIZE3R_stel.model) <- paste0("r", nosa_stel_rows$method3)
@@ -478,10 +555,18 @@ POPSIZE1R_stel.model <- matrix(list(0), n_stel, n_stel)
 diag(POPSIZE1R_stel.model) <- paste0("r", nosa_stel_rows$methodNo)
 
 # a
+scale6 <- "9Q3"
+  # sets relative value against which other survey methods will be scaled
+    # 9 -> dam counts - accurate (according to parsons and Skalski)
+    # 9s is the only 9 method that appears across all three species
+POPSIZE6a_stel.model <- matrix(list(0), n_stel, 1)
+for(i in 1:length(POPSIZE6a_stel.model)){
+  if(nosa_stel_rows$method6[i] != scale6){
+    POPSIZE6a_stel.model[i] <- paste0("a", nosa_stel_rows$method6[i])
+  }
+}
 scale3 <- "9M"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE3a_stel.model <- matrix(list(0), n_stel, 1)
 for(i in 1:length(POPSIZE3a_stel.model)){
   if(nosa_stel_rows$method3[i] != scale3){
@@ -490,9 +575,7 @@ for(i in 1:length(POPSIZE3a_stel.model)){
 }
 
 scale2 <- "9S"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE2a_stel.model <- matrix(list(0), n_stel, 1)
 for(i in 1:length(POPSIZE2a_stel.model)){
   if(nosa_stel_rows$method2[i] != scale2){
@@ -501,9 +584,7 @@ for(i in 1:length(POPSIZE2a_stel.model)){
 }
 
 scale1 <- "9"
-# sets relative value against which other survey methods will be scaled
-# 9 -> dam counts - accurate (according to parsons and Skalski)
-# 9s is the only 9 method that appears across all three species
+  # sets relative value against which other survey methods will be scaled
 POPSIZE1a_stel.model <- matrix(list(0), n_stel, 1)
 for(i in 1:length(POPSIZE1a_stel.model)){
   if(nosa_stel_rows$methodNo[i] != scale1){
@@ -555,41 +636,65 @@ POPSIZE3mod_stel.list <- list(
   tinitx = 0
 )
 
+POPSIZE6mod_stel.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "equalvarcov",
+  Z = Z_stel.model,
+  A = POPSIZE6a_stel.model,
+  R = POPSIZE6R_stel.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
 # run MARSS models - stel
 # agnostic to pop size
-if(!file.exists(here::here("data", "clean", paste("POPSIZE1ssm_stelM", scale1, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE1ssm_stelM", scale1, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE1ssm_stel <- MARSS(nosa_stel, model = POPSIZE1mod_stel.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE1ssm_stel, file=here::here("data", "clean", paste("POPSIZE1ssm_stelM", scale1, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE1ssm_stel, file=here::here("data", "clean", paste("POPSIZE1ssm_stelM", scale1, "S6TEST.rds", sep="")))
   stel_time <- proc.time()[3] - ptm
   stel_time
 }
 # load in ssm_stel
-POPSIZE1ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE1ssm_stelM", scale1, "S3TEST.rds", sep="")))
+POPSIZE1ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE1ssm_stelM", scale1, "S6TEST.rds", sep="")))
 
 # large and small
-if(!file.exists(here::here("data", "clean", paste("POPSIZE2ssm_stelM", scale2, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE2ssm_stelM", scale2, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE2ssm_stel <- MARSS(nosa_stel, model = POPSIZE2mod_stel.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE2ssm_stel, file=here::here("data", "clean", paste("POPSIZE2ssm_stelM", scale2, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE2ssm_stel, file=here::here("data", "clean", paste("POPSIZE2ssm_stelM", scale2, "S6TEST.rds", sep="")))
   stel_time <- proc.time()[3] - ptm
   stel_time
 }
 # load in ssm_stel
-POPSIZE2ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE2ssm_stelM", scale2, "S3TEST.rds", sep="")))
+POPSIZE2ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE2ssm_stelM", scale2, "S6TEST.rds", sep="")))
 
 # large, medium, and small
-if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale3, "S3TEST.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale3, "S6TEST.rds", sep="")))){
   ptm <- proc.time()
   POPSIZE3ssm_stel <- MARSS(nosa_stel, model = POPSIZE3mod_stel.list, method = "kem", control = con.list)
-  saveRDS(POPSIZE3ssm_stel, file=here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale3, "S3TEST.rds", sep="")))
+  saveRDS(POPSIZE3ssm_stel, file=here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale3, "S6TEST.rds", sep="")))
   stel_time <- proc.time()[3] - ptm
   stel_time
 }
 # load in ssm_stel
-POPSIZE3ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale3, "S3TEST.rds", sep="")))
+POPSIZE3ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE3ssm_stelM", scale3, "S6TEST.rds", sep="")))
+
+# sixths
+if(!file.exists(here::here("data", "clean", paste("POPSIZE6ssm_stelM", scale6, "S6TEST.rds", sep="")))){
+  ptm <- proc.time()
+  POPSIZE6ssm_stel <- MARSS(nosa_stel, model = POPSIZE6mod_stel.list, method = "kem", control = con.list)
+  saveRDS(POPSIZE6ssm_stel, file=here::here("data", "clean", paste("POPSIZE6ssm_stelM", scale6, "S6TEST.rds", sep="")))
+  stel_time <- proc.time()[3] - ptm
+  stel_time
+}
+# load in ssm_stel
+POPSIZE6ssm_stel <- readRDS(file=here::here("data", "clean", paste("POPSIZE6ssm_stelM", scale6, "S6TEST.rds", sep="")))
 
 # check for best fit
 POPSIZE1ssm_stel$AICc
 POPSIZE2ssm_stel$AICc
 POPSIZE3ssm_stel$AICc
+POPSIZE6ssm_stel$AICc
