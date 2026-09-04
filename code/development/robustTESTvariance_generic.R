@@ -11,7 +11,7 @@ options(max.print=2000)
 
 ## creating synthetic time series
 # set seed for reproducibility
-set.seed(694201)
+# set.seed(694201)
 
 # set params
 P_populations <- 30
@@ -155,7 +155,7 @@ test_data <- as.matrix(testW)
 
 ## model build
 # set controls
-con.list <- list(maxit = 3000, allow.degen = TRUE, trace = 1)
+con.list <- list(maxit = 1000, allow.degen = TRUE, trace = 1)
 
 # R
 n <- nrow(test_data)
@@ -183,14 +183,14 @@ mod.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
+# if(!file.exists(here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
   ptm <- proc.time()
   ssm <- MARSS(test_data, model = mod.list, method = "kem", control = con.list)
-  saveRDS(ssm, file=here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
+  # saveRDS(ssm, file=here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
   time <- proc.time()[3] - ptm
   time
-}
-ssm <- readRDS(file=here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
+# }
+# ssm <- readRDS(file=here::here("data", "clean", paste("ssmTEST_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
 
 # need to pull R. and Q. estimates from ssm
 fitted_matrices <- coef(ssm, type = "matrix")
@@ -200,14 +200,14 @@ fitted_R <- fitted_matrices$R
 fitted_R <- diag(fitted_R)
 
 # bootstrap vairance terms to create confidence intervals
-if(!file.exists(here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
+# if(!file.exists(here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))){
   ptm <- proc.time()
   boot <- MARSSboot(ssm, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
-  saveRDS(boot, file=here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
+  # saveRDS(boot, file=here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
   time <- proc.time()[3] - ptm
   time
-}
-boot <- readRDS(file=here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
+# }
+# boot <- readRDS(file=here::here("data", "clean", paste("ssmBOOT_generic-P", P_populations, "M", M_methods, "T", T_steps, ".rds", sep="")))
 
 # extract parameters
 boot_params <- boot$boot.params
