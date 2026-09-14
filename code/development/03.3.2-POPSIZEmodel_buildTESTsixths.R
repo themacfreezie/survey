@@ -494,7 +494,7 @@ nosa_stel$popmethod <- paste0(as.character(nosa_stel$PopID),"_", as.character(no
 # how often are particular survey methods used
 counts_stel <- table(nosa_stel$MethodNameID)
 counts_stel
-# 2 methods < 10 obs
+  # 2 methods < 10 obs
 
 # will drop those methods for which fewer than 10 observations exist
 # underlying must be the same for AICc comparsions to these drops will be based off MethodNameID, not MethodSizeID
