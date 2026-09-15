@@ -1,6 +1,8 @@
 ## SET WORKING DIR & PACKAGES
 library(ggrepel)
 library(here)
+library(readxl)
+library(reshape2)
 library(tidyverse)
 
 here::i_am("code/development/08.1-popvar_bymethod.R")

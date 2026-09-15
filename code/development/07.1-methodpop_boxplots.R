@@ -1,5 +1,6 @@
 ## SET WORKING DIR & PACKAGES
 library(here)
+library(readxl)
 library(tidyverse)
 
 here::i_am("code/development/07.1-methodpop_boxplots.R")
