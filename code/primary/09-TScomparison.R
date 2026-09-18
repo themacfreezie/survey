@@ -225,7 +225,13 @@ statecompare_chin <- ggplot(plotdata_chin, aes(x = Year, y = Value, color = Data
   theme(
     legend.position = "bottom",
     strip.text = element_text(face = "bold"),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
   )
 statecompare_chin
 
@@ -247,7 +253,13 @@ statecompare_coho <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Data
   theme(
     legend.position = "bottom",
     strip.text = element_text(face = "bold"),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
   )
 statecompare_coho
 
@@ -290,7 +302,13 @@ statecompare_stel <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dat
   theme(
     legend.position = "bottom",
     strip.text = element_text(face = "bold"),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
   )
 statecompare_stel
 

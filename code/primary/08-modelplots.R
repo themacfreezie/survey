@@ -141,6 +141,36 @@ chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 chinr_bplot
 
+chinPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group)) +
+  geom_boxplot(outlier.shape = NA) +
+  labs(x = NULL,
+       title='Chinook Precision Estimates',
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c", # dam counts
+                               # "#c772c5",
+                               "#5b3c90", # mixed methods
+                               # "#b85c37",
+                               "#b94656", # peak spawner count
+                               # "#b0457b",
+                               "#729a43", # AUC Population
+                               "#6d85db", # Redd counts
+                               "#4dc48f" # Weir counts
+  )) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
+  coord_cartesian(ylim = c(0, 25)) 
+chinPRECISION_bplot
+
 chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
   labs(y = 'Relative Bias (dam counts)',
@@ -306,6 +336,36 @@ cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   ) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 cohor_bplot
+
+cohoPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group)) +
+  geom_boxplot(outlier.shape = NA) +
+  labs(x = NULL,
+       title='Coho Precision Estimates',
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c", # dam counts
+                                "#c772c5", # AUC monitoring
+                                # "#5b3c90", # mixed methods
+                                # "#b85c37",
+                                "#b94656", # peak spawner count
+                                # "#b0457b",
+                                "#729a43" # AUC Population
+                                # "#6d85db", # Redd counts
+                                # "#4dc48f" # Weir counts
+  )) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
+  coord_cartesian(ylim = c(0, 20)) 
+cohoPRECISION_bplot
 
 coho_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
@@ -474,6 +534,37 @@ stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 30))
 stelr_bplot
+
+stelPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group)) +
+  geom_boxplot(outlier.shape = NA) +
+  labs(x = NULL,
+       title='Steelhead Precision Estimates',
+       y=NULL) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("#c1a13c", # dam counts
+                               # "#c772c5", # AUC monitoring
+                               # "#5b3c90", # mixed methods
+                               # "#b85c37",
+                               # "#b94656", # peak spawner count
+                               # "#b0457b",
+                               # "#729a43", # AUC Population
+                               "#6d85db", # Redd counts
+                               "#4dc48f" # Weir counts
+  )) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
+  coord_cartesian(ylim = c(0, 100)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 30))
+stelPRECISION_bplot
 
 stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +

@@ -557,3 +557,63 @@ ssm_stel_u2z2$AICc
   # 1385.541
 ssm_stel_u2z3$AICc
   # 1251.642
+
+## best fit models - a = "scaling"
+# pull in data
+ssm_chin_u1z3 <- readRDS(file=here::here("data", "clean", "ssm_chinM9.rds"))
+ssm_coho_u1z3 <- readRDS(file=here::here("data", "clean", "ssm_cohoM9.rds"))
+ssm_stel_u1z3 <- readRDS(file=here::here("data", "clean", "ssm_stelM9.rds"))
+
+mod_chin_u1z3SCALING.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "equalvarcov",
+  Z = Z_chin.model,
+  A = "scaling",
+  R = R_chin.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
+mod_coho_u1z3SCALING.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "equalvarcov",
+  Z = Z_coho.model,
+  A = "scaling",
+  R = R_coho.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
+mod_stel_u1z3SCALING.list <- list(
+  B = "identity",
+  U = "zero",
+  Q = "equalvarcov",
+  Z = Z_stel.model,
+  A = "scaling",
+  R = R_stel.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
+# fit scaling models
+ssm_chin_u1z3SCALING <- MARSS(nosa_chin, model = mod_chin_u1z3SCALING.list, method = "kem", control = con.list)
+ssm_coho_u1z3SCALING <- MARSS(nosa_coho, model = mod_coho_u1z3SCALING.list, method = "kem", control = con.list)
+ssm_stel_u1z3SCALING <- MARSS(nosa_stel, model = mod_stel_u1z3SCALING.list, method = "kem", control = con.list)
+
+# AICc comparison - should be like the same?
+ssm_chin_u1z3$AICc
+ssm_chin_u1z3SCALING$AICc
+
+ssm_coho_u1z3$AICc
+ssm_coho_u1z3SCALING$AICc
+
+ssm_stel_u1z3$AICc
+ssm_stel_u1z3SCALING$AICc
+
+ssm_stel_u1z3
+ssm_stel_u1z3SCALING

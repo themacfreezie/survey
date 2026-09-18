@@ -204,6 +204,45 @@ chin_vplot3 <- ggplot(data = nosa_chin, aes(x = MethodName, y = lnnosa, fill = G
   ) +
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
 
+chin_vplotORDERS <- ggplot(data = nosa_chin, aes(x = MethodName, y = lnnosa, fill = Group)) +
+  geom_violin(scale = "count", alpha = 0.8) +
+  geom_boxplot(width = 0.1, color = "black", linetype = "dashed", outlier.shape = NA, alpha = 0.2) +
+  geom_hline(yintercept = log(100), 
+             color = "red", linetype = "dashed", size = 1) +
+  geom_hline(yintercept = log(1000), 
+             color = "red", linetype = "dashed", size = 1) +
+  geom_text(aes(x = 0.5, y = log(100), label = "100"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  geom_text(aes(x = 0.5, y = log(1000), label = "1000"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  labs(
+    title = "Chinook",
+    x = "",
+    y = "ln(NOSA)"
+  ) +
+  scale_fill_manual(values = c("#c1a13c", # dam counts
+                               # "#c772c5",
+                               "#5b3c90", # mixed methods
+                               # "#b85c37",
+                               "#b94656", # peak spawner count
+                               # "#b0457b",
+                               "#729a43", # AUC Population
+                               "#6d85db", # Redd counts
+                               "#4dc48f" # Weir counts
+  )) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.title.y= element_text(size = 20),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9))
+
 # coho
 coho_bplot2 <- ggplot(data = nosa_coho, aes(x = MethodName, y = lnnosa, fill = Group)) +
   geom_boxplot() +
@@ -311,6 +350,49 @@ coho_vplot3 <- ggplot(data = nosa_coho, aes(x = MethodName, y = lnnosa, fill = G
              color = "red", linetype = "dashed", size = 1) +
   geom_hline(aes(yintercept = quantile(lnnosa, probs = 2/3, na.rm = TRUE)), 
              color = "red", linetype = "dashed", size = 1) +
+  labs(
+    title = "Coho",
+    x = "",
+    y = "ln(NOSA)"
+  ) +
+  scale_fill_manual(values = c("#c1a13c", # dam counts
+                               "#c772c5", # AUC monitoring
+                               # "#5b3c90", # mixed methods
+                               # "#b85c37",
+                               "#b94656", # peak spawner count
+                               # "#b0457b",
+                               "#729a43" # AUC Population
+                               # "#6d85db", # Redd counts
+                               # "#4dc48f" # Weir counts
+  )) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.title.y= element_text(size = 20),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) 
+
+coho_vplotORDERS <- ggplot(data = nosa_coho, aes(x = MethodName, y = lnnosa, fill = Group)) +
+  geom_violin(scale = "count", alpha = 0.8) +
+  geom_boxplot(width = 0.1, color = "black", linetype = "dashed", outlier.shape = NA, alpha = 0.2) +
+  geom_hline(yintercept = log(100), 
+             color = "red", linetype = "dashed", size = 1) +
+  geom_hline(yintercept = log(1000), 
+             color = "red", linetype = "dashed", size = 1) +
+  geom_hline(yintercept = log(10000), 
+             color = "red", linetype = "dashed", size = 1) +
+  geom_text(aes(x = 0.5, y = log(100), label = "100"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  geom_text(aes(x = 0.5, y = log(1000), label = "1000"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  geom_text(aes(x = 0.5, y = log(10000), label = "10000"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
   labs(
     title = "Coho",
     x = "",
@@ -478,6 +560,50 @@ stel_vplot3 <- ggplot(data = nosa_stel, aes(x = MethodName, y = lnnosa, fill = G
   theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 30))
 
+stel_vplotORDERS <- ggplot(data = nosa_stel, aes(x = MethodName, y = lnnosa, fill = Group)) +
+  geom_violin(scale = "count", alpha = 0.8) +
+  geom_boxplot(width = 0.1, color = "black", linetype = "dashed", outlier.shape = NA, alpha = 0.2) +
+  geom_hline(yintercept = log(100), 
+             color = "red", linetype = "dashed", size = 1) +
+  geom_hline(yintercept = log(1000), 
+             color = "red", linetype = "dashed", size = 1) +
+  geom_text(aes(x = 0.5, y = log(100), label = "100"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  geom_text(aes(x = 0.5, y = log(1000), label = "1000"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  labs(
+    title = "Steelhead",
+    x = "",
+    y = "ln(NOSA)"
+  ) +
+  scale_fill_manual(values = c("#c1a13c", # dam counts
+                               # "#c772c5", # AUC monitoring
+                               # "#5b3c90", # mixed methods
+                               # "#b85c37",
+                               # "#b94656", # peak spawner count
+                               # "#b0457b",
+                               # "#729a43", # AUC Population
+                               "#6d85db", # Redd counts
+                               "#4dc48f" # Weir counts
+  )) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.title.y= element_text(size = 20),
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  ) +
+  theme(axis.text.x = element_text(angle = 345, hjust = 0, vjust = 0.9)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 30))
+
 chin_vplot3 
 coho_vplot3 
 stel_vplot3 
+
+chin_vplotORDERS
+coho_vplotORDERS
+stel_vplotORDERS

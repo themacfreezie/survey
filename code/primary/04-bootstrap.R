@@ -10,13 +10,13 @@ here::i_am("code/primary/04-bootstrap.R")
 options(max.print=2000)
 
 # pull in data
-# ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chinM16.rds"))
-# ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM10.rds"))
-# ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM22.rds"))
-
 ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chinM9.rds"))
 ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM9.rds"))
 ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM9.rds"))
+
+ssm_chin_Ascaling <- readRDS(file=here::here("data", "clean", "ssm_chin_Ascaling.rds"))
+ssm_coho_Ascaling <- readRDS(file=here::here("data", "clean", "ssm_coho_Ascaling.rds"))
+ssm_stel_Ascaling <- readRDS(file=here::here("data", "clean", "ssm_stel_Ascaling.rds"))
 
 # bootstrap estimates
 boot_chin <- MARSSboot(ssm_chin, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
@@ -27,7 +27,15 @@ saveRDS(boot_coho, file=here::here("data", "clean", "ssmBOOT_cohoM9.rds"))
 
 boot_stel <- MARSSboot(ssm_stel, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
 saveRDS(boot_stel, file=here::here("data", "clean", "ssmBOOT_stelM9.rds"))
-  # results with hessian estimation find negative values for variance
+
+boot_chin_Ascaling <- MARSSboot(ssm_chin_Ascaling, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
+saveRDS(boot_chin_Ascaling, file=here::here("data", "clean", "ssmBOOT_chin_Ascaling.rds"))
+
+boot_coho_Ascaling <- MARSSboot(ssm_coho_Ascaling, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
+saveRDS(boot_coho_Ascaling, file=here::here("data", "clean", "ssmBOOT_coho_Ascaling.rds"))
+
+boot_stel_Ascaling <- MARSSboot(ssm_stel_Ascaling, nboot=10000, output="parameters", sim = "parametric", param.gen = "hessian")
+saveRDS(boot_stel_Ascaling, file=here::here("data", "clean", "ssmBOOT_stel_Ascaling.rds"))
 
 # # going to try running bootstraps in parallel to speed this up
 # num_cores <- detectCores() - 1 # leave one core free for your OS
