@@ -104,6 +104,9 @@ dfchin <- boot_chinM9$boot.params
 dfchin <- data.frame(t(dfchin))
 dfchin_r <- dfchin[, -c(1:8, 18:41)]
 
+dfchin_pre <- dfchin_r
+dfchin_pre[] <- 1/dfchin_pre
+
 dfcoho <- boot_cohoM9$boot.params
 dfcoho <- data.frame(t(dfcoho))
 dfcoho_r <- dfcoho[, -c(1:9, 20:49)]
@@ -117,6 +120,13 @@ names_r <- colnames(dfchin_r)
 mean_r <- sapply(dfchin_r, mean)
 sd_r <- sapply(dfchin_r, sd)
 pointschin_r <- data.frame(Method = names_r, mean_r = mean_r, sd_r = sd_r)
+pointschin_r$mean_pre <- (1/pointschin_r$mean_r)
+pointschin_r$sd_pre <- (1/pointschin_r$sd_r)
+
+names_pre <- colnames(dfchin_pre)
+mean_pre <- sapply(dfchin_pre, mean)
+sd_pre <- sapply(dfchin_pre, sd)
+pointschin_pre <- data.frame(Method = names_pre, mean_pre = mean_pre, sd_pre = sd_pre)
 
 names_r <- colnames(dfcoho_r)
 mean_r <- sapply(dfcoho_r, mean)
@@ -499,8 +509,8 @@ stel_splotTRUNC <- ggplot(data=points_stelTRUNC, aes(x = mean_r, y = mean_lnnosa
   geom_point(size = 3) +
   geom_smooth(aes(group = 1), method = "lm", color = "black", se = TRUE, linetype = "dashed", linewidth = 1) + 
   labs(y = 'ln(NOSA)',
-       title ='Steelhead - Method 22 omitted',
-       subtitle = 'Method 22 = Total redd counts * Fish per redd estimate',
+       title ="Steelhead - 'Total redd counts * Fish per redd estimate' omitted",
+       # subtitle = 'Method 22 = Total redd counts * Fish per redd estimate',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 # "#c772c5", # AUC monitoring
@@ -537,14 +547,12 @@ stel_splotTRUNC <- ggplot(data=points_stelTRUNC, aes(x = mean_r, y = mean_lnnosa
   )
 stel_splotTRUNC
 
-points_stelTRUNC <- points_stel %>%
-  filter(mean_r <= 0.5)
-stel_splotTRUNC <- ggplot(data=points_stelTRUNC, aes(x = mean_r, y = mean_lnnosa, color = Group)) +
+stel_splotTRUNCref <- ggplot(data=points_stelTRUNC, aes(x = mean_r, y = mean_lnnosa, color = Group)) +
   geom_point(size = 3) +
   geom_smooth(aes(group = 1), method = "lm", color = "black", se = TRUE, linetype = "dashed", linewidth = 1) + 
   labs(y = 'ln(NOSA)',
-       title ='Steelhead - Method 22 omitted',
-       subtitle = 'Method 22 = Total redd counts * Fish per redd estimate',
+       title ="Steelhead - 'Total redd counts * Fish per redd estimate' omitted",
+       # subtitle = 'Method 22 = Total redd counts * Fish per redd estimate',
        x = 'Variance') +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 # "#c772c5", # AUC monitoring
@@ -590,4 +598,4 @@ stel_splotTRUNC <- ggplot(data=points_stelTRUNC, aes(x = mean_r, y = mean_lnnosa
     panel.grid = element_blank(),
     legend.position = "right"
   )
-stel_splotTRUNC
+stel_splotTRUNCref
