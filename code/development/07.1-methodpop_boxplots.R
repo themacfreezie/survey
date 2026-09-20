@@ -176,6 +176,10 @@ chin_vplot3 <- ggplot(data = nosa_chin, aes(x = MethodName, y = lnnosa, fill = G
              color = "red", linetype = "dashed", size = 1) +
   geom_hline(aes(yintercept = quantile(lnnosa, probs = 2/3, na.rm = TRUE)), 
              color = "red", linetype = "dashed", size = 1) +
+  geom_text(aes(x = 0.5, y = quantile(lnnosa, probs = 1/3, na.rm = TRUE), label = "1/3"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  geom_text(aes(x = 0.5, y = quantile(lnnosa, probs = 2/3, na.rm = TRUE), label = "2/3"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
   labs(
     title = "Chinook",
     x = "",
@@ -216,7 +220,7 @@ chin_vplotORDERS <- ggplot(data = nosa_chin, aes(x = MethodName, y = lnnosa, fil
   geom_text(aes(x = 0.5, y = log(1000), label = "1000"), 
             color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
   labs(
-    title = "Chinook",
+    title = "Chinook Survey Methods by Population Size",
     x = "",
     y = "ln(NOSA)"
   ) +
@@ -350,6 +354,10 @@ coho_vplot3 <- ggplot(data = nosa_coho, aes(x = MethodName, y = lnnosa, fill = G
              color = "red", linetype = "dashed", size = 1) +
   geom_hline(aes(yintercept = quantile(lnnosa, probs = 2/3, na.rm = TRUE)), 
              color = "red", linetype = "dashed", size = 1) +
+  geom_text(aes(x = 0.5, y = quantile(lnnosa, probs = 1/3, na.rm = TRUE), label = "1/3"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  geom_text(aes(x = 0.5, y = quantile(lnnosa, probs = 2/3, na.rm = TRUE), label = "2/3"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
   labs(
     title = "Coho",
     x = "",
@@ -394,7 +402,7 @@ coho_vplotORDERS <- ggplot(data = nosa_coho, aes(x = MethodName, y = lnnosa, fil
   geom_text(aes(x = 0.5, y = log(10000), label = "10000"), 
             color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
   labs(
-    title = "Coho",
+    title = "Coho Survey Methods by Population Size",
     x = "",
     y = "ln(NOSA)"
   ) +
@@ -531,6 +539,10 @@ stel_vplot3 <- ggplot(data = nosa_stel, aes(x = MethodName, y = lnnosa, fill = G
              color = "red", linetype = "dashed", size = 1) +
   geom_hline(aes(yintercept = quantile(lnnosa, probs = 2/3, na.rm = TRUE)), 
              color = "red", linetype = "dashed", size = 1) +
+  geom_text(aes(x = 0.5, y = quantile(lnnosa, probs = 1/3, na.rm = TRUE), label = "1/3"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
+  geom_text(aes(x = 0.5, y = quantile(lnnosa, probs = 2/3, na.rm = TRUE), label = "2/3"), 
+            color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
   labs(
     title = "Steelhead",
     x = "",
@@ -572,7 +584,7 @@ stel_vplotORDERS <- ggplot(data = nosa_stel, aes(x = MethodName, y = lnnosa, fil
   geom_text(aes(x = 0.5, y = log(1000), label = "1000"), 
             color = "red", size = 5, vjust = 1.2, hjust = 0, inherit.aes = FALSE) +
   labs(
-    title = "Steelhead",
+    title = "Steelhead Survey Methods by Population Size",
     x = "",
     y = "ln(NOSA)"
   ) +
