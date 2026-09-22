@@ -276,12 +276,12 @@ statecompare_coho
 #   theme(
 #     legend.position = "bottom",
 #     strip.text = element_text(face = "bold") # Makes PopID headers bold
-#   ) +  
+#   ) +
 #   theme(
 #     panel.grid = element_blank()
 #   )
 # statecompare_stel
-# youngs bay is kind of ridiculous here (only 2 obs) - will drop from plot
+# # youngs bay is kind of ridiculous here (only 2 obs) - will drop from plot
 
 plotdata_stel2 <- plotdata_stel[plotdata_stel$COMMONPOPNAME != "Youngs Bay", ]
 statecompare_stel <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
@@ -411,3 +411,214 @@ popdiff_stel <- popdiff_stel %>%
 save(popdiff_chin, file=here("data", "clean", "popdiff_chin.Rda"))
 save(popdiff_coho, file=here("data", "clean", "popdiff_coho.Rda"))
 save(popdiff_stel, file=here("data", "clean", "popdiff_stel.Rda"))
+
+# how often do observations occur within 95% CIs?
+aligned_data <- plotdata_chin %>%
+  filter(Dataset == "observed") %>%
+  select(PopID, Year, COMMONPOPNAME, observed_value = Value) %>%
+  left_join(
+    plotdata_chin %>%
+      filter(Dataset == "fitted") %>%
+      select(PopID, Year, lower95, upper95),
+    by = c("PopID", "Year")
+  ) %>%
+  mutate(in_ci = observed_value >= lower95 & observed_value <= upper95)
+popsummary_chin <- aligned_data %>%
+  group_by(PopID, COMMONPOPNAME) %>%
+  summarize(
+    pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
+    total_years = sum(!is.na(in_ci)),
+    .groups = "drop"
+  )
+overall_row <- aligned_data %>%
+  summarize(
+    PopID = NA,
+    COMMONPOPNAME = "OVERALL ACCURACY",
+    pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
+    total_years = NA
+  )
+CIsummary_chin <- bind_rows(pop_summary, overall_row)
+CIsummary_chin <- CIsummary_chin[-c(1)]
+# colnames(CIsummary_chin) <- c("Population", "Within CI", "Years surveyed")
+
+aligned_data <- plotdata_coho %>%
+  filter(Dataset == "observed") %>%
+  select(PopID, Year, COMMONPOPNAME, observed_value = Value) %>%
+  left_join(
+    plotdata_coho %>%
+      filter(Dataset == "fitted") %>%
+      select(PopID, Year, lower95, upper95),
+    by = c("PopID", "Year")
+  ) %>%
+  mutate(in_ci = observed_value >= lower95 & observed_value <= upper95)
+popsummary_coho <- aligned_data %>%
+  group_by(PopID, COMMONPOPNAME) %>%
+  summarize(
+    pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
+    total_years = sum(!is.na(in_ci)),
+    .groups = "drop"
+  )
+overall_row <- aligned_data %>%
+  summarize(
+    PopID = NA,
+    COMMONPOPNAME = "OVERALL ACCURACY",
+    pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
+    total_years = NA
+  )
+CIsummary_coho <- bind_rows(pop_summary, overall_row)
+CIsummary_coho <- CIsummary_coho[-c(1)]
+colnames(CIsummary_coho) <- c("Population", "Within CI", "Years surveyed")
+
+aligned_data <- plotdata_stel2 %>%
+  filter(Dataset == "observed") %>%
+  select(PopID, Year, COMMONPOPNAME, observed_value = Value) %>%
+  left_join(
+    plotdata_stel2 %>%
+      filter(Dataset == "fitted") %>%
+      select(PopID, Year, lower95, upper95),
+    by = c("PopID", "Year")
+  ) %>%
+  mutate(in_ci = observed_value >= lower95 & observed_value <= upper95)
+popsummary_stel <- aligned_data %>%
+  group_by(PopID, COMMONPOPNAME) %>%
+  summarize(
+    pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
+    total_years = sum(!is.na(in_ci)),
+    .groups = "drop"
+  )
+overall_row <- aligned_data %>%
+  summarize(
+    PopID = NA,
+    COMMONPOPNAME = "OVERALL ACCURACY",
+    pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
+    total_years = NA
+  )
+CIsummary_stel <- bind_rows(pop_summary, overall_row)
+CIsummary_stel <- CIsummary_stel[-c(1)]
+colnames(CIsummary_stel) <- c("Population", "Within CI", "Years surveyed")
+
+print(CIsummary_chin)
+print(CIsummary_coho)
+print(CIsummary_stel)
+
+# state compare plots w/ percentages
+plot_labels <- popsummary_chin %>%
+  mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
+statecompare_chinPCT <- ggplot(plotdata_chin, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  geom_text(
+    data = plot_labels,
+    aes(x = -Inf, y = -Inf, label = accuracy_label),
+    color = "black",
+    size = 4,              # Adjust size of text here
+    fontface = "bold",
+    hjust = -0.4,           # Pushes text slightly left from the right edge
+    vjust = -0.8,           # Pushes text slightly down from the top edge
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Chinook population time series comparison by ESU (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_chinPCT
+
+plot_labels <- popsummary_coho %>%
+  mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
+statecompare_cohoPCT <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  geom_text(
+    data = plot_labels,
+    aes(x = -Inf, y = -Inf, label = accuracy_label),
+    color = "black",
+    size = 4,              # Adjust size of text here
+    fontface = "bold",
+    hjust = -0.4,           # Pushes text slightly left from the right edge
+    vjust = -0.8,           # Pushes text slightly down from the top edge
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Coho population time series comparison by ESU (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_cohoPCT
+
+plot_labels <- popsummary_stel %>%
+  mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
+
+statecompare_stelPCT <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  geom_text(
+    data = plot_labels,
+    aes(x = -Inf, y = -Inf, label = accuracy_label),
+    color = "black",
+    size = 4,              # Adjust size of text here
+    fontface = "bold",
+    hjust = -0.4,           # Pushes text slightly left from the right edge
+    vjust = -0.8,           # Pushes text slightly down from the top edge
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Steelhead population time series comparison by ESU (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_stelPCT
