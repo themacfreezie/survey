@@ -216,6 +216,11 @@ for(i in 1:length(a_chin.model)){
   }
 }
 
+a_chin.modelFULL <- matrix(list(0), n_chin, 1)
+for(i in 1:length(a_chin.modelFULL)){
+    a_chin.modelFULL[i] <- paste0("a", nosa_chin_rows$method[i])
+}
+
 # Z
 pops_chin <- c(unique(nosa_chin_rows$popid))
 Z_chin.model <- matrix(0, nrow=nrow(nosa_chin), ncol=length(unique(nosa_chin_rows$popid)))
@@ -241,7 +246,7 @@ mod_chinSCALING.list <- list(
   U = "zero",
   Q = "equalvarcov",
   Z = Z_chin.model,
-  A = "scaling",
+  A = a_chin.modelFULL,
   R = R_chin.model,
   x0 = "equal",
   V0 = "zero",
@@ -259,15 +264,15 @@ if(!file.exists(here::here("data", "clean", paste("ssm_chinM", scale, ".rds", se
 # load in ssm_chin
 ssm_chin <- readRDS(file=here::here("data", "clean", paste("ssm_chinM", scale, ".rds", sep="")))
 
-if(!file.exists(here::here("data", "clean", paste("ssm_chin_Ascaling.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_chin_Afull.rds", sep="")))){
   ptm <- proc.time()
-  ssm_chin_Ascaling <- MARSS(nosa_chin, model = mod_chinSCALING.list, method = "kem", control = con.list)
-  saveRDS(ssm_chin_Ascaling, file=here::here("data", "clean", paste("ssm_chin_Ascaling.rds", sep="")))
-  chin_time_Ascaling <- proc.time()[3] - ptm
-  chin_time_Ascaling
+  ssm_chin_Afull <- MARSS(nosa_chin, model = mod_chinSCALING.list, method = "kem", control = con.list)
+  saveRDS(ssm_chin_Afull, file=here::here("data", "clean", paste("ssm_chin_Afull.rds", sep="")))
+  chin_time_Afull <- proc.time()[3] - ptm
+  chin_time_Afull
 }
-# load in ssm_chin_Ascaling
-ssm_chin_Ascaling <- readRDS(file=here::here("data", "clean", paste("ssm_chin_Ascaling.rds", sep="")))
+# load in ssm_chin_Afull
+ssm_chin_Afull <- readRDS(file=here::here("data", "clean", paste("ssm_chin_Afull.rds", sep="")))
 
 ## model coho
 # constructing R and a and Z
@@ -284,6 +289,11 @@ for(i in 1:length(a_coho.model)){
   if(nosa_coho_rows$method[i] != scale){
     a_coho.model[i] <- paste0("a", nosa_coho_rows$method[i])
   }
+}
+
+a_coho.modelFULL <- matrix(list(0), n_coho, 1)
+for(i in 1:length(a_coho.modelFULL)){
+  a_coho.modelFULL[i] <- paste0("a", nosa_coho_rows$method[i])
 }
 
 # Z
@@ -311,7 +321,7 @@ mod_cohoSCALING.list <- list(
   U = "zero",
   Q = "equalvarcov",
   Z = Z_coho.model,
-  A = "scaling",
+  A = a_coho.modelFULL,
   R = R_coho.model,
   x0 = "equal",
   V0 = "zero",
@@ -329,15 +339,15 @@ if(!file.exists(here::here("data", "clean", paste("ssm_cohoM", scale, ".rds", se
 # load in ssm_coho
 ssm_coho <- readRDS(file=here::here("data", "clean", paste("ssm_cohoM", scale, ".rds", sep="")))
 
-if(!file.exists(here::here("data", "clean", paste("ssm_coho_Ascaling.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_coho_Afull.rds", sep="")))){
   ptm <- proc.time()
-  ssm_coho_Ascaling <- MARSS(nosa_coho, model = mod_cohoSCALING.list, method = "kem", control = con.list)
-  saveRDS(ssm_coho_Ascaling, file=here::here("data", "clean", paste("ssm_coho_Ascaling.rds", sep="")))
-  coho_time_Ascaling <- proc.time()[3] - ptm
-  coho_time_Ascaling
+  ssm_coho_Afull <- MARSS(nosa_coho, model = mod_cohoSCALING.list, method = "kem", control = con.list)
+  saveRDS(ssm_coho_Afull, file=here::here("data", "clean", paste("ssm_coho_Afull.rds", sep="")))
+  coho_time_Afull <- proc.time()[3] - ptm
+  coho_time_Afull
 }
-# load in ssm_coho_Ascaling
-ssm_coho_Ascaling <- readRDS(file=here::here("data", "clean", paste("ssm_coho_Ascaling.rds", sep="")))
+# load in ssm_coho_Afull
+ssm_coho_Afull <- readRDS(file=here::here("data", "clean", paste("ssm_coho_Afull.rds", sep="")))
 
 ## model steelhead
 # constructing R and a and Z
@@ -354,6 +364,11 @@ for(i in 1:length(a_stel.model)){
   if(nosa_stel_rows$method[i] != scale){
     a_stel.model[i] <- paste0("a", nosa_stel_rows$method[i])
   }
+}
+
+a_stel.modelFULL <- matrix(list(0), n_stel, 1)
+for(i in 1:length(a_stel.modelFULL)){
+  a_stel.modelFULL[i] <- paste0("a", nosa_stel_rows$method[i])
 }
 
 # Z
@@ -381,7 +396,7 @@ mod_stelSCALING.list <- list(
   U = "zero",
   Q = "equalvarcov",
   Z = Z_stel.model,
-  A = "scaling",
+  A = a_stel.modelFULL,
   R = R_stel.model,
   x0 = "equal",
   V0 = "zero",
@@ -399,12 +414,15 @@ if(!file.exists(here::here("data", "clean", paste("ssm_stelM", scale, ".rds", se
 # load in ssm_stel
 ssm_stel <- readRDS(file=here::here("data", "clean", paste("ssm_stelM", scale, ".rds", sep="")))
 
-if(!file.exists(here::here("data", "clean", paste("ssm_stel_Ascaling.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_stel_Afull.rds", sep="")))){
   ptm <- proc.time()
-  ssm_stel_Ascaling <- MARSS(nosa_stel, model = mod_stelSCALING.list, method = "kem", control = con.list)
-  saveRDS(ssm_stel_Ascaling, file=here::here("data", "clean", paste("ssm_stel_Ascaling.rds", sep="")))
-  stel_time_Ascaling <- proc.time()[3] - ptm
-  stel_time_Ascaling
+  ssm_stel_Afull <- MARSS(nosa_stel, model = mod_stelSCALING.list, method = "kem", control = con.list)
+  saveRDS(ssm_stel_Afull, file=here::here("data", "clean", paste("ssm_stel_Afull.rds", sep="")))
+  stel_time_Afull <- proc.time()[3] - ptm
+  stel_time_Afull
 }
-# load in ssm_stel_Ascaling
-ssm_stel_Ascaling <- readRDS(file=here::here("data", "clean", paste("ssm_stel_Ascaling.rds", sep="")))
+# load in ssm_stel_Afull
+ssm_stel_Afull <- readRDS(file=here::here("data", "clean", paste("ssm_stel_Afull.rds", sep="")))
+
+ssm_stel
+ssm_stel_Afull
