@@ -11,9 +11,9 @@ options(max.print=2000)
 # ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM10.rds"))
 # ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM22.rds"))
 
-ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chinM9.rds"))
-ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM9.rds"))
-ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM9.rds"))
+ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_Afull.rds"))
+ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
+ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_Afull.rds"))
 
 load(here("data", "clean", "nosa_codes.Rda"))
 nosa <- merge
