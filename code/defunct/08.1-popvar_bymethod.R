@@ -16,9 +16,9 @@ legend <- read_excel(here("data", "clean", "method_key.xlsx"), col_names = TRUE)
 legend$MethodNameID <- legend$Method
 legend <- legend[-c(1)]
 
-boot_chinM9 <- readRDS(here("data", "clean", "ssmBOOT_chinM9.rds"))
-boot_cohoM9 <- readRDS(here("data", "clean", "ssmBOOT_cohoM9.rds"))
-boot_stelM9 <- readRDS(here("data", "clean", "ssmBOOT_stelM9.rds"))
+boot_chinM9 <- readRDS(here("data", "clean", "ssmBOOT_chin_Afull.rds"))
+boot_cohoM9 <- readRDS(here("data", "clean", "ssmBOOT_coho_Afull.rds"))
+boot_stelM9 <- readRDS(here("data", "clean", "ssmBOOT_stel_Afull.rds"))
 
 # natural log of counts
 nosa$lnnosa <- log(nosa$NOSA + 1)

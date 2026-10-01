@@ -93,7 +93,7 @@ outline_panels_clipped <- lapply(1:nrow(sf_outlines), function(i) {
     )
 })
 esu_panels_clipped <- wrap_plots(outline_panels_clipped, nrow = 3)
-esu_panels_clipped
+# esu_panels_clipped
 # I think it's 4 and 104
 
 # preplots
@@ -385,7 +385,10 @@ coho_AR_choro <- doink + inset_element(inset_context,
 
 ## iterated bias and precision by esu
 # bias
-outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+outline_ids <- unique(sf_outlines$DPS_IDtrunc)
+max_abs_bias <- max(abs(sf_coho_nad83col$mean_a), na.rm = TRUE)
+bias_lims <- c(-max_abs_bias, max_abs_bias)
+custom_lims <- c(-0.15, 0.15)
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   
   # select the single focus polygon
@@ -401,30 +404,48 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   # build the map
   p <- ggplot() +
     annotation_map_tile(type = "hotstyle", zoom = 10) +
-    # Background: Full muted choropleth
     geom_sf(data = sf_coho_nad83col, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = FALSE) +
-    # Shroud: Semi-opaque white layer
     geom_sf(data = st_union(sf_coho_nad83col), fill = "white", alpha = 0.7, color = NA) +
-    # Highlight: Clipped data only
     geom_sf(data = focus_data_clipped, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = TRUE) +
-    # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
     coord_sf(crs = crsSET) + 
-    scale_fill_viridis_c(option = palette, name = "Bias") + 
+    scale_fill_distiller(palette = "RdBu", 
+                         name = "Bias", 
+                         # direction = 1, 
+                         limits = custom_lims,
+                         oob = scales::squish, 
+                         breaks = c(custom_lims[1], seq(from = custom_lims[1], to = custom_lims[2], by = 0.1), custom_lims[2]),
+                         labels = function(x) {
+                           min_lim <- custom_lims[1]
+                           max_lim <- custom_lims[2]
+                           # format labels conditionally based on limits
+                           case_when(
+                             x == min_lim ~ paste0("≤ ", x),
+                             x == max_lim ~ paste0("≥ ", x),
+                             TRUE         ~ paste0(x)
+                           )
+                         }
+    ) +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
 
 doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average bias - coho surveys (1980 - 2024)",
-                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))) &
+  theme(legend.title = element_text(size = 14, face = "bold"), 
+        legend.text  = element_text(size = 12))
 cohoBias_panel <- doink + inset_element(inset_context, 
                                         left = 0.85, bottom = 0.05, 
                                         right = 1.15, top = 0.3)
 cohoBias_panel
 
 # Precision
-outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+sf_coho_nad83col$precision <- (1/sf_coho_nad83col$mean_R)
+outline_ids <- unique(sf_outlines$DPS_IDtrunc)
+max_precision <- max(abs(sf_coho_nad83col$precision), na.rm = TRUE)
+precision_lims <- c(0, max_precision)
+rdbu_upper_half <- rev(RColorBrewer::brewer.pal(9, "RdBu")[1:5])
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   
   # select the single focus polygon
@@ -449,14 +470,16 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
     coord_sf(crs = crsSET) + 
-    scale_fill_viridis_c(option = palette, name = "Precision") + 
+    scale_fill_gradientn(colors = rdbu_upper_half, name = "Precision", limits = precision_lims) + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
 
 doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average precision - coho surveys (1980 - 2024)",
-                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))) &
+  theme(legend.title = element_text(size = 14, face = "bold"), 
+        legend.text  = element_text(size = 12))
 cohoPre_panel <- doink + inset_element(inset_context, 
                                        left = 0.85, bottom = 0.05, 
                                        right = 1.15, top = 0.3)

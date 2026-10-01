@@ -15,9 +15,9 @@ here::i_am("code/primary/09.1-TScomparisonESU.R")
 options(max.print=2000)
 
 # pull in data - model objects
-ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_ESUchinM9.rds"))
-ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_ESUcohoM9.rds"))
-ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_ESUstelM9.rds"))
+ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_ESUchin_Afull.rds")) # these don't exist yet
+ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_ESUcoho_Afull.rds"))
+ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_ESUstel_Afull.rds"))
 
 # ESU level abundance data
 load(file=here::here("data", "clean", "nosa_chinESU.Rda"))
@@ -213,9 +213,9 @@ ggplot(data = nosa_stel_plotted, aes(x = Year, y = lnnosa, color = Dataset)) +
 
 # let's try using aggregated data from pop level modeling..
 # pull in data - model objects
-ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chinM9.rds"))
-ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM9.rds"))
-ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM9.rds"))
+ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_Afull.rds"))
+ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
+ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_Afull.rds"))
 
 # pull in data - pop list
 load(file=here::here("data", "clean", "populations_list.Rda"))

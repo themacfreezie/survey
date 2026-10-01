@@ -124,7 +124,7 @@ stel_a <- main_map + inset_element(inset_context,
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
 # stel_a
-ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=300)
+# ggsave(here("output", "figures", "stel_a.png"), plot=stel_a, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(type = "hotstyle", zoom = 10) + 
@@ -146,7 +146,7 @@ stel_r <- main_map + inset_element(inset_context,
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
 # stel_r
-ggsave(here("output", "figures", "stel_r.png"), plot=stel_r, device="png", dpi=300)
+# ggsave(here("output", "figures", "stel_r.png"), plot=stel_r, device="png", dpi=300)
 
 sf_stel_nad83col$precision <- (1/sf_stel_nad83col$mean_R)
 
@@ -170,7 +170,7 @@ stel_pre <- main_map + inset_element(inset_context,
                                    left = 0.7, bottom = 0.05, 
                                    right = 0.98, top = 0.3)
 # stel_pre
-ggsave(here("output", "figures", "stel_pre.png"), plot=stel_pre, device="png", dpi=300)
+# ggsave(here("output", "figures", "stel_pre.png"), plot=stel_pre, device="png", dpi=300)
 
 main_map <- ggplot(data = sf_stel_nad83col) +
   annotation_map_tile(
@@ -195,7 +195,7 @@ stel_pop <- main_map + inset_element(inset_context,
                                      left = 0.7, bottom = 0.05, 
                                      right = 0.98, top = 0.3)
 # stel_pop
-ggsave(here("output", "figures", "stel_pop.png"), plot=stel_pop, device="png", dpi=300)
+# ggsave(here("output", "figures", "stel_pop.png"), plot=stel_pop, device="png", dpi=300)
 
 # choropleths
 data <- bi_class(sf_stel_nad83col, x = mean_lnnosa, y = mean_R, style = "equal", dim = 4)
@@ -297,7 +297,10 @@ stel_AR_choro <- final_plot + inset_element(inset_context,
 
 # iterated bias and precision by esu
 # bias
-outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+outline_ids <- unique(sf_outlines$DPS_IDtrunc)
+max_abs_bias <- max(abs(sf_stel_nad83col$mean_a), na.rm = TRUE)
+bias_lims <- c(-max_abs_bias, max_abs_bias)
+custom_lims <- c(-0.15, 0.15)
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   
   # select the single focus polygon
@@ -322,21 +325,43 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
     coord_sf(crs = crsSET) + 
-    scale_fill_viridis_c(option = palette, name = "Bias") + 
+    scale_fill_distiller(palette = "RdBu", 
+                         name = "Bias", 
+                         # direction = 1, 
+                         limits = custom_lims,
+                         oob = scales::squish, 
+    breaks = c(custom_lims[1], seq(from = custom_lims[1], to = custom_lims[2], by = 0.1), custom_lims[2]),
+    labels = function(x) {
+    min_lim <- custom_lims[1]
+    max_lim <- custom_lims[2]
+    # format labels conditionally based on limits
+    case_when(
+      x == min_lim ~ paste0("≤ ", x),
+      x == max_lim ~ paste0("≥ ", x),
+      TRUE         ~ paste0(x)
+    )
+  }
+) +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
 
 doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average bias - steelhead surveys (1980 - 2024)",
-                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))) &
+  theme(legend.title = element_text(size = 14, face = "bold"), 
+    legend.text  = element_text(size = 12))
 stelBias_panel <- doink + inset_element(inset_context, 
                                          left = 0.7, bottom = 0.05, 
                                          right = 1.1, top = 0.35)
 stelBias_panel
 
 # Precision
+sf_stel_nad83col$precision <- (1/sf_stel_nad83col$mean_R)
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+max_precision <- max(abs(sf_stel_nad83col$precision), na.rm = TRUE)
+precision_lims <- c(0, max_precision)
+rdbu_upper_half <- rev(RColorBrewer::brewer.pal(9, "RdBu")[1:5])
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   
   # select the single focus polygon
@@ -361,14 +386,16 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     # Outline: Crisp black border
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
     coord_sf(crs = crsSET) + 
-    scale_fill_viridis_c(option = palette, name = "Precision") + 
+    scale_fill_gradientn(colors = rdbu_upper_half, name = "Precision", limits = precision_lims) +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
 
 doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average precision - steelhead surveys (1980 - 2024)",
-                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))) &
+  theme(legend.title = element_text(size = 14, face = "bold"), 
+        legend.text  = element_text(size = 12))
 stelPre_panel <- doink + inset_element(inset_context, 
                                             left = 0.7, bottom = 0.05, 
                                             right = 1.1, top = 0.35)
