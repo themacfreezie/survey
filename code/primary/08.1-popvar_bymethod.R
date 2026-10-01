@@ -5,7 +5,7 @@ library(readxl)
 library(reshape2)
 library(tidyverse)
 
-here::i_am("code/development/08.1-popvar_bymethod.R")
+here::i_am("code/primary/08.1-popvar_bymethod.R")
 options(max.print=2000)
 
 # pull in data

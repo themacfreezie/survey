@@ -20,8 +20,8 @@ neat_table <- df %>%
     decimals = 2
   ) %>%
   tab_header(
-    title = "Survey method bias and variance",
-    subtitle = "Bias measured relative to 'Dam Counts' method"
+    title = "Survey method bias and precision",
+    subtitle = "Values reported are log-transformed"
   ) %>%
   opt_align_table_header(align = "left") 
 neat_table

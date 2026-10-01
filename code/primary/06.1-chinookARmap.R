@@ -17,6 +17,7 @@ options(max.print=2000)
 
 # set palette of choice
 palette <- "turbo"
+divpal <- "RdBu"
 bivar_palette <- "Brown2"
 
 # set crs of choice
@@ -338,7 +339,9 @@ chin_ARchoro_panel <- doink + inset_element(inset_context,
 # iterated bias and precision by esu - ISSUE HERE WITH SHARED POLYGON
     # man that fucking thing is annoying
 # bias
-outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+outline_ids <- unique(sf_outlines$DPS_IDtrunc)
+max_abs_bias <- max(abs(sf_chin_nad83col$mean_a), na.rm = TRUE)
+bias_lims <- c(-max_abs_bias, max_abs_bias)
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
 
   # select the focus ESU outline
@@ -359,7 +362,11 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = mean_a), color = "white", size = 0.1, show.legend = TRUE) +
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
     coord_sf(crs = crsSET) +
-    scale_fill_viridis_c(option = palette, name = "Bias") +
+    # scale_fill_viridis_c(option = palette, name = "Bias") +
+    scale_fill_distiller(palette = "RdBu", 
+                         name = "Bias", 
+                         # direction = 1, 
+                         limits = bias_lims) + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
@@ -372,9 +379,13 @@ chinBias_panel <- doink + inset_element(inset_context,
                                         right = 2, top = 0.7)
 chinBias_panel
 
-sf_chin_nad83col$precision <- (1/sf_chin_nad83col$mean_R)
+
 # Precision
+sf_chin_nad83col$precision <- (1/sf_chin_nad83col$mean_R)
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
+max_precision <- max(abs(sf_chin_nad83col$precision), na.rm = TRUE) # assuming 'mean_p' for precision
+precision_lims <- c(0, max_precision)
+rdbu_upper_half <- rev(RColorBrewer::brewer.pal(9, "RdBu")[1:5])
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
   
   # select the focus ESU outline
@@ -395,7 +406,8 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     geom_sf(data = focus_data_clipped, mapping = aes(fill = precision), color = "white", size = 0.1, show.legend = TRUE) +
     geom_sf(data = focus_polygon, fill = NA, color = "black", linewidth = 1.2) +
     coord_sf(crs = crsSET) +
-    scale_fill_viridis_c(option = palette, name = "Precision") +
+    # scale_fill_viridis_c(option = palette, name = "Precision") +
+    scale_fill_gradientn(colors = rdbu_upper_half, name = "Precision", limits = precision_lims) + 
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
