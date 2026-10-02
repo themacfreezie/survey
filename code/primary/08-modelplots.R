@@ -9,23 +9,23 @@ library(tidyverse)
 # boot_cohoM10 <- readRDS(here("data", "clean", "ssmBOOT_cohoM10.rds"))
 # boot_stelM22 <- readRDS(here("data", "clean", "ssmBOOT_stelM22.rds"))
 
-boot_chinM9 <- readRDS(here("data", "clean", "ssmBOOT_chinM9.rds"))
-boot_cohoM9 <- readRDS(here("data", "clean", "ssmBOOT_cohoM9.rds"))
-boot_stelM9 <- readRDS(here("data", "clean", "ssmBOOT_stelM9.rds"))
+boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_Afull.rds"))
+boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_Afull.rds"))
+boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_Afull.rds"))
 
 legend <- read_excel(here("data", "clean", "method_key.xlsx"), col_names = TRUE)
 legend$method <- legend$Method
 legend <- legend[-c(1)]
 
 # modular code - Chinook
-mod <- boot_chinM9
+mod <- boot_chin
 
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(18:41)]
-df_a <- df[, -c(9:17)]
-df_r <- df[, -c(1:8)]
+df <- df[, -c(19:41)]
+df_a <- df[, -c(10:18)]
+df_r <- df[, -c(1:9)]
 
 # grab mean and sd
 names_a <- colnames(df_a)
@@ -86,8 +86,8 @@ china_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Chinook Bias Estimates',
-       subtitle='Bias relative to damn counts',
-       y=NULL) +
+       # subtitle='Bias relative to damn counts',
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5",
@@ -105,7 +105,8 @@ china_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -116,7 +117,7 @@ chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Chinook Variance Estimates',
-       y=NULL) +
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5",
@@ -134,7 +135,8 @@ chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -145,7 +147,7 @@ chinPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
   geom_boxplot(outlier.shape = NA) +
   labs(x = NULL,
        title='Chinook Precision Estimates',
-       y=NULL) +
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5",
@@ -163,7 +165,8 @@ chinPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -205,7 +208,7 @@ chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.title.x = element_text(size = 20),
-    axis.title.y= element_text(size = 20),
+    axis.title.y= element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
     axis.text.y= element_text(size = 18, color = "black"),
     panel.grid = element_blank(),
@@ -214,14 +217,14 @@ chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
 chin_splot
 
 # modular code - Coho
-mod <- boot_cohoM9
+mod <- boot_coho
 
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(20:49)]
-df_a <- df[, -c(10:19)]
-df_r <- df[, -c(1:9)]
+df <- df[, -c(21:49)]
+df_a <- df[, -c(11:20)]
+df_r <- df[, -c(1:10)]
 
 # grab mean and sd
 names_a <- colnames(df_a)
@@ -282,8 +285,8 @@ cohoa_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Coho Bias Estimates',
-       subtitle='Bias relative to dam counts',
-       y=NULL) +
+       # subtitle='Bias relative to dam counts',
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                "#c772c5", # AUC monitoring
@@ -301,7 +304,8 @@ cohoa_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -312,7 +316,7 @@ cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Coho Variance Estimates',
-       y=NULL) +
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                "#c772c5", # AUC monitoring
@@ -330,7 +334,8 @@ cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -341,7 +346,7 @@ cohoPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
   geom_boxplot(outlier.shape = NA) +
   labs(x = NULL,
        title='Coho Precision Estimates',
-       y=NULL) +
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                 "#c772c5", # AUC monitoring
@@ -359,7 +364,8 @@ cohoPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -401,7 +407,7 @@ theme(
   legend.title = element_text(size = 20),
   legend.text = element_text(size = 18),
   axis.title.x = element_text(size = 20),
-  axis.title.y= element_text(size = 20),
+  axis.title.y= element_text(size = 18),
   axis.text.x = element_text(size = 18, color = "black"),
   axis.text.y= element_text(size = 18, color = "black"),
   panel.grid = element_blank(),
@@ -410,14 +416,14 @@ theme(
 coho_splot
 
 # modular code - steelhead
-mod <- boot_stelM9
+mod <- boot_stel
 
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(16:39)]
-df_a <- df[, -c(8:15)]
-df_r <- df[, -c(1:7)]
+df <- df[, -c(17:39)]
+df_a <- df[, -c(9:16)]
+df_r <- df[, -c(1:8)]
 
 # grab mean and sd
 names_a <- colnames(df_a)
@@ -478,8 +484,8 @@ stela_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Steelhead Bias Estimates',
-       subtitle='Bias relative to dam counts',
-       y=NULL) +
+       # subtitle='Bias relative to dam counts',
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5", # AUC monitoring
@@ -497,7 +503,8 @@ stela_bplot <- ggplot(data=df_a, aes(x = Name, y = value, fill=Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -509,7 +516,7 @@ stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Steelhead Variance Estimates',
-       y=NULL) +
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5", # AUC monitoring
@@ -527,7 +534,8 @@ stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),
+    axis.text.y= element_text(size = 18, color = "black"),     
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -539,7 +547,7 @@ stelPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
   geom_boxplot(outlier.shape = NA) +
   labs(x = NULL,
        title='Steelhead Precision Estimates',
-       y=NULL) +
+       y= "ln(NOSA)") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5", # AUC monitoring
@@ -558,6 +566,7 @@ stelPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
     legend.text = element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
     axis.text.y= element_text(size = 18, color = "black"),
+      axis.title.y = element_text(size = 18),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -600,7 +609,7 @@ stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     axis.title.x = element_text(size = 20),
-    axis.title.y= element_text(size = 20),
+    axis.title.y= element_text(size = 18),
     axis.text.x = element_text(size = 18, color = "black"),
     axis.text.y= element_text(size = 18, color = "black"),
     panel.grid = element_blank(),

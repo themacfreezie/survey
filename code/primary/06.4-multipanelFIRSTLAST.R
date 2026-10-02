@@ -20,7 +20,8 @@ options(max.print = 2000)
 # ==========================================
 
 # set palette
-palette <- "turbo"
+# palette <- "turbo"
+palette <- "RdBu"
 
 # Base geographical boundaries
 gdb_path <- here("data", "raw", "WCR_Salmon_Steelhead_gdb_2015", "WCR_Salmon_Steelhead_gdb_2015.gdb")
@@ -87,9 +88,16 @@ processed_data <- map(species_list, process_species_data)
 # ==========================================
 
 # Bind values together to detect absolute global limits across all datasets
-global_range <- map_dfr(processed_data, ~ as_tibble(.x) %>% select(pctchange_lnnosa)) %>%
+raw_range <- map_dfr(processed_data, ~ as_tibble(.x) %>% select(pctchange_lnnosa)) %>%
   pull(pctchange_lnnosa) %>%
   range(na.rm = TRUE)
+
+# Make limits symmetrical around 0 for the diverging palette
+max_abs_val <- max(abs(raw_range), na.rm = TRUE)
+global_range <- c(-max_abs_val, max_abs_val)
+
+# custom limits, because global range washes out most observations
+custom_limits <- c(-25, 25) #difference MUST be multiple of ten
 
 # ==========================================
 # 4. PLOTTING FUNCTION FOR SUBPANELS
@@ -151,11 +159,23 @@ generate_species_plot <- function(data_sf, title_text, limits) {
   main_map <- main_map +
     geom_sf(data = shared_borders, color = "black", linetype = "dashed", linewidth = 0.6) +
     geom_sf(data = sf_outlines, fill = NA, color = "black", linewidth = 1.2) +
-    scale_fill_viridis_c(
-      option = palette,
+    scale_fill_distiller(
+      palette = palette,
       aesthetics = c("fill", "pattern_fill"),
       name = "% Change",
-      limits = limits # Locks identical scales across plots
+      limits = custom_limits,
+      oob = scales::squish, # keeps outliers clamped to endpoints
+      breaks = c(custom_limits[1], seq(from = custom_limits[1], to = custom_limits[2], by = 10), custom_limits[2]),
+      labels = function(x) {
+        min_lim <- custom_limits[1]
+        max_lim <- custom_limits[2]
+        # format labels conditionally based on limits
+        case_when(
+          x == min_lim ~ paste0("≤ ", x, "%"),
+          x == max_lim ~ paste0("≥ ", x, "%"),
+          TRUE         ~ paste0(x, "%")
+        )
+      }
     ) +
     coord_sf(crs = 4269) +
     labs(title = title_text) +
@@ -184,36 +204,66 @@ p2 <- generate_species_plot(processed_data$Coho, "Coho", global_range)
 p3 <- generate_species_plot(processed_data$Steelhead, "Steelhead", global_range)
 
 # Append the specific caption to p1 (Chinook) only and style it
-# p1 <- p1 + 
+# p1 <- p1 +
 #   labs(caption = "Solid color = Lower Columbia ESU | Striped color = Upper Willamette ESU")
 
 # Extract a shared legend using a dummy plot setup
 legend_plot <- ggplot(processed_data$Chinook) +
   geom_sf(aes(fill = pctchange_lnnosa)) +
-  scale_fill_viridis_c(
-    option = palette, 
+  scale_fill_distiller(
+    palette = palette,
     name = "Pct Change\nPop Size\n(1980-2024)",
-    limits = global_range
+    limits = custom_limits,
+    oob = scales::squish, # keeps outliers clamped to endpoints
+    breaks = c(custom_limits[1], seq(from = custom_limits[1], to = custom_limits[2], by = 10), custom_limits[2]),
+    labels = function(x) {
+      min_lim <- custom_limits[1]
+      max_lim <- custom_limits[2]
+      # format labels conditionally based on limits
+      case_when(
+        x == min_lim ~ paste0("≤ ", x, "%"),
+        x == max_lim ~ paste0("≥ ", x, "%"),
+        TRUE         ~ paste0(x, "%")
+      )
+    }
   ) +
   theme_minimal() +
   theme(
     legend.title = element_text(size = 14, face = "bold"),
-    legend.text  = element_text(size = 12),
+    legend.text  = element_text(size = 12, face = "bold"),
     legend.key.height = unit(1.5, "cm")
   )
 shared_legend <- cowplot::get_legend(legend_plot)
 
-# Compile visual canvas (3 Maps side-by-side + 1 unified legend space)
-multipanel_layout <- (p1 / p3) |  p2 + 
-  plot_layout(guides = "keep", widths = c(2.5, 1.5)) 
+# # Compile visual canvas (3 Maps side-by-side + 1 unified legend space)
+# multipanel_layout <- (p1 / p3) |  p2 +
+#   plot_layout(guides = "keep", widths = c(1, 0.8))
+#
+# # Append unified title, captioning, and the shared legend block
+# final_output <- cowplot::plot_grid(
+#   multipanel_layout,
+#   shared_legend,
+#   rel_widths = c(10, 0.6),
+#   nrow = 1
+# )
+#
+# # Render complete layout
+# final_output
 
-# Append unified title, captioning, and the shared legend block
-final_output <- cowplot::plot_grid(
-  multipanel_layout, 
-  shared_legend, 
-  rel_widths = c(10, 1.5), 
-  nrow = 1
-)
+# Convert the grob into a patchwork-compatible element and apply a negative margin
+# This forcefully shifts the standalone color bar to the left, closing the white gap
+clean_legend_panel <- patchwork::wrap_elements(shared_legend) +
+  theme(plot.margin = margin(l = -40, r = 0, t = 0, b = 0))
+
+# --- ASSEMBLE VIA PURE PATCHWORK ---
+# Column 1: Stacked maps | Column 2: Large Coho map | Column 3: Tight clean legend
+final_output <- (p1 / p3) | p2 | clean_legend_panel +
+  plot_layout(
+    widths = c(1.2, 1, 0.2), # Sharp layout boundary definitions
+    guides = "keep"
+  )
 
 # Render complete layout
 final_output
+
+## THIS IS A CASE OF GOOD ENOUGH, THE MARGINS AREN'T RIGHT AND I HAD TO GET CRAFTY WITH SNIPPING TOOL

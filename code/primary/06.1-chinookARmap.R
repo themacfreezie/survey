@@ -50,9 +50,9 @@ sf_chin <- sf_fish_combined %>%
 # make sure crs is good
 sf_chin_nad83 <- st_transform(sf_chin, crs = crsSET)
 
-ggplot() +
-  annotation_map_tile(type = "hotstyle", zoom = 10) +
-  geom_sf(data = sf_chin_nad83)
+# ggplot() +
+#   annotation_map_tile(type = "hotstyle", zoom = 10) +
+#   geom_sf(data = sf_chin_nad83)
 
 # # can we make these contiguous?
 # contiguity_test <- sf_chin_nad83 %>%
@@ -100,7 +100,7 @@ outline_panels_clipped <- lapply(1:nrow(sf_outlines), function(i) {
     )
 })
 esu_panels_clipped <- wrap_plots(outline_panels_clipped, nrow = 3)
-esu_panels_clipped
+# esu_panels_clipped
 # I think it's 4 and 104
 
 # preplots
@@ -342,6 +342,7 @@ chin_ARchoro_panel <- doink + inset_element(inset_context,
 outline_ids <- unique(sf_outlines$DPS_IDtrunc)
 max_abs_bias <- max(abs(sf_chin_nad83col$mean_a), na.rm = TRUE)
 bias_lims <- c(-max_abs_bias, max_abs_bias)
+custom_lims <- c(-0.5, 0.5)
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
 
   # select the focus ESU outline
@@ -366,14 +367,29 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
     scale_fill_distiller(palette = "RdBu", 
                          name = "Bias", 
                          # direction = 1, 
-                         limits = bias_lims) + 
+                         limits = custom_lims,
+                         oob = scales::squish, 
+                         breaks = c(custom_lims[1], seq(from = custom_lims[1], to = custom_lims[2], by = 0.2), custom_lims[2]),
+                         labels = function(x) {
+                           min_lim <- custom_lims[1]
+                           max_lim <- custom_lims[2]
+                           # format labels conditionally based on limits
+                           case_when(
+                             x == min_lim ~ paste0("≤ ", x),
+                             x == max_lim ~ paste0("≥ ", x),
+                             TRUE         ~ paste0(x)
+                           )
+                         }
+    ) +
     labs(title = current_title) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 })
 
 doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average bias - Chinook surveys (1980 - 2024)",
-                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))) &
+  theme(legend.title = element_text(size = 14, face = "bold"), 
+        legend.text  = element_text(size = 12))
 chinBias_panel <- doink + inset_element(inset_context, 
                                         left = 1.5, bottom = 0.05, 
                                         right = 2, top = 0.7)
@@ -383,7 +399,7 @@ chinBias_panel
 # Precision
 sf_chin_nad83col$precision <- (1/sf_chin_nad83col$mean_R)
 outline_ids <- unique(sf_outlines$DPS_IDtrunc) 
-max_precision <- max(abs(sf_chin_nad83col$precision), na.rm = TRUE) # assuming 'mean_p' for precision
+max_precision <- max(abs(sf_chin_nad83col$precision), na.rm = TRUE)
 precision_lims <- c(0, max_precision)
 rdbu_upper_half <- rev(RColorBrewer::brewer.pal(9, "RdBu")[1:5])
 plot_list <- lapply(1:nrow(sf_outlines), function(i) {
@@ -414,7 +430,9 @@ plot_list <- lapply(1:nrow(sf_outlines), function(i) {
 
 doink <- wrap_plots(plot_list, ncol = 2) + plot_layout(guides = "collect") +
   plot_annotation(title = "Average precision - Chinook surveys (1980 - 2024)",
-                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16)))
+                  theme = theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))) &
+  theme(legend.title = element_text(size = 14, face = "bold"), 
+        legend.text  = element_text(size = 12))
 chinPre_panel <- doink + inset_element(inset_context, 
                                        left = 1.5, bottom = 0.05, 
                                        right = 2, top = 0.7)

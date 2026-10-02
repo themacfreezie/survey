@@ -11,9 +11,9 @@ here::i_am("code/primary/09-TScomparison.R")
 options(max.print=2000)
 
 # pull in data - model objects
-ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chinM9.rds"))
-ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM9.rds"))
-ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM9.rds"))
+ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_Afull.rds"))
+ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
+ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_Afull.rds"))
 
 # pull in data - observed time series
 load(file=here::here("data", "clean", "nosa_chinPOP.Rda"))
@@ -437,7 +437,7 @@ overall_row <- aligned_data %>%
     pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
     total_years = NA
   )
-CIsummary_chin <- bind_rows(pop_summary, overall_row)
+CIsummary_chin <- bind_rows(popsummary_chin, overall_row)
 CIsummary_chin <- CIsummary_chin[-c(1)]
 # colnames(CIsummary_chin) <- c("Population", "Within CI", "Years surveyed")
 
@@ -465,7 +465,7 @@ overall_row <- aligned_data %>%
     pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
     total_years = NA
   )
-CIsummary_coho <- bind_rows(pop_summary, overall_row)
+CIsummary_coho <- bind_rows(popsummary_coho, overall_row)
 CIsummary_coho <- CIsummary_coho[-c(1)]
 colnames(CIsummary_coho) <- c("Population", "Within CI", "Years surveyed")
 
@@ -493,7 +493,7 @@ overall_row <- aligned_data %>%
     pct_within_ci = mean(in_ci, na.rm = TRUE) * 100,
     total_years = NA
   )
-CIsummary_stel <- bind_rows(pop_summary, overall_row)
+CIsummary_stel <- bind_rows(popsummary_stel, overall_row)
 CIsummary_stel <- CIsummary_stel[-c(1)]
 colnames(CIsummary_stel) <- c("Population", "Within CI", "Years surveyed")
 
