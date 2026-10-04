@@ -605,7 +605,7 @@ statecompare_stelPCT <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = 
     labels = c("fitted" = "State Estimate", "observed" = "Observation")
   ) +
   labs(
-    title = "Steelhead population time series comparison by ESU (1980-2024)",
+    title = "Steelhead population time series comparison by DPS (1980-2024)",
     x = "",
     y = "ln(NOSA)",
     color = ""
