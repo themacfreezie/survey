@@ -187,6 +187,11 @@ for(i in 1:length(a_chin.model)){
   }
 }
 
+a_chin.modelFULL <- matrix(list(0), n_chin, 1)
+for(i in 1:length(a_chin.modelFULL)){
+  a_chin.modelFULL[i] <- paste0("a", chin_dat_rows$method[i])
+}
+
 # Z
 pops_chin <- c(unique(chin_dat_rows$ESAcode))
 Z_chin.model <- matrix(0, nrow=nrow(chin_dat), ncol=length(unique(chin_dat_rows$ESAcode)))
@@ -198,9 +203,9 @@ for(i in seq(length(pops_chin))){
 mod_chin.list <- list(
   B = "identity",
   U = "zero",
-  Q = "diagonal and unequal",
+  Q = "equalvarcov",
   Z = Z_chin.model,
-  A = a_chin.model,
+  A = a_chin.modelFULL,
   R = R_chin.model,
   x0 = "equal",
   V0 = "zero",
@@ -208,15 +213,15 @@ mod_chin.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", paste("ssm_ESUchinM", scale, ".rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_ESUchin_Afull.rds", sep="")))){
   ptm <- proc.time()
   ssm_ESUchin <- MARSS(chin_dat, model = mod_chin.list, method = "kem", control = con.list)
-  saveRDS(ssm_ESUchin, file=here::here("data", "clean", paste("ssm_ESUchinM", scale, ".rds", sep="")))
+  saveRDS(ssm_ESUchin, file=here::here("data", "clean", paste("ssm_ESUchin_Afull.rds", sep="")))
   chin_time <- proc.time()[3] - ptm
   chin_time
 }
 # load in ssm_ESUchin
-ssm_ESUchin <- readRDS(file=here::here("data", "clean", paste("ssm_ESUchinM", scale, ".rds", sep="")))
+ssm_ESUchin <- readRDS(file=here::here("data", "clean", paste("ssm_ESUchin_Afull.rds", sep="")))
 
 
 ## model coho
@@ -237,6 +242,11 @@ for(i in 1:length(a_coho.model)){
   }
 }
 
+a_coho.modelFULL <- matrix(list(0), n_coho, 1)
+for(i in 1:length(a_coho.modelFULL)){
+  a_coho.modelFULL[i] <- paste0("a", coho_dat_rows$method[i])
+}
+
 # Z
 pops_coho <- c(unique(coho_dat_rows$ESAcode))
 Z_coho.model <- matrix(0, nrow=nrow(coho_dat), ncol=length(unique(coho_dat_rows$ESAcode)))
@@ -248,9 +258,9 @@ for(i in seq(length(pops_coho))){
 mod_coho.list <- list(
   B = "identity",
   U = "zero",
-  Q = "diagonal and unequal",
+  Q = "equalvarcov",
   Z = Z_coho.model,
-  A = a_coho.model,
+  A = a_coho.modelFULL,
   R = R_coho.model,
   x0 = "equal",
   V0 = "zero",
@@ -258,15 +268,15 @@ mod_coho.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", paste("ssm_ESUcohoM", scale, ".rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_ESUcoho_Afull.rds", sep="")))){
   ptm <- proc.time()
   ssm_ESUcoho <- MARSS(coho_dat, model = mod_coho.list, method = "kem", control = con.list)
-  saveRDS(ssm_ESUcoho, file=here::here("data", "clean", paste("ssm_ESUcohoM", scale, ".rds", sep="")))
+  saveRDS(ssm_ESUcoho, file=here::here("data", "clean", paste("ssm_ESUcoho_Afull.rds", sep="")))
   coho_time <- proc.time()[3] - ptm
   coho_time
 }
 # load in ssm_ESUcoho
-ssm_ESUcoho <- readRDS(file=here::here("data", "clean", paste("ssm_ESUcohoM", scale, ".rds", sep="")))
+ssm_ESUcoho <- readRDS(file=here::here("data", "clean", paste("ssm_ESUcoho_Afull.rds", sep="")))
 
 
 ## model steelhead
@@ -287,6 +297,11 @@ for(i in 1:length(a_stel.model)){
   }
 }
 
+a_stel.modelFULL <- matrix(list(0), n_stel, 1)
+for(i in 1:length(a_stel.modelFULL)){
+  a_stel.modelFULL[i] <- paste0("a", stel_dat_rows$method[i])
+}
+
 # Z
 pops_stel <- c(unique(stel_dat_rows$ESAcode))
 Z_stel.model <- matrix(0, nrow=nrow(stel_dat), ncol=length(unique(stel_dat_rows$ESAcode)))
@@ -298,9 +313,9 @@ for(i in seq(length(pops_stel))){
 mod_stel.list <- list(
   B = "identity",
   U = "zero",
-  Q = "diagonal and unequal",
+  Q = "equalvarcov",
   Z = Z_stel.model,
-  A = a_stel.model,
+  A = a_stel.modelFULL,
   R = R_stel.model,
   x0 = "equal",
   V0 = "zero",
@@ -308,15 +323,15 @@ mod_stel.list <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", paste("ssm_ESUstelM", scale, ".rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_ESUstel_Afull.rds", sep="")))){
   ptm <- proc.time()
   ssm_ESUstel <- MARSS(stel_dat, model = mod_stel.list, method = "kem", control = con.list)
-  saveRDS(ssm_ESUstel, file=here::here("data", "clean", paste("ssm_ESUstelM", scale, ".rds", sep="")))
+  saveRDS(ssm_ESUstel, file=here::here("data", "clean", paste("ssm_ESUstel_Afull.rds", sep="")))
   stel_time <- proc.time()[3] - ptm
   stel_time
 }
 # load in ssm_ESUstel
-ssm_ESUstel <- readRDS(file=here::here("data", "clean", paste("ssm_ESUstelM", scale, ".rds", sep="")))
+ssm_ESUstel <- readRDS(file=here::here("data", "clean", paste("ssm_ESUstel_Afull.rds", sep="")))
   # odd results w/ deterministic x2 state
 
 strict_control <- list(
@@ -326,15 +341,15 @@ strict_control <- list(
 )
 
 # run MARSS model
-if(!file.exists(here::here("data", "clean", paste("ssm_ESUstelM", scale, "-strict.rds", sep="")))){
+if(!file.exists(here::here("data", "clean", paste("ssm_ESUstel_Afull-strict.rds", sep="")))){
   ptm <- proc.time()
   ssm_ESUstel <- MARSS(stel_dat, model = mod_stel.list, method = "kem", control = strict_control)
-  saveRDS(ssm_ESUstel, file=here::here("data", "clean", paste("ssm_ESUstelM", scale, "-strict.rds", sep="")))
+  saveRDS(ssm_ESUstel, file=here::here("data", "clean", paste("ssm_ESUstel_Afull-strict.rds", sep="")))
   stel_time <- proc.time()[3] - ptm
   stel_time
 }
 # load in ssm_ESUstel
-ssm_ESUstel <- readRDS(file=here::here("data", "clean", paste("ssm_ESUstelM", scale, "-strict.rds", sep="")))
+ssm_ESUstel <- readRDS(file=here::here("data", "clean", paste("ssm_ESUstel_Afull-strict.rds", sep="")))
   # same issue..
 
 # further invettigation
