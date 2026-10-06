@@ -699,6 +699,8 @@ obs_stel <- obs_stel %>%
     by = "PopID"
   )
 obs_stel <- obs_stel[-c(1, 3)]
+obs_stel <- obs_stel[obs_stel$COMMONPOPNAME != "Youngs Bay", ]
+  # to match plotdata_stel2
 plotdata_stel2 <- plotdata_stel2 %>%
   filter(Dataset != "observed")
 plotdata_stel2 <- rbind(obs_stel, plotdata_stel2)
