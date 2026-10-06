@@ -461,6 +461,10 @@ ESUcompare_chin <- ggplot(plotdata_chinESU, aes(x = Year, y = Value, color = Dat
     y = "ln(NOSA)",
     color = ""
   ) +
+  scale_color_manual(values = c(
+    "State Estimate" = "#F8766D",
+    "Observation"    = "#00BFC4" 
+  )) +
   theme(
     legend.position = "bottom",
     strip.text = element_text(face = "bold") # Makes PopID headers bold
@@ -488,6 +492,10 @@ ESUcompare_coho <- ggplot(plotdata_cohoESU, aes(x = Year, y = Value, color = Dat
     legend.position = "bottom",
     strip.text = element_text(face = "bold") # Makes PopID headers bold
   ) +
+  scale_color_manual(values = c(
+    "State Estimate" = "#F8766D",
+    "Observation"    = "#00BFC4" 
+  )) +
   theme_minimal() +  
   theme(
     legend.position = "bottom",
@@ -507,6 +515,10 @@ ESUcompare_stel <- ggplot(plotdata_stelESU, aes(x = Year, y = Value, color = Dat
     y = "ln(NOSA)",
     color = ""
   ) +
+  scale_color_manual(values = c(
+    "State Estimate" = "#F8766D",
+    "Observation"    = "#00BFC4" 
+  )) +
   theme(
     legend.position = "bottom",
     strip.text = element_text(face = "bold") # Makes PopID headers bold

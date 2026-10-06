@@ -622,3 +622,204 @@ statecompare_stelPCT <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = 
     axis.title.y= element_text(size = 18)
   )
 statecompare_stelPCT
+
+# let's try to fold in confidence intervals for y as well..
+# pull in data - popmethod key
+keyPM_chin <- read_excel(here("data", "clean", "ytT_statekey.xlsx"), sheet = "chin")
+keyPM_coho <- read_excel(here("data", "clean", "ytT_statekey.xlsx"), sheet = "coho")
+keyPM_stel <- read_excel(here("data", "clean", "ytT_statekey.xlsx"), sheet = "stel")
+
+# extract
+predobs_chin <- predict(ssm_chin, type = "ytT", interval = "prediction", level = 0.95)
+obs_chin <- predobs_chin$pred
+
+predobs_coho <- predict(ssm_coho, type = "ytT", interval = "prediction", level = 0.95)
+obs_coho <- predobs_coho$pred
+
+predobs_stel <- predict(ssm_stel, type = "ytT", interval = "prediction", level = 0.95)
+obs_stel <- predobs_stel$pred
+
+# match to proper popmethod and clean
+names(obs_chin)[names(obs_chin) == ".rownames"] <- "popmethod"
+obs_chin$popmethod <- as.numeric(sub("^Y", "", obs_chin$popmethod))
+obs_chin <- obs_chin %>%
+  left_join(keyPM_chin, by = c("popmethod" = "Popmethod")) %>% 
+  select(-popmethod)
+obs_chin  <- obs_chin  %>%
+  filter(!is.na(y))
+obs_chin$Year <- obs_chin$t + 1979
+obs_chin <- rename(obs_chin, Value = y, SE = se, upper95 = `Hi 95`, lower95 = `Lo 95`)
+obs_chin$Dataset <- "observed"
+obs_chin <- obs_chin %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  )
+obs_chin <- obs_chin[-c(1, 3)]
+plotdata_chin <- plotdata_chin %>%
+  filter(Dataset != "observed")
+plotdata_chin <- rbind(obs_chin, plotdata_chin)
+
+names(obs_coho)[names(obs_coho) == ".rownames"] <- "popmethod"
+obs_coho$popmethod <- as.numeric(sub("^Y", "", obs_coho$popmethod))
+obs_coho <- obs_coho %>%
+  left_join(keyPM_coho, by = c("popmethod" = "Popmethod")) %>% 
+  select(-popmethod)
+obs_coho  <- obs_coho  %>%
+  filter(!is.na(y))
+obs_coho$Year <- obs_coho$t + 1979
+obs_coho <- rename(obs_coho, Value = y, SE = se, upper95 = `Hi 95`, lower95 = `Lo 95`)
+obs_coho$Dataset <- "observed"
+obs_coho <- obs_coho %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  )
+obs_coho <- obs_coho[-c(1, 3)]
+plotdata_coho <- plotdata_coho %>%
+  filter(Dataset != "observed")
+plotdata_coho <- rbind(obs_coho, plotdata_coho)
+
+names(obs_stel)[names(obs_stel) == ".rownames"] <- "popmethod"
+obs_stel$popmethod <- as.numeric(sub("^Y", "", obs_stel$popmethod))
+obs_stel <- obs_stel %>%
+  left_join(keyPM_stel, by = c("popmethod" = "Popmethod")) %>% 
+  select(-popmethod)
+obs_stel  <- obs_stel  %>%
+  filter(!is.na(y))
+obs_stel$Year <- obs_stel$t + 1979
+obs_stel <- rename(obs_stel, Value = y, SE = se, upper95 = `Hi 95`, lower95 = `Lo 95`)
+obs_stel$Dataset <- "observed"
+obs_stel <- obs_stel %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  )
+obs_stel <- obs_stel[-c(1, 3)]
+plotdata_stel2 <- plotdata_stel2 %>%
+  filter(Dataset != "observed")
+plotdata_stel2 <- rbind(obs_stel, plotdata_stel2)
+
+# state compare plots w/ percentages AND uncertainty for obs and states
+plot_labels <- popsummary_chin %>%
+  mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
+statecompare_chinOBVAR <- ggplot(plotdata_chin, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  geom_text(
+    data = plot_labels,
+    aes(x = -Inf, y = -Inf, label = accuracy_label),
+    color = "black",
+    size = 4,              # Adjust size of text here
+    fontface = "bold",
+    hjust = -0.4,           # Pushes text slightly left from the right edge
+    vjust = -0.8,           # Pushes text slightly down from the top edge
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Chinook population time series comparison by ESU (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_chinOBVAR
+
+plot_labels <- popsummary_coho %>%
+  mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
+statecompare_cohoOBVAR <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  geom_text(
+    data = plot_labels,
+    aes(x = -Inf, y = -Inf, label = accuracy_label),
+    color = "black",
+    size = 4,              # Adjust size of text here
+    fontface = "bold",
+    hjust = -0.4,           # Pushes text slightly left from the right edge
+    vjust = -0.8,           # Pushes text slightly down from the top edge
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Coho population time series comparison by ESU (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_cohoOBVAR
+
+plot_labels <- popsummary_stel %>%
+  mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
+statecompare_stelOBVAR <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  geom_text(
+    data = plot_labels,
+    aes(x = -Inf, y = -Inf, label = accuracy_label),
+    color = "black",
+    size = 4,              # Adjust size of text here
+    fontface = "bold",
+    hjust = -0.4,           # Pushes text slightly left from the right edge
+    vjust = -0.8,           # Pushes text slightly down from the top edge
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Steelhead population time series comparison by ESU (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_stelOBVAR
