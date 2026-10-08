@@ -1,0 +1,63 @@
+---
+title: "Survey state plot reprex"
+author: "Brian McGreal"
+date: "2026-10-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggpattern)
+library(here)
+library(MARSS)
+library(panelr)
+library(readxl)
+library(tidyverse)
+here::i_am("code/primary/09-TScomparison.R")
+```
+
+```{r loaddata_hidden, message=FALSE, warning=FALSE, echo=FALSE}
+ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
+load(file=here::here("data", "clean", "nosa_cohoPOP.Rda"))
+key_coho <- read_excel(here("data", "clean", "xtT_statekey.xlsx"), sheet = "coho")
+load(file=here::here("data", "clean", "populations_list.Rda"))
+pop_list <- pop_list |> 
+  filter(CommonPopName !="Lostine River Spring Chinook")
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Upper Willamette River ESU) Clackamas River - spring"] <- "Clackamas River - Spring"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Clackamas River - fall"] <- "Clackamas River - Fall"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Sandy River - late fall"] <- "Sandy River - Fall"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Sandy River - spring"] <- "Sandy River - Spring"
+pop_names <- pop_list[-c(1, 3, 4, 6:10)]
+keyPM_coho <- read_excel(here("data", "clean", "ytT_statekey.xlsx"), sheet = "coho")
+```
+
+## R Markdown
+
+Here is how I'm coding my population-level plots of observed time series and underlying states along with their confidence intervals. First I pull in the MARSS model object ssm_coho, as well as two keys (keyX and keyY) which relate the model output to the proper underlying population ID.
+
+```{r loaddata_visible}
+# load data
+ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
+keyX_coho <- read_excel(here("data", "clean", "xtT_statekey.xlsx"), sheet = "coho")
+keyY_coho <- read_excel(here("data", "clean", "ytT_statekey.xlsx"), sheet = "coho")
+```
+
+Next I extract from the MARSS object state estimates and confidence intervals, as well as Y_t predictions and those intervals as well. This is where I'm concerned I might not be grabbing the right information from the fitted model.
+
+```{r extract}
+# pull fitted states from MARSS object
+states_coho <- tsSmooth(ssm_coho, type = "xtT")
+
+predobs_coho <- predict(ssm_coho, type = "ytT", interval = "prediction", level = 0.95)
+obs_coho <- predobs_coho$pred
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
