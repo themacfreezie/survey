@@ -1,0 +1,148 @@
+---
+title: "Survey state plot reprex"
+author: "Brian McGreal"
+date: "2026-10-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggpattern)
+library(here)
+library(MARSS)
+library(panelr)
+library(readxl)
+library(tidyverse)
+here::i_am("comparison.Rmd")
+```
+
+```{r loaddata_hidden, message=FALSE, warning=FALSE, echo=FALSE}
+load(file=here::here("populations_list.Rda"))
+pop_list <- pop_list |> 
+  filter(CommonPopName !="Lostine River Spring Chinook")
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Upper Willamette River ESU) Clackamas River - spring"] <- "Clackamas River - Spring"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Clackamas River - fall"] <- "Clackamas River - Fall"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Sandy River - late fall"] <- "Sandy River - Fall"
+pop_list$COMMONPOPNAME[pop_list$ESAPOPNAME == "Salmon, Chinook (Lower Columbia River ESU) Sandy River - spring"] <- "Sandy River - Spring"
+pop_names <- pop_list[-c(1, 3, 4, 6:10)]
+```
+
+Here is how I'm coding my population-level plots of observed time series and underlying states along with their confidence intervals. First I pull in the MARSS model object ssm_coho, as well as two keys (keyX and keyY) which relate the model output to the proper underlying population ID.
+```{r loaddata_visible}
+ssm_coho <- readRDS(file=here::here("ssm_coho_Afull.rds"))
+keyX_coho <- read_excel(here("xtT_statekey.xlsx"), sheet = "coho")
+keyY_coho <- read_excel(here("ytT_statekey.xlsx"), sheet = "coho")
+load(file=here::here("nosa_cohoPOP.Rda"))
+```
+
+pop_list requires some cleaning so I do that 'under the hood' but here's what it looks like. pop_names is just the names of each population and the popID for labelling plots.
+```{r clean_poplist}
+head(pop_list)
+pop_names <- pop_list[-c(1, 3, 4, 6:10)]
+head(pop_names)
+```
+
+Next I extract from the MARSS object state estimates and confidence intervals, as well as Y_t predictions and those intervals as well. **This is where I'm concerned I might not be grabbing the right information from the fitted model, specifically the "ytT" bit.** If this looks correct to you than these plots should be good.
+```{r extract}
+# pull fitted states from MARSS object
+states_coho <- tsSmooth(ssm_coho, type = "xtT")
+
+predobs_coho <- predict(ssm_coho, type = "ytT", interval = "prediction", level = 0.95)
+obs_coho <- predobs_coho$pred
+```
+
+Now I've got to match the state key to the states in states_coho to assign each the proper popID.
+```{r statesX, message=FALSE, warning=FALSE}
+names(states_coho)[names(states_coho) == ".rownames"] <- "state"
+states_coho$state <- as.numeric(sub("^X", "", states_coho$state))
+states_coho <- states_coho %>%
+  left_join(keyX_coho, by = c("state" = "State")) %>%
+  select(-state)
+states_coho$Year <- states_coho$t + 1979
+states_coho <- rename(states_coho, Value = .estimate, SE = .se)
+states_coho <- states_coho[-c(1)]
+states_coho$Dataset <- "fitted"
+
+states_coho$upper95 <- states_coho$Value + (states_coho$SE * 1.96)
+states_coho$lower95 <- states_coho$Value - (states_coho$SE * 1.96)
+
+states_coho <- states_coho %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  )
+```
+Again here I match the state key to the rows in obs_coho, which are enumerated at the level of pop/method, since they make up the input data for the MARSS models. This match assigns each row to the proper popID.
+```{r statesY, message=FALSE, warning=FALSE}
+names(obs_coho)[names(obs_coho) == ".rownames"] <- "popmethod"
+obs_coho$popmethod <- as.numeric(sub("^Y", "", obs_coho$popmethod))
+obs_coho <- obs_coho %>%
+  left_join(keyY_coho, by = c("popmethod" = "Popmethod")) %>% 
+  select(-popmethod)
+obs_coho  <- obs_coho  %>%
+  filter(!is.na(y))
+obs_coho$Year <- obs_coho$t + 1979
+obs_coho <- rename(obs_coho, Value = y, SE = se, upper95 = `Hi 95`, lower95 = `Lo 95`)
+obs_coho$Dataset <- "observed"
+obs_coho <- obs_coho %>%
+  mutate(PopID = as.character(PopID)) %>%
+  left_join(
+    pop_names %>% mutate(PopID = as.character(PopID)),
+    by = "PopID"
+  )
+obs_coho <- obs_coho[-c(1, 3)]
+```
+
+Next I bind these two datasets together (observations and underlying states). A step here drops all fitted state estimates from before or after the first and last observed year.
+```{r join, message=FALSE, warning=FALSE}
+# row bind
+plotdata_coho <- rbind(states_coho, obs_coho)
+
+# drop estimates from before any observations were made
+plotdata_coho <- plotdata_coho %>%
+  group_by(PopID) %>%
+  filter(
+    trimws(Dataset) == "observed" | 
+      (trimws(Dataset) == "fitted" & Year >= min(Year[trimws(Dataset) == "observed" & !is.na(Value)], na.rm = TRUE) &
+         Year <= max(Year[trimws(Dataset) == "observed" & !is.na(Value)], na.rm = TRUE))) %>%
+  ungroup()
+```
+
+```{r dedupe, include=FALSE}
+# de-duping - just in case
+duplicated(plotdata_coho)
+plotdata_coho <- unique(plotdata_coho)
+duplicated(plotdata_coho)
+```
+
+Now that I have a dataset with both observations and fitted state estiamtes, I make my plot, including confidence intervals around each.
+```{r plot2, fig.width=15, fig.height=10, out.width="200%", warning=FALSE}
+statecompare_cohoOBVAR <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Coho population time series comparison by ESU (1980-2024)",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_cohoOBVAR
+```
