@@ -92,6 +92,8 @@ merged_stel <- merge(nosa, stel_ARdata, by = c("MethodNameID", "CommonName"))
   # 173 obs less than nosa (due to dropped observations with little-used methods)
 
 merged_ARdata <- bind_rows(merged_chin, merged_coho, merged_stel)
+save(merged_ARdata, file=here::here("data", "clean", "merged_ARdata.rda"))
+  # save for coeff of variation script  
 
 # collapse around population
 collapsed_ARdata <- merged_ARdata %>%

@@ -48,6 +48,9 @@ mtds <- mtds %>%
   ) %>% 
   distinct(MethodNameID, .keep_all = TRUE)
 
+# save for coeff of variation script  
+save(mtds, file=here::here("data", "clean", "mtds.rda"))
+
 ## pure ai here - trying to lock down unique elements
 # get all unique individual elements from the MethodName column
 all_elements <- mtds %>%
