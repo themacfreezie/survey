@@ -57,23 +57,23 @@ process_species_data <- function(file_path) {
   
   sf_combined <- sf_fish %>% 
     left_join(ar_data, by = "NWFSC_POP_ID") %>%
-    filter(!is.na(first10_mean_a)) %>%
+    filter(!is.na(first10_mean_lnnosa)) %>%
     st_transform(crs = 4269)
   
   sf_collapsed <- sf_combined %>%
     group_by(NWFSC_POP_ID, DPS_IDtrunc, DPStrunc) %>%
     summarize(
       first10mean_lnnosa = mean(first10_mean_lnnosa, na.rm = TRUE),
-      first10mean_a      = mean(first10_mean_a, na.rm = TRUE),
-      first10mean_R      = mean(first10_mean_R, na.rm = TRUE),
+      # first10mean_a      = mean(first10_mean_a, na.rm = TRUE),
+      # first10mean_R      = mean(first10_mean_R, na.rm = TRUE),
       last10mean_lnnosa  = mean(last10_mean_lnnosa, na.rm = TRUE),
-      last10mean_a       = mean(last10_mean_a, na.rm = TRUE),
-      last10mean_R       = mean(last10_mean_R, na.rm = TRUE),
+      # last10mean_a       = mean(last10_mean_a, na.rm = TRUE),
+      # last10mean_R       = mean(last10_mean_R, na.rm = TRUE),
       .groups = "drop"
     ) %>%
     mutate(
-      change_a        = last10mean_a - first10mean_a,
-      change_R        = last10mean_R - first10mean_R,
+      # change_a        = last10mean_a - first10mean_a,
+      # change_R        = last10mean_R - first10mean_R,
       pctchange_lnnosa = ((last10mean_lnnosa - first10mean_lnnosa) / first10mean_lnnosa) * 100
     )
   

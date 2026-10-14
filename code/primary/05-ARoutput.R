@@ -174,6 +174,11 @@ popavgAR_chin <- popavgAR %>% filter(CommonName=="Chinook Salmon")
 popavgAR_coho <- popavgAR %>% filter(CommonName=="Coho Salmon")
 popavgAR_stel <- popavgAR %>% filter(CommonName=="Steelhead")
 
+FLavgAR <- FLavgAR[-c(13, 16)]
+duplicated(FLavgAR)
+FLavgAR<- unique(FLavgAR)
+duplicated(FLavgAR)
+
 FLavgAR_chin <- FLavgAR %>% filter(CommonName=="Chinook Salmon")
 FLavgAR_coho <- FLavgAR %>% filter(CommonName=="Coho Salmon")
 FLavgAR_stel <- FLavgAR %>% filter(CommonName=="Steelhead")
