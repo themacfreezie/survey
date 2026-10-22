@@ -843,8 +843,8 @@ single_plot_label <- target_label %>%
   filter(COMMONPOPNAME == target_pop)
 
 # generate single population plot
-singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
-  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = exp(Value), color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = exp(lower95), ymax = exp(upper95)), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 1.3) +
   theme_minimal() +
   scale_color_manual(
@@ -856,7 +856,8 @@ singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = Value, color = Data
     title = "Steelhead - Upper Grande Ronde (summer)",
     subtitle = "1980-2024",
     x = "",
-    y = "ln(NOSA)",
+    # y = "ln(NOSA)",
+    y = "Natural-origin Spawners",
     color = ""
   ) +
   theme(
