@@ -132,14 +132,14 @@ chinCoV <- chinCoV |>
   mutate(Highlight = ifelse(PopID == 1000, "Universal", "Population"))
 ggplot() +
   # geom_jitter(width = 0.2, height = 0, alpha = 1, size = 2) +
-  geom_point(data = filter(chinCoV, PopID != 1000), 
-             aes(x = MethodName, y = CoV),
-             alpha = 1, size = 2, color = "steelblue") +
   geom_point(
     data = filter(chinCoV, PopID == 1000),
     aes(x = MethodName, y = CoV),
     size = 3, color = "firebrick"
   ) +
+  geom_point(data = filter(chinCoV, PopID != 1000), 
+             aes(x = MethodName, y = CoV),
+             alpha = 0.6, size = 2, color = "steelblue") +
   labs(
     x = "",
     title = 'Chinook survey method coefficients of variation',
@@ -163,15 +163,14 @@ ggplot() +
 cohoCoV <- cohoCoV |> 
   mutate(Highlight = ifelse(PopID == 1000, "Universal", "Population"))
 ggplot() +
-  # geom_jitter(width = 0.2, height = 0, alpha = 1, size = 2) +
-  geom_point(data = filter(cohoCoV, PopID != 1000), 
-             aes(x = MethodName, y = CoV),
-             alpha = 1, size = 2, color = "steelblue") +
   geom_point(
     data = filter(cohoCoV, PopID == 1000),
     aes(x = MethodName, y = CoV),
     size = 3, color = "firebrick"
   ) +
+  geom_point(data = filter(cohoCoV, PopID != 1000), 
+             aes(x = MethodName, y = CoV),
+             alpha = 0.6, size = 2, color = "steelblue") +
   labs(
     x = "",
     title = 'Coho survey method coefficients of variation',
@@ -195,15 +194,14 @@ ggplot() +
 stelCoV <- stelCoV |> 
   mutate(Highlight = ifelse(PopID == 1000, "Universal", "Population"))
 ggplot() +
-  # geom_jitter(width = 0.2, height = 0, alpha = 1, size = 2) +
-  geom_point(data = filter(stelCoV, PopID != 1000), 
-             aes(x = MethodName, y = CoV),
-             alpha = 1, size = 2, color = "steelblue") +
   geom_point(
     data = filter(stelCoV, PopID == 1000),
     aes(x = MethodName, y = CoV),
     size = 3, color = "firebrick"
   ) +
+  geom_point(data = filter(stelCoV, PopID != 1000), 
+             aes(x = MethodName, y = CoV),
+             alpha = 0.6, size = 2, color = "steelblue") +
   labs(
     x = "",
     title = 'Steelhead survey method coefficients of variation',
