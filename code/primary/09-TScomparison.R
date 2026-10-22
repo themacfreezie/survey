@@ -502,13 +502,13 @@ print(CIsummary_coho)
 print(CIsummary_stel)
 
 # state compare plots w/ percentages
-plot_labels <- popsummary_chin %>%
+plotlabels_chin <- popsummary_chin %>%
   mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
 statecompare_chinPCT <- ggplot(plotdata_chin, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
   geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 0.8) +
   geom_text(
-    data = plot_labels,
+    data = plotlabels_chin,
     aes(x = -Inf, y = -Inf, label = accuracy_label),
     color = "black",
     size = 4,              # Adjust size of text here
@@ -542,13 +542,13 @@ statecompare_chinPCT <- ggplot(plotdata_chin, aes(x = Year, y = Value, color = D
   )
 statecompare_chinPCT
 
-plot_labels <- popsummary_coho %>%
+plotlabels_coho <- popsummary_coho %>%
   mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
 statecompare_cohoPCT <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
   geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 0.8) +
   geom_text(
-    data = plot_labels,
+    data = plotlabels_coho,
     aes(x = -Inf, y = -Inf, label = accuracy_label),
     color = "black",
     size = 4,              # Adjust size of text here
@@ -582,14 +582,14 @@ statecompare_cohoPCT <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = D
   )
 statecompare_cohoPCT
 
-plot_labels <- popsummary_stel %>%
+plotlabels_stel <- popsummary_stel %>%
   mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
 
 statecompare_stelPCT <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
   geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 0.8) +
   geom_text(
-    data = plot_labels,
+    data = plotlabels_stel,
     aes(x = -Inf, y = -Inf, label = accuracy_label),
     color = "black",
     size = 4,              # Adjust size of text here
@@ -706,13 +706,13 @@ plotdata_stel2 <- plotdata_stel2 %>%
 plotdata_stel2 <- rbind(obs_stel, plotdata_stel2)
 
 # state compare plots w/ percentages AND uncertainty for obs and states
-plot_labels <- popsummary_chin %>%
+plotlabels_chin <- popsummary_chin %>%
   mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
 statecompare_chinOBVAR <- ggplot(plotdata_chin, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
   geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 0.8) +
   geom_text(
-    data = plot_labels,
+    data = plotlabels_chin,
     aes(x = -Inf, y = -Inf, label = accuracy_label),
     color = "black",
     size = 4,              # Adjust size of text here
@@ -728,7 +728,7 @@ statecompare_chinOBVAR <- ggplot(plotdata_chin, aes(x = Year, y = Value, color =
     labels = c("fitted" = "State Estimate", "observed" = "Observation")
   ) +
   labs(
-    title = "Chinook population time series comparison by ESU (1980-2024)",
+    title = "Chinook population time series comparison (1980-2024)",
     x = "",
     y = "ln(NOSA)",
     color = ""
@@ -746,13 +746,13 @@ statecompare_chinOBVAR <- ggplot(plotdata_chin, aes(x = Year, y = Value, color =
   )
 statecompare_chinOBVAR
 
-plot_labels <- popsummary_coho %>%
+plotlabels_coho <- popsummary_coho %>%
   mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
 statecompare_cohoOBVAR <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
   geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 0.8) +
   geom_text(
-    data = plot_labels,
+    data = plotlabels_coho,
     aes(x = -Inf, y = -Inf, label = accuracy_label),
     color = "black",
     size = 4,              # Adjust size of text here
@@ -768,7 +768,7 @@ statecompare_cohoOBVAR <- ggplot(plotdata_coho, aes(x = Year, y = Value, color =
     labels = c("fitted" = "State Estimate", "observed" = "Observation")
   ) +
   labs(
-    title = "Coho population time series comparison by ESU (1980-2024)",
+    title = "Coho population time series comparison (1980-2024)",
     x = "",
     y = "ln(NOSA)",
     color = ""
@@ -786,13 +786,13 @@ statecompare_cohoOBVAR <- ggplot(plotdata_coho, aes(x = Year, y = Value, color =
   )
 statecompare_cohoOBVAR
 
-plot_labels <- popsummary_stel %>%
+plotlabels_stel <- popsummary_stel %>%
   mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
 statecompare_stelOBVAR <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
   geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 0.8) +
   geom_text(
-    data = plot_labels,
+    data = plotlabels_stel,
     aes(x = -Inf, y = -Inf, label = accuracy_label),
     color = "black",
     size = 4,              # Adjust size of text here
@@ -808,7 +808,7 @@ statecompare_stelOBVAR <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color 
     labels = c("fitted" = "State Estimate", "observed" = "Observation")
   ) +
   labs(
-    title = "Steelhead population time series comparison by ESU (1980-2024)",
+    title = "Steelhead population time series comparison (1980-2024)",
     x = "",
     y = "ln(NOSA)",
     color = ""
@@ -825,3 +825,49 @@ statecompare_stelOBVAR <- ggplot(plotdata_stel2, aes(x = Year, y = Value, color 
     axis.title.y= element_text(size = 18)
   )
 statecompare_stelOBVAR
+
+
+## CODE TO PLOT SINGLE POPULATION OF CHOICE
+  # requires COMMONPOPNAME and dataset
+
+# specify target pop and dataset
+target_pop <- "North Umpqua"
+target_species <- plotdata_coho
+target_label <- plotlabels_coho
+
+# filter dataframes
+single_plot_data <- target_species %>% 
+  filter(COMMONPOPNAME == target_pop)
+
+single_plot_label <- target_label %>% 
+  filter(COMMONPOPNAME == target_pop)
+
+# generate single population plot
+singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 1.3) +
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    # title = paste("", target_pop),
+    title = "Coho - North Umpqua River",
+    subtitle = "1990-2024",
+    x = "",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 22),
+    plot.subtitle = element_text(size = 14, color = "gray30"),
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 16, color = "black"),
+    axis.text.y = element_text(size = 16, color = "black"),
+    axis.title.y = element_text(size = 18)
+  )
+singlepop_plot

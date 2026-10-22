@@ -117,7 +117,7 @@ chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Chinook Variance Estimates',
-       y= "ln(NOSA)") +
+       y= expression(sigma^2)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5",
@@ -147,7 +147,7 @@ chinPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
   geom_boxplot(outlier.shape = NA) +
   labs(x = NULL,
        title='Chinook Precision Estimates',
-       y= "ln(NOSA)") +
+       y= expression(sigma^-2)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5",
@@ -176,9 +176,9 @@ chinPRECISION_bplot
 
 chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
-  labs(y = 'Relative Bias (dam counts)',
+  labs(y = 'Bias',
        title='Chinook Bias and Variance',
-       x = 'Variance') +
+       x = expression(sigma^2)) +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 # "#c772c5",
                                 "#5b3c90", # mixed methods
@@ -316,7 +316,7 @@ cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Coho Variance Estimates',
-       y= "ln(NOSA)") +
+       y= expression(sigma^2)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                "#c772c5", # AUC monitoring
@@ -346,7 +346,7 @@ cohoPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
   geom_boxplot(outlier.shape = NA) +
   labs(x = NULL,
        title='Coho Precision Estimates',
-       y= "ln(NOSA)") +
+       y= expression(sigma^-2)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                 "#c772c5", # AUC monitoring
@@ -375,9 +375,9 @@ cohoPRECISION_bplot
 
 coho_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
-  labs(y = 'Relative Bias (dam counts)',
+  labs(y = 'Bias',
        title='Coho Bias and Variance',
-       x = 'Variance') +
+       x = expression(sigma^2)) +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 "#c772c5", # AUC monitoring
                                 # "#5b3c90", # mixed methods
@@ -516,7 +516,7 @@ stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   geom_boxplot() +
   labs(x = NULL,
        title='Steelhead Variance Estimates',
-       y= "ln(NOSA)") +
+       y= expression(sigma^2)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5", # AUC monitoring
@@ -547,7 +547,7 @@ stelPRECISION_bplot <- ggplot(data=df_r, aes(x = Name, y = (1/value), fill=Group
   geom_boxplot(outlier.shape = NA) +
   labs(x = NULL,
        title='Steelhead Precision Estimates',
-       y= "ln(NOSA)") +
+       y= expression(sigma^-2)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_fill_manual(values = c("#c1a13c", # dam counts
                                # "#c772c5", # AUC monitoring
@@ -577,9 +577,9 @@ stelPRECISION_bplot
 
 stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
   geom_point() +
-  labs(y = 'Relative Bias (dam counts)',
+  labs(y = 'Bias',
        title='Steelhead Bias and Variance',
-       x = 'Variance') +
+       x = expression(sigma^2)) +
   scale_color_manual(values = c("#c1a13c", # dam counts
                                 # "#c772c5", # AUC monitoring
                                 # "#5b3c90", # mixed methods
