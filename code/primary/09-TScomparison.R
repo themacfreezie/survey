@@ -831,9 +831,9 @@ statecompare_stelOBVAR
   # requires COMMONPOPNAME and dataset
 
 # specify target pop and dataset
-target_pop <- "North Umpqua"
-target_species <- plotdata_coho
-target_label <- plotlabels_coho
+target_pop <- "Upper Grande Ronde summer Steelhead"
+target_species <- plotdata_stel2
+target_label <- plotlabels_stel
 
 # filter dataframes
 single_plot_data <- target_species %>% 
@@ -853,8 +853,8 @@ singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = Value, color = Data
   ) +
   labs(
     # title = paste("", target_pop),
-    title = "Coho - North Umpqua River",
-    subtitle = "1990-2024",
+    title = "Steelhead - Upper Grande Ronde (summer)",
+    subtitle = "1980-2024",
     x = "",
     y = "ln(NOSA)",
     color = ""
@@ -862,12 +862,12 @@ singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = Value, color = Data
   theme(
     legend.position = "bottom",
     panel.grid = element_blank(),
-    plot.title = element_text(face = "bold", size = 22),
-    plot.subtitle = element_text(size = 14, color = "gray30"),
-    legend.title = element_text(size = 16),
+    plot.title = element_text(face = "bold", size = 26),
+    plot.subtitle = element_text(size = 22, color = "gray30"),
+    legend.title = element_text(size = 22),
     legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 16, color = "black"),
-    axis.text.y = element_text(size = 16, color = "black"),
-    axis.title.y = element_text(size = 18)
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y = element_text(size = 18, color = "black"),
+    axis.title.y = element_text(size = 22)
   )
 singlepop_plot

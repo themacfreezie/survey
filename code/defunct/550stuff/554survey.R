@@ -65,7 +65,8 @@ lines <- ggplot(data=methods_ct) + aes(x=year, y=Method, group=value, color=Grou
                                "#729a43",
                                "#6d85db",
                                "#4dc48f")) +
-  theme_classic()
+  theme_classic() +
+  theme(axis.text.y = element_blank())
 lines <- lines + guides(color=guide_legend(title="Method Group"))
 lines
 

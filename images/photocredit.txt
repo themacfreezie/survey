@@ -1,6 +1,8 @@
 aerial_survey - Nic McPhee
-chinook _ Bureau of Land Management
+chinook - Bureau of Land Management
+chinook2 - Olympic National Park
 coho - Animalia
+coho2 - Bureau of Land Mgmt
 columbia - Ashish Jain
 evenmore_chinook - Pacific Northwest National Laboratory
 grand coulee - Ken Lund
@@ -14,5 +16,6 @@ survey_sign - Bureau of Land Management
 wcr-recovery-map-2024 - NOAA Fisheries
 pacific-salmon-life-history-updated-2022 - NOAA Fisheries
 sitka_fishing - CoastAlaska News
+steelhead - Oregon State University
 Kwantlen - Robert Jago (Nooksack)
 Salmon_bear - Jean Beaufort

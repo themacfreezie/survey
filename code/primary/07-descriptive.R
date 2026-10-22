@@ -48,7 +48,7 @@ nosa_chin <- nosa %>% filter(CommonName=="Chinook Salmon")
 nosa_coho <- nosa %>% filter(CommonName=="Coho Salmon")
 nosa_stel <- nosa %>% filter(CommonName=="Steelhead")
 
-# 1. Combine and clean data
+# clean data
 all_data <- bind_rows(
   mutate(nosa_chin, Species = "Chinook"),
   mutate(nosa_coho, Species = "Coho"),
@@ -57,15 +57,15 @@ all_data <- bind_rows(
   filter(!is.na(NWFSC_POP_ID), NWFSC_POP_ID != 1)
     # this is sketchy but its being weird
 
-# 2. Create the shuffled global color palette
+# shuffled color palette
 set.seed(123) # Keeps your 'random' colors consistent across runs
 n_pops <- length(unique(all_data$NWFSC_POP_ID))
 rand_colors <- sample(colorRampPalette(brewer.pal(12, "Paired"))(n_pops))
 
-# 3. Plot with heavier line weights
+# plot
 ggplot(all_data, aes(x = Year, y = lnnosa, color = factor(NWFSC_POP_ID), group = NWFSC_POP_ID)) +
-  # Increased linewidth for better visibility
-  geom_line(linewidth = .75, alpha = 0.85) + 
+  # increased linewidth for better visibility
+  geom_line(linewidth = 1.25, alpha = 0.85) + 
   facet_wrap(~ Species, ncol = 1, scales = "free_y") +
   scale_color_manual(values = rand_colors) +
   theme_minimal() +
@@ -73,15 +73,15 @@ ggplot(all_data, aes(x = Year, y = lnnosa, color = factor(NWFSC_POP_ID), group =
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     legend.position = "none",
-    plot.title = element_text(size = 24, face = "bold", margin = margin(b = 10)),
-    strip.text = element_text(size = 18, face = "bold", hjust = 0),
+    plot.title = element_text(size = 26, face = "bold", margin = margin(b = 10)),
+    strip.text = element_text(size = 22, face = "bold", hjust = 0),
     axis.line = element_line(color = "black"),
-    # Make Y-axis label larger
-    axis.title.y = element_text(size = 18),
-    # Remove X-axis label (title) while keeping the years (text)
+      # make Y-axis label larger
+    axis.title.y = element_text(size = 22),
+      # remove X-axis label while keeping years
     axis.title.x = element_blank(),
-    axis.text.x = element_text(size = 14, color = "black"),
-    axis.text.y = element_text(size = 14, color = "black")
+    axis.text.x = element_text(size = 18, color = "black"),
+    axis.text.y = element_text(size = 18, color = "black")
   ) +
   labs(
     title = "Oregon salmonid populations",
