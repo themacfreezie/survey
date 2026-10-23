@@ -142,6 +142,52 @@ surveyPCT <- ggplot(
 surveyPCT <- surveyPCT + guides(fill=guide_legend(title="Method Group"))
 surveyPCT
 
+surveyLINE <- ggplot(
+  data = methods_ctGROUP,
+  aes(x = year, y = freq, colour = Group, group = Group)
+) +
+  geom_line(linewidth = 2) +
+  labs(
+    x = "",
+    y = "Number of Surveys Conducted",
+    # title = "Frequency of Salmonid Survey Methods in Oregon",
+    title = "",
+    subtitle = "1980–2022",
+    colour = "Method Group"
+  ) +
+  scale_x_continuous(
+    breaks = c(1980, 1990, 2000, 2010, 2020),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  scale_colour_manual(
+    values = c(
+      "#c1a13c", 
+      "#c772c5", 
+      "#5b3c90",
+      "#b85c37", 
+      "#b94656", 
+      "#b0457b",
+      "#729a43", 
+      "#6d85db", 
+      "#4dc48f"
+    )
+  ) +
+  theme_classic() +
+  theme(
+    # plot.title = element_text(face = "bold", size = 26),
+    plot.subtitle = element_text(size = 24, color = "black"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 24),
+    axis.text.x = element_text(size = 22, color = "black"),
+    axis.text.y = element_text(size = 22, color = "black"),
+    axis.title.y = element_text(size = 24)
+  )
+surveyLINE <- surveyLINE + guides(fill=guide_legend(title="Method Group"))
+surveyLINE
+
 ggsave(here("550", "output", "lines.png"), plot=lines, device="png", dpi=300)
 ggsave(here("550", "output", "survey.png"), plot=survey, device="png", dpi=300)
 
