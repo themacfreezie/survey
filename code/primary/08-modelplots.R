@@ -102,10 +102,11 @@ china_bplot <- ggplot(data=df_a, aes(x = value, y = Name, fill=Group)) +
   theme_classic() +
   theme(
     plot.title = element_text(face = "bold", size = 26),
-    legend.title = element_text(size = 22),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 20, color = "black"),
-    axis.text.y = element_text(size = 18, color = "black"),
+    # legend.title = element_text(size = 22),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 22),
+    axis.text.x = element_text(size = 22, color = "black"),
+    axis.text.y = element_text(size = 22, color = "black"),
     axis.title.x = element_text(size = 22),
     panel.grid = element_blank(),
     legend.position = "right"
@@ -131,12 +132,13 @@ chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
   )) +
   theme_classic() +
   theme(
-    plot.title = element_text(face = "bold", size = 28),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 18, color = "black"),
-    axis.text.y= element_text(size = 18, color = "black"),     
-      axis.title.y = element_text(size = 18),
+    plot.title = element_text(face = "bold", size = 26),
+    # legend.title = element_text(size = 22),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 22),
+    axis.text.x = element_text(size = 22, color = "black"),
+    axis.text.y = element_text(size = 22, color = "black"),
+    axis.title.x = element_text(size = 22),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -193,10 +195,11 @@ chinPRECISION_bplot <- ggplot(data=df_r, aes(x = (1/value), y = Name, fill=Group
   theme_classic() +
   theme(
     plot.title = element_text(face = "bold", size = 26),
-    legend.title = element_text(size = 22),
-    legend.text = element_text(size = 18),
-    axis.text.x = element_text(size = 20, color = "black"),
-    axis.text.y = element_text(size = 18, color = "black"),
+    # legend.title = element_text(size = 22),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 22),
+    axis.text.x = element_text(size = 22, color = "black"),
+    axis.text.y = element_text(size = 22, color = "black"),
     axis.title.x = element_text(size = 22),
     panel.grid = element_blank(),
     legend.position = "right"

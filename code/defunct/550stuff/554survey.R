@@ -94,6 +94,54 @@ survey <- ggplot(data=methods_ctGROUP) + aes(x=year, y=freq, fill=Group) +
 survey <- survey + guides(fill=guide_legend(title="Method Group"))
 survey
 
+methods_pctGROUP <- methods_ctGROUP %>%
+  group_by(year) %>%
+    mutate(percentage = freq / sum(freq) * 100) %>%
+      ungroup()
+
+surveyPCT <- ggplot(
+  data = methods_pctGROUP,
+  aes(x = year, y = percentage, fill = Group)
+) +
+  geom_area(
+    alpha = 0.6,
+    linewidth = 0.1,
+    colour = NA
+  ) +
+  labs(
+    x = "",
+    y = "Percentage of Surveys (%)",
+    title = "Proportion of Salmonid Survey Methods in Oregon",
+    subtitle = "1980–2022",
+    fill = "Method Group"
+  ) +
+  scale_x_continuous(
+    breaks = c(1980, 1990, 2000, 2010, 2020),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 100),
+    breaks = seq(0, 100, by = 20),
+    labels = function(x) paste0(x, "%"),
+    expand = c(0, 0)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "#c1a13c", 
+      "#c772c5", 
+      "#5b3c90",
+      "#b85c37", 
+      "#b94656", 
+      "#b0457b",
+      "#729a43", 
+      "#6d85db", 
+      "#4dc48f"
+    )
+  ) +
+  theme_classic()
+surveyPCT <- surveyPCT + guides(fill=guide_legend(title="Method Group"))
+surveyPCT
+
 ggsave(here("550", "output", "lines.png"), plot=lines, device="png", dpi=300)
 ggsave(here("550", "output", "survey.png"), plot=survey, device="png", dpi=300)
 

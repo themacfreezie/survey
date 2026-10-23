@@ -746,6 +746,34 @@ statecompare_chinOBVAR <- ggplot(plotdata_chin, aes(x = Year, y = Value, color =
   )
 statecompare_chinOBVAR
 
+statecompare_chinOBVARnoln <- ggplot(plotdata_chin, aes(x = Year, y = exp(Value), color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = exp(lower95), ymax = exp(upper95)), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 0.8) +
+  facet_wrap(~ COMMONPOPNAME, scales = "free_y") + 
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    title = "Chinook population time series comparison (1980-2024)",
+    x = "",
+    y = "Natural-origin Spawners",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 28),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y= element_text(size = 12, color = "black"),
+    axis.title.y= element_text(size = 18)
+  )
+statecompare_chinOBVARnoln
+
 plotlabels_coho <- popsummary_coho %>%
   mutate(accuracy_label = paste0(sprintf("%.1f", pct_within_ci), "%"))
 statecompare_cohoOBVAR <- ggplot(plotdata_coho, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
@@ -831,9 +859,9 @@ statecompare_stelOBVAR
   # requires COMMONPOPNAME and dataset
 
 # specify target pop and dataset
-target_pop <- "Upper Grande Ronde summer Steelhead"
-target_species <- plotdata_stel2
-target_label <- plotlabels_stel
+target_pop <- "Clackamas River - Spring"
+target_species <- plotdata_chin
+target_label <- plotlabels_chin
 
 # filter dataframes
 single_plot_data <- target_species %>% 
@@ -842,8 +870,39 @@ single_plot_data <- target_species %>%
 single_plot_label <- target_label %>% 
   filter(COMMONPOPNAME == target_pop)
 
-# generate single population plot
-singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = exp(Value), color = Dataset, fill = Dataset)) +
+# generate single population plot 
+singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = Value, color = Dataset, fill = Dataset)) +
+  geom_ribbon(aes(ymin = lower95, ymax = upper95), alpha = 0.2, color = NA, show.legend = FALSE) +
+  geom_line(linewidth = 1.3) +
+  theme_minimal() +
+  scale_color_manual(
+    values = c("fitted" = "#D55E00", "observed" = "#0072B2"), 
+    labels = c("fitted" = "State Estimate", "observed" = "Observation")
+  ) +
+  labs(
+    # title = paste("", target_pop),
+    title = "Chinook - Clackamas River (spring)",
+    subtitle = "1980-2024",
+    x = "",
+    # y = "ln(NOSA)",
+    y = "ln(NOSA)",
+    color = ""
+  ) +
+  theme(
+    legend.position = "bottom",
+    panel.grid = element_blank(),
+    plot.title = element_text(face = "bold", size = 26),
+    plot.subtitle = element_text(size = 24, color = "gray30"),
+    # legend.title = element_text(size = 22),
+    legend.text = element_text(size = 24),
+    axis.text.x = element_text(size = 22, color = "black"),
+    axis.text.y = element_text(size = 22, color = "black"),
+    axis.title.y = element_text(size = 24)
+  )
+singlepop_plot
+
+# generate single population plot (no log sacle)
+singlepop_plotnoln <- ggplot(single_plot_data, aes(x = Year, y = exp(Value), color = Dataset, fill = Dataset)) +
   geom_ribbon(aes(ymin = exp(lower95), ymax = exp(upper95)), alpha = 0.2, color = NA, show.legend = FALSE) +
   geom_line(linewidth = 1.3) +
   theme_minimal() +
@@ -871,4 +930,4 @@ singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = exp(Value), color =
     axis.text.y = element_text(size = 18, color = "black"),
     axis.title.y = element_text(size = 22)
   )
-singlepop_plot
+singlepop_plotnoln
