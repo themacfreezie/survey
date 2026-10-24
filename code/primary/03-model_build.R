@@ -253,6 +253,18 @@ mod_chinSCALING.list <- list(
   tinitx = 0
 )
 
+mod_chinSCALINGu.list <- list(
+  B = "identity",
+  U = "unequal",
+  Q = "equalvarcov",
+  Z = Z_chin.model,
+  A = a_chin.modelFULL,
+  R = R_chin.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
 # run MARSS model
 if(!file.exists(here::here("data", "clean", paste("ssm_chinM", scale, ".rds", sep="")))){
   ptm <- proc.time()
@@ -273,6 +285,16 @@ if(!file.exists(here::here("data", "clean", paste("ssm_chin_Afull.rds", sep=""))
 }
 # load in ssm_chin_Afull
 ssm_chin_Afull <- readRDS(file=here::here("data", "clean", paste("ssm_chin_Afull.rds", sep="")))
+
+if(!file.exists(here::here("data", "clean", paste("ssm_chin_AfullU.rds", sep="")))){
+  ptm <- proc.time()
+  ssm_chin_AfullU <- MARSS(nosa_chin, model = mod_chinSCALINGu.list, method = "kem", control = con.list)
+  saveRDS(ssm_chin_AfullU, file=here::here("data", "clean", paste("ssm_chin_AfullU.rds", sep="")))
+  chin_time_AfullU <- proc.time()[3] - ptm
+  chin_time_AfullU
+}
+# load in ssm_chin_Afull
+ssm_chin_AfullU <- readRDS(file=here::here("data", "clean", paste("ssm_chin_AfullU.rds", sep="")))
 
 ## model coho
 # constructing R and a and Z
@@ -328,6 +350,18 @@ mod_cohoSCALING.list <- list(
   tinitx = 0
 )
 
+mod_cohoSCALINGu.list <- list(
+  B = "identity",
+  U = "unequal",
+  Q = "equalvarcov",
+  Z = Z_coho.model,
+  A = a_coho.modelFULL,
+  R = R_coho.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
 # run MARSS model
 if(!file.exists(here::here("data", "clean", paste("ssm_cohoM", scale, ".rds", sep="")))){
   ptm <- proc.time()
@@ -348,6 +382,16 @@ if(!file.exists(here::here("data", "clean", paste("ssm_coho_Afull.rds", sep=""))
 }
 # load in ssm_coho_Afull
 ssm_coho_Afull <- readRDS(file=here::here("data", "clean", paste("ssm_coho_Afull.rds", sep="")))
+
+if(!file.exists(here::here("data", "clean", paste("ssm_coho_AfullU.rds", sep="")))){
+  ptm <- proc.time()
+  ssm_coho_AfullU <- MARSS(nosa_coho, model = mod_cohoSCALINGu.list, method = "kem", control = con.list)
+  saveRDS(ssm_coho_AfullU, file=here::here("data", "clean", paste("ssm_coho_AfullU.rds", sep="")))
+  coho_time_AfullU <- proc.time()[3] - ptm
+  coho_time_AfullU
+}
+# load in ssm_coho_Afull
+ssm_coho_AfullU <- readRDS(file=here::here("data", "clean", paste("ssm_coho_AfullU.rds", sep="")))
 
 ## model steelhead
 # constructing R and a and Z
@@ -403,6 +447,18 @@ mod_stelSCALING.list <- list(
   tinitx = 0
 )
 
+mod_stelSCALINGu.list <- list(
+  B = "identity",
+  U = "unequal",
+  Q = "equalvarcov",
+  Z = Z_stel.model,
+  A = a_stel.modelFULL,
+  R = R_stel.model,
+  x0 = "equal",
+  V0 = "zero",
+  tinitx = 0
+)
+
 # run MARSS model
 if(!file.exists(here::here("data", "clean", paste("ssm_stelM", scale, ".rds", sep="")))){
   ptm <- proc.time()
@@ -424,5 +480,12 @@ if(!file.exists(here::here("data", "clean", paste("ssm_stel_Afull.rds", sep=""))
 # load in ssm_stel_Afull
 ssm_stel_Afull <- readRDS(file=here::here("data", "clean", paste("ssm_stel_Afull.rds", sep="")))
 
-ssm_stel
-ssm_stel_Afull
+if(!file.exists(here::here("data", "clean", paste("ssm_stel_AfullU.rds", sep="")))){
+  ptm <- proc.time()
+  ssm_stel_AfullU <- MARSS(nosa_stel, model = mod_stelSCALINGu.list, method = "kem", control = con.list)
+  saveRDS(ssm_stel_AfullU, file=here::here("data", "clean", paste("ssm_stel_AfullU.rds", sep="")))
+  stel_time_AfullU <- proc.time()[3] - ptm
+  stel_time_AfullU
+}
+# load in ssm_stel_Afull
+ssm_stel_AfullU <- readRDS(file=here::here("data", "clean", paste("ssm_stel_AfullU.rds", sep="")))
