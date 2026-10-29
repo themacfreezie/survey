@@ -107,13 +107,6 @@ if(!file.exists(here::here("data", "clean", "ssmBOOT_stel_AfullU.rds"))){
 boot_stelU <- readRDS(file=here::here("data", "clean", "ssmBOOT_stel_AfullU.rds"))
 
 # bootstrap estimates - 1000 draws
-if(!file.exists(here::here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))){
-  boot_chinU1K <- MARSSboot(ssm_chinU, nboot=1000, output="parameters", sim = "parametric")
-  saveRDS(boot_chinU1K, file=here::here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
-}
-# load in
-boot_chinU1K <- readRDS(file=here::here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
-
 if(!file.exists(here::here("data", "clean", "ssmBOOT_coho_AfullU1K.rds"))){
   boot_cohoU1K <- MARSSboot(ssm_cohoU, nboot=1000, output="parameters", sim = "parametric")
   saveRDS(boot_cohoU1K, file=here::here("data", "clean", "ssmBOOT_coho_AfullU1K.rds"))
@@ -127,3 +120,10 @@ if(!file.exists(here::here("data", "clean", "ssmBOOT_stel_AfullU1K.rds"))){
 }  
 # load in
 boot_stelU1K <- readRDS(file=here::here("data", "clean", "ssmBOOT_stel_AfullU1K.rds"))
+
+if(!file.exists(here::here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))){
+  boot_chinU1K <- MARSSboot(ssm_chinU, nboot=1000, output="parameters", sim = "parametric")
+  saveRDS(boot_chinU1K, file=here::here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
+}
+# load in
+boot_chinU1K <- readRDS(file=here::here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
