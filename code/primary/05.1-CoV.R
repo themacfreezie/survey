@@ -10,7 +10,11 @@ load(here("data", "clean", "merged_ARdata.rda"))
 load(here("data", "clean", "mtds.Rda"))
 
 Rdata <- merge(merged_ARdata, mtds, by = c("MethodNameID"))
-Rdata <- Rdata[-c(4, 7)]
+
+# exponentiate
+Rdata$R <- exp(Rdata$R)
+Rdata$nosa <- exp(Rdata$lnnosa)
+
 Rdata$SD <- sqrt(Rdata$R)
 
 # different species
@@ -33,7 +37,7 @@ Rdata_stelLIST <- split(Rdata_stel, Rdata_stel$MethodNameID)
 
 # get method level abundance averages
 chin_avgNOSA <- sapply(Rdata_chinLIST, function(df) {
-  mean(df$lnnosa, na.rm = TRUE)
+  mean(df$nosa, na.rm = TRUE)
 })
 chin_avgNOSA <- data.frame(
   Group = names(chin_avgNOSA),
@@ -44,7 +48,7 @@ names(chin_avgNOSA) <- c("MethodNameID", "avgNOSA")
 chin_avgNOSA
 
 coho_avgNOSA <- sapply(Rdata_cohoLIST, function(df) {
-  mean(df$lnnosa, na.rm = TRUE)
+  mean(df$nosa, na.rm = TRUE)
 })
 coho_avgNOSA <- data.frame(
   Group = names(coho_avgNOSA),
@@ -55,7 +59,7 @@ names(coho_avgNOSA) <- c("MethodNameID", "avgNOSA")
 coho_avgNOSA
 
 stel_avgNOSA <- sapply(Rdata_stelLIST, function(df) {
-  mean(df$lnnosa, na.rm = TRUE)
+  mean(df$nosa, na.rm = TRUE)
 })
 stel_avgNOSA <- data.frame(
   Group = names(stel_avgNOSA),
@@ -87,7 +91,7 @@ stelCoV$PopID <- 1000
 chin_avg_list <- lapply(Rdata_chinLIST, function(df) {
   df |> 
     group_by(MethodNameID, PopID) |> 
-    summarize(avgNOSA = mean(lnnosa, na.rm = TRUE), .groups = "drop")
+    summarize(avgNOSA = mean(nosa, na.rm = TRUE), .groups = "drop")
 })
 chin_avgNOSApop <- bind_rows(chin_avg_list)
 print(chin_avgNOSApop)
@@ -95,7 +99,7 @@ print(chin_avgNOSApop)
 coho_avg_list <- lapply(Rdata_cohoLIST, function(df) {
   df |> 
     group_by(MethodNameID, PopID) |> 
-    summarize(avgNOSA = mean(lnnosa, na.rm = TRUE), .groups = "drop")
+    summarize(avgNOSA = mean(nosa, na.rm = TRUE), .groups = "drop")
 })
 coho_avgNOSApop <- bind_rows(coho_avg_list)
 print(coho_avgNOSApop)
@@ -103,7 +107,7 @@ print(coho_avgNOSApop)
 stel_avg_list <- lapply(Rdata_stelLIST, function(df) {
   df |> 
     group_by(MethodNameID, PopID) |> 
-    summarize(avgNOSA = mean(lnnosa, na.rm = TRUE), .groups = "drop")
+    summarize(avgNOSA = mean(nosa, na.rm = TRUE), .groups = "drop")
 })
 stel_avgNOSApop <- bind_rows(stel_avg_list)
 print(stel_avgNOSApop)
