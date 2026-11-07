@@ -5,13 +5,17 @@ library(reshape2)
 library(tidyverse)
 
 # load model objects
-# boot_chinM16 <- readRDS(here("data", "clean", "ssmBOOT_chinM16.rds"))
-# boot_cohoM10 <- readRDS(here("data", "clean", "ssmBOOT_cohoM10.rds"))
-# boot_stelM22 <- readRDS(here("data", "clean", "ssmBOOT_stelM22.rds"))
+# boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
+# boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU1K.rds"))
+# boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU1K.rds"))
 
 boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_Afull1K.rds"))
 boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_Afull1K.rds"))
 boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_Afull1K.rds"))
+ 
+# boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU.rds"))
+# boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU.rds"))
+# boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU.rds"))
 
 legend <- read_excel(here("data", "clean", "method_key.xlsx"), col_names = TRUE)
 legend$method <- legend$Method
