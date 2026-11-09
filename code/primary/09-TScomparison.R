@@ -11,13 +11,13 @@ here::i_am("code/primary/09-TScomparison.R")
 options(max.print=2000)
 
 # pull in data - model objects
-ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_Afull.rds"))
-ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
-ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_Afull.rds"))
+# ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_Afull.rds"))
+# ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
+# ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_Afull.rds"))
 
-# ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_AfullU.rds"))
-# ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_AfullU.rds"))
-# ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_AfullU.rds"))
+ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_AfullU.rds"))
+ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_AfullU.rds"))
+ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_AfullU.rds"))
 
 # pull in data - observed time series
 load(file=here::here("data", "clean", "nosa_chinPOP.Rda"))

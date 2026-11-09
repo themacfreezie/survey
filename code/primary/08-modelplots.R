@@ -5,19 +5,11 @@ library(reshape2)
 library(tidyverse)
 
 # load model objects
-# boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
-# boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU1K.rds"))
-# boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU1K.rds"))
-
 # boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_Afull1K.rds"))
 # boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_Afull1K.rds"))
 # boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_Afull1K.rds"))
- 
-boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU.rds"))
-# boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU.rds"))
-# boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU.rds"))
 
-# boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
+boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
 boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU1K.rds"))
 boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU1K.rds"))
 
@@ -133,7 +125,8 @@ china_bplot <- ggplot(data=df_a, aes(x = value, y = Name, fill=Group, color=Grou
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
-  scale_y_discrete(labels = function(x) str_wrap(x, width = 30))
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 30)) +
+  guides(color = guide_legend(override.aes = list(size = 5, alpha = 1))) 
 china_bplot
 
 chinr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
@@ -238,7 +231,8 @@ chinPRECISION_bplot <- ggplot(data=df_r, aes(x = (1/value), y = Name, fill=Group
     legend.position = "right"
   ) +
   coord_cartesian(xlim = c(0, 20)) +
-  scale_y_discrete(labels = function(x) str_wrap(x, width = 30))
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 30)) +
+  guides(color = guide_legend(override.aes = list(size = 5, alpha = 1))) 
 chinPRECISION_bplot
 
 chin_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
@@ -389,7 +383,8 @@ cohoa_bplot <- ggplot(data=df_a, aes(x = value, y = Name, fill=Group, color=Grou
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
-  scale_y_discrete(labels = function(x) str_wrap(x, width = 30))
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 30)) +
+  guides(color = guide_legend(override.aes = list(size = 5, alpha = 1))) 
 cohoa_bplot
 
 cohor_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
@@ -460,7 +455,8 @@ cohoPRECISION_bplot <- ggplot(data=df_r, aes(x = (1/value), y = Name, fill=Group
     legend.position = "right"
   ) +
   coord_cartesian(xlim = c(0, 20)) +
-  scale_y_discrete(labels = function(x) str_wrap(x, width = 30))
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 30)) +
+  guides(color = guide_legend(override.aes = list(size = 5, alpha = 1))) 
 cohoPRECISION_bplot
 
 coho_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +
@@ -611,7 +607,8 @@ stela_bplot <- ggplot(data=df_a, aes(x = value, y = Name, fill=Group, color=Grou
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
-  scale_y_discrete(labels = function(x) str_wrap(x, width = 30))
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 30)) +
+  guides(color = guide_legend(override.aes = list(size = 5, alpha = 1))) 
 stela_bplot
 
 stelr_bplot <- ggplot(data=df_r, aes(x = Name, y = value, fill=Group)) +
@@ -684,7 +681,8 @@ stelPRECISION_bplot <- ggplot(data=df_r, aes(x = (1/value), y = Name, fill=Group
     legend.position = "right"
   ) +
   coord_cartesian(xlim = c(0, 100)) +
-  scale_y_discrete(labels = function(x) str_wrap(x, width = 30))
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 30)) +
+  guides(color = guide_legend(override.aes = list(size = 5, alpha = 1))) 
 stelPRECISION_bplot
 
 stel_splot <- ggplot(data=points, aes(x = mean_r, y = mean_a, color = Group)) +

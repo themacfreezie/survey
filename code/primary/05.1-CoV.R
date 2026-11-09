@@ -2,7 +2,7 @@
 library(here)
 library(tidyverse)
 
-here::i_am("code/primary/05.1-CoV_redux.R")
+here::i_am("code/primary/05.1-CoV.R")
 options(max.print=2000)
 
 # load data

@@ -7,13 +7,9 @@ here::i_am("code/primary/05-ARoutput.R")
 options(max.print=2000)
 
 # pull in data
-# ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chinM16.rds"))
-# ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_cohoM10.rds"))
-# ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stelM22.rds"))
-
-ssm_chin <- readRDS(file=here::here("data", "clean", "ssm_chin_Afull.rds"))
-ssm_coho <- readRDS(file=here::here("data", "clean", "ssm_coho_Afull.rds"))
-ssm_stel <- readRDS(file=here::here("data", "clean", "ssm_stel_Afull.rds"))
+ssm_chin <- readRDS(here("data", "clean", "ssm_chin_AfullU.rds"))
+ssm_coho <- readRDS(here("data", "clean", "ssm_coho_AfullU.rds"))
+ssm_stel <- readRDS(here("data", "clean", "ssm_stel_AfullU.rds"))
 
 load(here("data", "clean", "nosa_codes.Rda"))
 nosa <- merge

@@ -24,7 +24,7 @@ W <- diag(diag(W))
 Q <- W %*% t(W)
 Q <- Q + diag(0.1, P_populations)
 
-# generate R matrix (population level process variance)
+# generate R matrix (observation variance)
 V <- matrix(runif(M_methods * M_methods, min = -1, max = 1), nrow = M_methods, ncol = M_methods)
 V <- diag(diag(V))
 R <- V %*% t(V)
@@ -53,10 +53,10 @@ w_matrix <- mvrnorm(T_steps, mu = rep(0, M_methods), Sigma = R)
   # rows = T_steps, cols = P_populations
 chosen_method_idx <- matrix(NA, nrow = T_steps, ncol = P_populations)
 
-# time step 1: randomly pick an initial method (1 to 15) for each population
+# time step 1 - initial method for each population
 chosen_method_idx[1, ] <- sample(1:M_methods, P_populations, replace = TRUE)
 
-# time steps 2 to T: Apply the 15% switching probability
+# time steps 2 to T - switching probability
 switch_prob <- 0.15
 
 for (t in 2:T_steps) {
@@ -66,20 +66,31 @@ for (t in 2:T_steps) {
   # for those staying the same, carry over the previous method index
   chosen_method_idx[t, ] <- chosen_method_idx[t - 1, ]
   
+  # if (any(will_switch)) {
+  #   # count how many populations need a new method
+  #   num_switchers <- sum(will_switch)
+  #   
+  #   # randomly select a NEW method out of the remaining 14 options for each switcher
+  #   chosen_method_idx[t, will_switch] <- replicate(num_switchers, {
+  #     prev_method <- chosen_method_idx[t - 1, will_switch]
+  #     # sample from all methods EXCEPT the previous one
+  #     sample(setdiff(1:M_methods, prev_method), 1) 
+  #   })
+  # }
+  
   if (any(will_switch)) {
-    # count how many populations need a new method
-    num_switchers <- sum(will_switch)
+    # Find the indices of the populations that will switch
+    switcher_indices <- which(will_switch)
     
-    # randomly select a NEW method out of the remaining 14 options for each switcher
-    chosen_method_idx[t, will_switch] <- replicate(num_switchers, {
-      prev_method <- chosen_method_idx[t - 1, will_switch]
-      # sample from all methods EXCEPT the previous one
-      sample(setdiff(1:M_methods, prev_method), 1) 
+    # Sample a new method for each population independently
+    chosen_method_idx[t, switcher_indices] <- sapply(switcher_indices, function(p) {
+      prev_method <- chosen_method_idx[t - 1, p]
+      sample(setdiff(1:M_methods, prev_method), 1)
     })
   }
 }
 
-# build the final 3,000-row dataframe using fast vector indexing
+# build final dataframe
 df_list <- list()
 
 for (p in 1:P_populations) {
@@ -169,11 +180,12 @@ for(i in seq(length(pops))){
   Z.model[rows$population == pops[i], i] <- 1
 }
 
-# model list
+# model list - does not include bias terms
 mod.list <- list(
   B = "identity",
   U = "zero",
-  Q = "equalvarcov",
+  # Q = "equalvarcov",
+  Q = "diagonal and unequal",
   Z = Z.model,
   A = "zero",
   R = R.model,
