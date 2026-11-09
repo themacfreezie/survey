@@ -9,13 +9,17 @@ library(tidyverse)
 # boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU1K.rds"))
 # boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU1K.rds"))
 
-boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_Afull1K.rds"))
-boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_Afull1K.rds"))
-boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_Afull1K.rds"))
+# boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_Afull1K.rds"))
+# boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_Afull1K.rds"))
+# boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_Afull1K.rds"))
  
-# boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU.rds"))
+boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU.rds"))
 # boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU.rds"))
 # boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU.rds"))
+
+# boot_chin <- readRDS(here("data", "clean", "ssmBOOT_chin_AfullU1K.rds"))
+boot_coho <- readRDS(here("data", "clean", "ssmBOOT_coho_AfullU1K.rds"))
+boot_stel <- readRDS(here("data", "clean", "ssmBOOT_stel_AfullU1K.rds"))
 
 legend <- read_excel(here("data", "clean", "method_key.xlsx"), col_names = TRUE)
 legend$method <- legend$Method
@@ -27,7 +31,7 @@ mod <- boot_chin
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(19:41)]
+df <- df[, -c(19:ncol(df))]
 df_a <- df[, -c(10:18)]
 df_r <- df[, -c(1:9)]
 
@@ -75,12 +79,15 @@ points <- replace(points, is.na(points), 0)
 df_a <- merge(df_a, legend, by = "method", all.x = TRUE, all.y = TRUE)
 df_a <- na.omit(df_a)
 df_a <- df_a[-c(1,2)]
+df_a$Name <- reorder(factor(df_a$Name), df_a$value, FUN = mean)
 
 df_r <- merge(df_r, legend, by = "method", all.x = TRUE, all.y = TRUE)
 df_r <- na.omit(df_r)
 df_r <- df_r[-c(1,2)]
 df_r[df_r < 0] <- NA
   # hessian param gen creates values less than zero for variance
+    # I'm no longer doing hessian but still good qc
+df_r$Name <- reorder(factor(df_r$Name), df_r$value, FUN = mean)
 
 points <- merge(points, legend, by = "method", all.x = TRUE, all.y = TRUE)
 points <- na.omit(points)
@@ -282,7 +289,7 @@ mod <- boot_coho
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(21:49)]
+df <- df[, -c(21:ncol(df))]
 df_a <- df[, -c(11:20)]
 df_r <- df[, -c(1:10)]
 
@@ -330,12 +337,14 @@ points <- replace(points, is.na(points), 0)
 df_a <- merge(df_a, legend, by = "method", all.x = TRUE, all.y = TRUE)
 df_a <- na.omit(df_a)
 df_a <- df_a[-c(1,2)]
+df_a$Name <- reorder(factor(df_a$Name), df_a$value, FUN = mean)
 
 df_r <- merge(df_r, legend, by = "method", all.x = TRUE, all.y = TRUE)
 df_r <- na.omit(df_r)
 df_r <- df_r[-c(1,2)]
 df_r[df_r < 0] <- NA
-# hessian param gen creates values less than zero for variance
+  # hessian param gen creates values less than zero for variance
+df_r$Name <- reorder(factor(df_r$Name), df_r$value, FUN = mean)
 
 points <- merge(points, legend, by = "method", all.x = TRUE, all.y = TRUE)
 points <- na.omit(points)
@@ -502,7 +511,7 @@ mod <- boot_stel
 # grab bootstrap parameter estimates for a & r
 df <- mod$boot.params
 df <- data.frame(t(df))
-df <- df[, -c(17:39)]
+df <- df[, -c(17:ncol(df))]
 df_a <- df[, -c(9:16)]
 df_r <- df[, -c(1:8)]
 
@@ -550,12 +559,14 @@ points <- replace(points, is.na(points), 0)
 df_a <- merge(df_a, legend, by = "method", all.x = TRUE, all.y = TRUE)
 df_a <- na.omit(df_a)
 df_a <- df_a[-c(1,2)]
+df_a$Name <- reorder(factor(df_a$Name), df_a$value, FUN = mean)
 
 df_r <- merge(df_r, legend, by = "method", all.x = TRUE, all.y = TRUE)
 df_r <- na.omit(df_r)
 df_r <- df_r[-c(1,2)]
 df_r[df_r < 0] <- NA
-# hessian param gen creates values less than zero for variance
+  # hessian param gen creates values less than zero for variance
+df_r$Name <- reorder(factor(df_r$Name), df_r$value, FUN = mean)
 
 points <- merge(points, legend, by = "method", all.x = TRUE, all.y = TRUE)
 points <- na.omit(points)
