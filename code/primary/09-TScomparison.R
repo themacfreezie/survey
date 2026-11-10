@@ -863,7 +863,7 @@ statecompare_stelOBVAR
   # requires COMMONPOPNAME and dataset
 
 # specify target pop and dataset
-target_pop <- "Clackamas River - Spring"
+target_pop <- "North Fork John Day River spring Chinook"
 target_species <- plotdata_chin
 target_label <- plotlabels_chin
 
@@ -885,10 +885,9 @@ singlepop_plot <- ggplot(single_plot_data, aes(x = Year, y = Value, color = Data
   ) +
   labs(
     # title = paste("", target_pop),
-    title = "Chinook - Clackamas River (spring)",
-    subtitle = "1980-2024",
+    title = "Chinook - N. Fork John Day River (spring)",
+    subtitle = "2000-2024",
     x = "",
-    # y = "ln(NOSA)",
     y = "ln(NOSA)",
     color = ""
   ) +
@@ -934,4 +933,4 @@ singlepop_plotnoln <- ggplot(single_plot_data, aes(x = Year, y = exp(Value), col
     axis.text.y = element_text(size = 18, color = "black"),
     axis.title.y = element_text(size = 22)
   )
-singlepop_plotnoln
+# singlepop_plotnoln
