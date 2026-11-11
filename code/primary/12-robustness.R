@@ -10,8 +10,8 @@ here::i_am("code/primary/12-robustness.R")
 options(max.print=2000)
 
 # pregame
-sim <- 5      # number of simulations to run
-resultsGENERIC <- data.frame() # store results
+sim <- 100                        # number of simulations to run
+resultsGENERIC <- data.frame()    # store results
 resultsENDOGENOUS <- data.frame() # store results
 
 # simulation params
