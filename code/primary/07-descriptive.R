@@ -110,6 +110,13 @@ chin_pops <- left_join(nosa_chin, pop_list, by = "PopID")
 chin_pops$ESAPOPNAME <- sub(".*\\((.*?)\\).*", "\\1", chin_pops$ESAPOPNAME)
 chin_pops <- chin_pops[chin_pops$ESAPOPNAME != "N/A", ]
 
+chin_pops$MethodName <- gsub(
+  "Index redd count expansion * Fish per redd estimate",
+  "Redd count expansion * Fish per redd estimate",
+  chin_pops$MethodName,
+  fixed = TRUE
+)
+
 coho_pops <- left_join(nosa_coho, pop_list, by = "PopID")
 coho_pops$ESAPOPNAME <- sub(".*\\((.*?)\\).*", "\\1", coho_pops$ESAPOPNAME)
 coho_pops <- coho_pops[coho_pops$ESAPOPNAME != "N/A", ]
@@ -117,6 +124,13 @@ coho_pops <- coho_pops[coho_pops$ESAPOPNAME != "N/A", ]
 stel_pops <- left_join(nosa_stel, pop_list, by = "PopID")
 stel_pops$ESAPOPNAME <- sub(".*\\((.*?)\\).*", "\\1", stel_pops$ESAPOPNAME)
 stel_pops <- stel_pops[stel_pops$ESAPOPNAME != "N/A", ]
+
+stel_pops$MethodName <- gsub(
+  "Index redd count expansion * Fish per redd estimate",
+  "Redd count expansion * Fish per redd estimate",
+  stel_pops$MethodName,
+  fixed = TRUE
+)
 
 # table
 ESUmethods_chin <- table(chin_pops$MethodName, chin_pops$ESAPOPNAME)
