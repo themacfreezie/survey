@@ -532,7 +532,7 @@ time
 save(results, file=here("data", "clean", "robustness_results.Rda"))
 }
 # load in
-results <- load(file=here::here("data", "clean", "robustness_results.Rda"))
+load(file=here::here("data", "clean", "robustness_results.Rda"))
 
 summary_pct <- results %>%
   group_by(model) %>%
