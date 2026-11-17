@@ -20,7 +20,7 @@ M_methods <- 15         # must be divisible by 3
 T_steps <- 40
 max <- 3                # maximum number of large/small exclusive survey methods
 
-if(!file.exists(here::here("data", "clean", "robustness_results.Rda"))){
+if(!file.exists(here::here("data", "clean", "robustness_R100.Rda"))){
 ptm <- proc.time()
 
 # begin generic loop -  1) generate data 
@@ -529,10 +529,10 @@ results <- rbind(resultsGENERIC, resultsENDOGENOUS)
 time <- proc.time()[3] - ptm
 time
 
-save(results, file=here("data", "clean", "robustness_results.Rda"))
+save(results, file=here("data", "clean", "robustness_R100.Rda"))
 }
 # load in
-load(file=here::here("data", "clean", "robustness_results.Rda"))
+load(file=here::here("data", "clean", "robustness_R100.Rda"))
 
 summary_pct <- results %>%
   group_by(model) %>%
